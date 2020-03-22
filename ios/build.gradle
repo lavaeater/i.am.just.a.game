@@ -3,7 +3,7 @@ apply plugin: 'robovm'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 ext {
-	mainClassName = "the.game.package.ios.IOSLauncher"
+	mainClassName = "the.game.ios.IOSLauncher"
 }
 
 launchIPhoneSimulator.dependsOn build

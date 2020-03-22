@@ -31,7 +31,6 @@ dependencies {
 	api "io.github.libktx:ktx-box2d:$ktxBox2dVersion"
 	api "io.github.libktx:ktx-i18n:$ktxI18nVersion"
 	api "com.rafaskoberg.gdx:typing-label:$typingLabelVersion"
-	api "com.github.tommyettinger:regexodus:$typingLabelVersion"
 	api "io.github.libktx:ktx-vis:$ktxVisVersion"
 	api "io.github.libktx:ktx-collections:$ktxCollectionsVersion"
 }

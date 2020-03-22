@@ -1,4 +1,4 @@
-package the.game.package;
+package the.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 

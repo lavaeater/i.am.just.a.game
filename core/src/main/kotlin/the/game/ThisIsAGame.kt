@@ -1,3 +1,5 @@
+package the.game
+
 import com.badlogic.gdx.Screen
 import data.GameSettings
 import ktx.app.KtxGame

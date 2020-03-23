@@ -1,5 +1,6 @@
 package injection
 
+import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Camera
@@ -11,7 +12,9 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import data.GameSettings
 import ktx.inject.Context
 import screens.MainGameScreen
-import kotlin.coroutines.coroutineContext
+import systems.FollowCameraSystem
+import systems.GameInputSystem
+import systems.RenderSystem
 
 class Injector {
 
@@ -31,6 +34,8 @@ class Injector {
                             this.inject())
                 }
 
+                bindSingleton(getEngine(this))
+
                 bindSingleton(MainGameScreen(
                         inject(), //inject InputProcessor
                         inject(), //Batch
@@ -38,8 +43,27 @@ class Injector {
                         inject(), //Engine (ashley)
                         inject() //camera
                 ))
+            }
+        }
 
-                //                bindSingleton(createWorld().apply {
+        inline fun <reified Type : Any> inject(): Type {
+            return context.inject()
+        }
+
+        private fun getEngine(context: Context) : Engine {
+            return Engine().apply {
+                addSystem(GameInputSystem(
+                        inputProcessor = context.inject(),
+                        camera = inject<Camera>() as OrthographicCamera))
+                addSystem(RenderSystem(context.inject()))
+                addSystem(FollowCameraSystem(inject()))
+            }
+        }
+    }
+}
+
+
+//                bindSingleton(createWorld().apply {
 //                    setContactListener(CollisionListener(this@register.inject()))
 //                })
 //                bindSingleton(BodyFactory(this.inject()))
@@ -61,7 +85,7 @@ class Injector {
 //                bindSingleton(TileManager())
 //                bindSingleton(Player(name = "William Hamparsomian"))
 
-                //Bind provider for a viewport with the correct settings for this game!
+//Bind provider for a viewport with the correct settings for this game!
 
 //                bindSingleton<Telegraph>(MessageTelegraph(this.inject()))
 
@@ -107,14 +131,20 @@ class Injector {
 //                        this.inject(),
 //                        this.inject(),
 //                        this.inject()))
-            }
-        }
 
-        inline fun <reified Type : Any> inject(): Type {
-            return context.inject()
-        }
-    }
-}
+
+//        addSystem(PlayerEntityDiscoverySystem())
+//        addSystem(FeatureDiscoverySystem())
+//        addSystem(RenderFeatureSystem(context.inject()))
+//        addSystem(AiSystem())
+//        addSystem(PhysicsSystem(context.inject()))
+//			  addSystem(PhysicsDebugSystem(
+//						context.inject(),
+//						context.inject()))
+//        addSystem(WorldFactsSystem())
+
+
+
 
 //bindSingleton(FactsOfTheWorld(Gdx.app.getPreferences("default"))
 //.apply {
@@ -124,27 +154,3 @@ class Injector {
 //bindSingleton(GameState())
 
 
-//private fun getEngine(context: Context) : Engine {
-//    return Engine().apply {
-//        addSystem(GameInputSystem(
-//                inputProcessor = context.inject(),
-//                gameState = context.inject()))
-//        addSystem(NpcControlSystem())
-//        addSystem(RenderMapSystem(
-//                context.inject(),
-//                context.inject(),
-//                context.inject(),
-//                true))
-//        addSystem(RenderCharactersSystem(context.inject()))
-//        addSystem(RenderFeatureSystem(context.inject()))
-//        addSystem(AiSystem())
-//        addSystem(PhysicsSystem(context.inject()))
-////			  addSystem(PhysicsDebugSystem(
-////						context.inject(),
-////						context.inject()))
-//        addSystem(WorldFactsSystem())
-//        addSystem(FollowCameraSystem(context.inject()))
-//        addSystem(PlayerEntityDiscoverySystem())
-//        addSystem(FeatureDiscoverySystem())
-//    }
-//}

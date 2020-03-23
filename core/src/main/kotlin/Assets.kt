@@ -27,17 +27,6 @@ object Assets : Disposable {
         fun load(gameSettings: GameSettings): AssetManager {
         Assets.gameSettings = gameSettings
         am = AssetManager()
-//
-//        initializeMapTiles()
-//        initializeCharacterSprites()
-//
-//        initAnimatedCharacterSprites()
-//
-//        initializeFeatureSprites()
-//
-//        initializeFonts()
-//
-//        initializeScene2dDefaultSkin()
 
         return am
     }

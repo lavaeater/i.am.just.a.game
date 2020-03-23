@@ -6,31 +6,26 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.InputProcessor
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import components.Box2dBodyComponent
 import components.KeyboardControlComponent
-import injection.Ctx
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 import ktx.math.vec2
-import managers.GameEvents
-import managers.GameState
 import java.util.*
 
 class GameInputSystem(
-    val speed: Float = 20f,
-    val inputProcessor: InputProcessor,
-    private val gameState: GameState) :
+    private val speed: Float = 20f,
+    private val inputProcessor: InputProcessor,
+    private val camera: OrthographicCamera) :
     KtxInputAdapter,
     IteratingSystem(allOf(KeyboardControlComponent::class, Box2dBodyComponent::class).get(), 45) {
 
-	val camera by lazy { Ctx.context.inject<Camera>() as OrthographicCamera}
-  var pInput = true
-  var processInput: Boolean
+  private var pInput = true
+  private var processInput: Boolean
     get() = this.pInput
     set(value) {
       this.pInput = processInput
@@ -61,21 +56,23 @@ class GameInputSystem(
 
   var y = 0f;
   var x = 0f
-  val kbCtrlMpr = mapperFor<KeyboardControlComponent>()
-  val b2bBMpr = mapperFor<Box2dBodyComponent>()
+  private val kbCtrlMpr = mapperFor<KeyboardControlComponent>()
+  private val b2bBMpr = mapperFor<Box2dBodyComponent>()
 
   var ctrlId: UUID? = null
   var ctrlBody: Body? = null
 
   override fun keyDown(keycode: Int): Boolean {
+
+    //Use keys to select which character to follow
     if(!processInput) return false
     when (keycode) {
       Input.Keys.A, Input.Keys.LEFT -> x = 1f
       Input.Keys.D, Input.Keys.RIGHT -> x = -1f
       Input.Keys.W, Input.Keys.UP -> y = -1f
       Input.Keys.S, Input.Keys.DOWN -> y = 1f
-      Input.Keys.I -> gameState.handleEvent(GameEvents.InventoryToggled)
-      Input.Keys.M -> gameState.handleEvent(GameEvents.DialogStarted) //Will be something like "NPC met" and handled by some
+//      Input.Keys.I -> gameState.handleEvent(GameEvents.InventoryToggled)
+//      Input.Keys.M -> gameState.handleEvent(GameEvents.DialogStarted) //Will be something like "NPC met" and handled by some
       Input.Keys.U -> camera.zoom+=0.05f
       Input.Keys.J -> camera.zoom-=0.05f
       //Global object or other that manages meetings, encounters and dialogs

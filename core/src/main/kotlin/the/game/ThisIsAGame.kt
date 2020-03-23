@@ -1,7 +1,10 @@
 package the.game
 
+import com.badlogic.gdx.Application
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import data.GameSettings
+import injection.Injector
 import ktx.app.KtxGame
 import screens.MainGameScreen
 
@@ -11,13 +14,13 @@ class ThisIsAGame(private val gameSettings: GameSettings = GameSettings()) : Ktx
 
 
     override fun create() {
-//        Gdx.app.logLevel = Application.LOG_ERROR
+        Gdx.app.logLevel = Application.LOG_ERROR
 
         Assets.load(gameSettings)
 
 //        VisUI.load(VisUI.SkinScale.X1)
-//        Ctx.buildContext(gameSettings)
-        mainGameScreen = MainGameScreen()
+        Injector.buildContext(gameSettings)
+        mainGameScreen = Injector.inject()
         addScreen(mainGameScreen)
         setScreen<MainGameScreen>()
     }

@@ -10,18 +10,18 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import data.GameSettings
 import ktx.inject.Context
+import screens.MainGameScreen
+import kotlin.coroutines.coroutineContext
 
 class Injector {
 
     companion object {
         val context = Context()
 
-
-
         fun buildContext(gameSettings: GameSettings) {
+
             context.register {
                 bindSingleton(gameSettings)
-
                 bindSingleton<InputProcessor>(InputMultiplexer())
                 bindSingleton<Batch>(SpriteBatch())
                 bindSingleton<Camera>(OrthographicCamera())
@@ -30,6 +30,14 @@ class Injector {
                             gameSettings.height,
                             this.inject())
                 }
+
+                bindSingleton(MainGameScreen(
+                        inject(), //inject InputProcessor
+                        inject(), //Batch
+                        inject(), //Viewport
+                        inject(), //Engine (ashley)
+                        inject() //camera
+                ))
 
                 //                bindSingleton(createWorld().apply {
 //                    setContactListener(CollisionListener(this@register.inject()))
@@ -100,6 +108,10 @@ class Injector {
 //                        this.inject(),
 //                        this.inject()))
             }
+        }
+
+        inline fun <reified Type : Any> inject(): Type {
+            return context.inject()
         }
     }
 }

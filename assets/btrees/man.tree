@@ -1,0 +1,26 @@
+#
+# Man Tree
+#
+
+# Alias definitions
+
+import goabout:"ai.GoAbout"
+import content:"ai.IsThisNpcContent"
+import hungry:"ai.IsThisNpcHungry"
+import tired:"ai.IsThisNpcTired"
+import poor:"ai.IsThisNpcPoor"
+import eat:"ai.Eat"
+import sleep:"ai.Sleep"
+
+# Tree definition (note that root is optional)
+root
+  selector
+    sequence
+      content
+      goabout
+    sequence
+      hungry
+      eat
+    sequence
+      tired
+      sleep

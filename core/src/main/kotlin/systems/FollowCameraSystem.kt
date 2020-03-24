@@ -11,7 +11,7 @@ import ktx.math.vec2
 
 class FollowCameraSystem(private val camera:Camera) : EntitySystem(300) {
 	//Lets just add another character
-	private val trackedEntity by lazy { Injector.inject<ActorFactory>().addNpcAt("Steve", vec2(1f,1f)) }
+	private val trackedEntity by lazy { Injector.inject<ActorFactory>().addNpcAt("Lars", vec2(1f,1f)) }
 	private lateinit var transformComponent: TransformComponent
 	private var needsInit = true
 	private val speed = 0.2f
@@ -19,6 +19,7 @@ class FollowCameraSystem(private val camera:Camera) : EntitySystem(300) {
 	override fun update(deltaTime: Float) {
 		if (needsInit) {
 			transformComponent = mapperFor<TransformComponent>()[trackedEntity]
+
 			needsInit = false
 		}
 		camera.position.x = MathUtils.lerp(camera.position.x, transformComponent.position.x, speed)

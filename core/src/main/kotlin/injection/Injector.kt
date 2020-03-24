@@ -15,10 +15,7 @@ import factory.BodyFactory
 import ktx.box2d.createWorld
 import ktx.inject.Context
 import screens.MainGameScreen
-import systems.FollowCameraSystem
-import systems.GameInputSystem
-import systems.RenderSystem
-import systems.TimeSystem
+import systems.*
 
 class Injector {
 
@@ -41,7 +38,7 @@ class Injector {
                     setContactListener(CollisionListener())
                 })
 
-                bindSingleton(getEngine(this))
+                bindSingleton(getEngine())
 
                 bindSingleton(BodyFactory(inject()))
 
@@ -65,16 +62,22 @@ class Injector {
             return context.inject()
         }
 
-        private fun getEngine(context: Context) : Engine {
+        private fun getEngine() : Engine {
             return Engine().apply {
                 addSystem(TimeSystem())
+                addSystem(AiSystem())
+                addSystem(NpcControlSystem())
                 addSystem(GameInputSystem(
-                        inputProcessor = context.inject(),
+                        inputProcessor = inject(),
                         camera = inject<Camera>() as OrthographicCamera))
+                addSystem(PhysicsSystem(inject()))
+                addSystem(PhysicsDebugSystem(inject(), inject()))
+
+
                 addSystem(
                         RenderSystem(
-                                context.inject(),
-                                context.inject()))
+                                inject(),
+                                inject()))
                 addSystem(FollowCameraSystem(inject()))
             }
         }

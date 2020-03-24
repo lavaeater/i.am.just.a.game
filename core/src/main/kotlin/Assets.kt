@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.utils.Disposable
 import data.GameSettings
+import java.io.Reader
 
 
 /**
@@ -51,13 +52,15 @@ object Assets : Disposable {
 
     val sprites = mutableMapOf<String, MutableMap<String, Sprite>>()
 
-
-
     private fun createAndAddSprite(spriteCollection: HashMap<String, MutableList<Sprite>>, atlas: TextureAtlas, region: TextureAtlas.AtlasRegion, width: Float, height: Float, spriteKey: String) {
         spriteCollection[spriteKey]!!.add(atlas.createSprite(region.name).apply {
                 setSize(width, height)
                 setOriginCenter()
         })
+    }
+
+    fun readerForTree(treeFileName: String): Reader {
+        return Gdx.files.internal("btrees/$treeFileName").reader()
     }
 
     override fun dispose() {

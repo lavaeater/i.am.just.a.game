@@ -3,7 +3,7 @@ package systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IntervalIteratingSystem
 import components.AiComponent
-import components.Npc
+import data.Npc
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 

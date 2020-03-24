@@ -8,9 +8,10 @@ import components.Box2dBodyComponent
 import components.NpcComponent
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
+import ktx.log.info
 import ktx.math.*
 
-class CharacterControlSystem : IteratingSystem(allOf(
+class NpcControlSystem : IteratingSystem(allOf(
     NpcComponent::class,
     Box2dBodyComponent::class).get(),10) {
 
@@ -18,8 +19,18 @@ class CharacterControlSystem : IteratingSystem(allOf(
   val bodyMpr = mapperFor<Box2dBodyComponent>()
 
   override fun processEntity(entity: Entity, deltaTime:Float) {
-    val character = npcMpr[entity].npc
+    val npc = npcMpr[entity].npc
     val body = bodyMpr[entity]!!.body
+    if(npc.onMyWay) {
+      val whereToGo = body.position + npc.thisIsWhereIWantToBe
+//      info { "${npc.name} is going to $whereToGo" }
+
+      moveFromTo(whereToGo, body)
+
+    if(whereToGo.dst(body.position) < 3f )
+      npc.iAmThereNow()
+    }
+
   }
 
   private fun moveFromTo(desiredPos: Vector2, body: Body) {

@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import components.CharacterSpriteComponent
 import components.TransformComponent
 import components.VisibleComponent
-import ktx.app.use
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
+import ktx.graphics.use
 
 class RenderSystem(
         private val batch: Batch,
@@ -38,6 +38,8 @@ class RenderSystem(
     forceSort()
     batch.projectionMatrix = camera.combined
     camera.update(true)
+
+    batch
 
     batch.use {
       super.update(deltaTime)

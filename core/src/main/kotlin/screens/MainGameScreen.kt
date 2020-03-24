@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.utils.viewport.Viewport
 import factory.ActorFactory
 import ktx.app.KtxScreen
+import ktx.math.amid
+import ktx.math.random
 import ktx.math.vec2
 import systems.GameInputSystem
 import systems.RenderSystem
@@ -65,7 +67,13 @@ class MainGameScreen(
     private var needsInit = true
     private fun initializeGame() {
         //Create an npc
-        actorFactory.addNpcAt("Steve", vec2(0f,0f))
+
+        val r = 0f amid 50f
+
+        for (i in 1..10) {
+            actorFactory.addNpcAt("Steve_$i", vec2(r.random(),r.random()))
+        }
+
         needsInit = false
     }
 }

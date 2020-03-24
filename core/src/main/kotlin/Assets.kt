@@ -1,5 +1,6 @@
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.utils.Disposable
 import data.GameSettings
@@ -13,14 +14,50 @@ object Assets : Disposable {
     lateinit var am: AssetManager
 
         fun load(gameSettings: GameSettings): AssetManager {
-        Assets.gameSettings = gameSettings
-        am = AssetManager()
+            Assets.gameSettings = gameSettings
+            am = AssetManager()
+            fixSprites()
 
-        return am
+            return am
+        }
+
+    private fun fixSprites() {
+        val atlas = textureAtlases["man"]!!
+        sprites["man"] = mutableMapOf(
+                "front" to atlas.createSprite("front").apply {
+                    setSize(4f, 4.5f)
+                    setOriginCenter()
+                },
+                "back" to atlas.createSprite("back").apply {
+                    setSize(4f, 4.5f)
+                    setOriginCenter()
+                },
+                "left" to atlas.createSprite("left").apply {
+                    setSize(4f, 4.5f)
+                    setOriginCenter()
+                },
+                "right" to atlas.createSprite("right").apply {
+                    setSize(4f, 4.5f)
+                    setOriginCenter()
+                }
+        )
     }
 
-    val sprites by lazy {
+    private val textureAtlases by lazy {
         mapOf("man" to TextureAtlas(Gdx.files.internal("sprites/man/man.txp")))
+    }
+
+
+
+    val sprites = mutableMapOf<String, MutableMap<String, Sprite>>()
+
+
+
+    private fun createAndAddSprite(spriteCollection: HashMap<String, MutableList<Sprite>>, atlas: TextureAtlas, region: TextureAtlas.AtlasRegion, width: Float, height: Float, spriteKey: String) {
+        spriteCollection[spriteKey]!!.add(atlas.createSprite(region.name).apply {
+                setSize(width, height)
+                setOriginCenter()
+        })
     }
 
     override fun dispose() {

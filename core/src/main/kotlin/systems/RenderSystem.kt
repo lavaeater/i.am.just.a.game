@@ -27,7 +27,7 @@ class RenderSystem(private val batch: Batch) :
     val spriteComponent = spriteMapper[entity]
 
     //TODO: Fix sprites
-    val sprite = Sprite() // Assets.tileSprites[spriteComponent.spriteKey]!!.entries.first().value //Just to test it
+    val sprite = Assets.sprites[spriteComponent.spriteKey]!!.entries.first().value
     sprite.setPosition(transform.position.x - sprite.width / 2, transform.position.y - sprite.height / 3)
 
     sprite.draw(batch)

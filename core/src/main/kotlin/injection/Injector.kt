@@ -18,6 +18,7 @@ import screens.MainGameScreen
 import systems.FollowCameraSystem
 import systems.GameInputSystem
 import systems.RenderSystem
+import systems.TimeSystem
 
 class Injector {
 
@@ -66,6 +67,7 @@ class Injector {
 
         private fun getEngine(context: Context) : Engine {
             return Engine().apply {
+                addSystem(TimeSystem())
                 addSystem(GameInputSystem(
                         inputProcessor = context.inject(),
                         camera = inject<Camera>() as OrthographicCamera))

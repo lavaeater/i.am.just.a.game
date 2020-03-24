@@ -23,7 +23,7 @@ class ActorFactory(
 
     val entity = engine.createEntity().apply {
       add(TransformComponent())
-//      add(AiComponent(npc.getBehaviorTree())) //Re-add this, it is needed
+      //add(AiComponent(npc.getBehaviorTree())) //Re-add this, it is needed
       add(NpcComponent(npc))
       add(CharacterSpriteComponent("man"))
       add(VisibleComponent())

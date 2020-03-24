@@ -22,7 +22,7 @@ class GameInputSystem(
     private val inputProcessor: InputProcessor,
     private val camera: OrthographicCamera) :
     KtxInputAdapter,
-    IteratingSystem(allOf(KeyboardControlComponent::class, Box2dBodyComponent::class).get(), 45) {
+    IteratingSystem(allOf(Box2dBodyComponent::class).get(), 45) {
 
   private var pInput = true
   var processInput: Boolean
@@ -41,11 +41,11 @@ class GameInputSystem(
   }
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
-    val component = kbCtrlMpr[entity]!!
-    if (ctrlId != null || ctrlId != component.id) {
-      ctrlId = component.id
-      ctrlBody = b2bBMpr[entity]!!.body
-    }
+//    val component = kbCtrlMpr[entity]!!
+//    if (ctrlId != null || ctrlId != component.id) {
+//      ctrlId = component.id
+//      ctrlBody = b2bBMpr[entity]!!.body
+//    }
   }
 
   override fun update(deltaTime: Float) {

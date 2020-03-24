@@ -26,6 +26,7 @@ class ActorFactory(
 //      add(AiComponent(npc.getBehaviorTree())) //Re-add this, it is needed
       add(NpcComponent(npc))
       add(CharacterSpriteComponent("man"))
+      add(VisibleComponent())
       add(Box2dBodyComponent(createNpcBody(position, npc)))
     }
     engine.addEntity(entity)

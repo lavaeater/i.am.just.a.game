@@ -4,12 +4,14 @@ import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.math.MathUtils
 import components.TransformComponent
-import injection.Ctx
 import ktx.ashley.mapperFor
 import factory.ActorFactory
+import injection.Injector
+import ktx.math.vec2
 
 class FollowCameraSystem(private val camera:Camera) : EntitySystem(300) {
-	private val trackedEntity by lazy { Ctx.context.inject<ActorFactory>().addHeroEntity() }
+	//Lets just add another character
+	private val trackedEntity by lazy { Injector.inject<ActorFactory>().addNpcAt("Steve", vec2(1f,1f)) }
 	private lateinit var transformComponent: TransformComponent
 	private var needsInit = true
 	private val speed = 0.2f

@@ -20,10 +20,6 @@ class MainGameScreen(
         private val camera: Camera,
         private val actorFactory: ActorFactory) : KtxScreen {
 
-//    private val gameManager by lazy { Ctx.context.inject<GameManager>() }
-//    private val gameState by lazy { Ctx.context.inject<GameState>() }
-//    private val hud by lazy {Ctx.context.inject<IUserInterface>() }
-
     init {
         Gdx.input.inputProcessor = inputProcessor
     }
@@ -33,7 +29,6 @@ class MainGameScreen(
     }
 
     override fun show() {
-//        gameState.start()
         if (needsInit)
             initializeGame()
     }
@@ -71,8 +66,6 @@ class MainGameScreen(
     private fun initializeGame() {
         //Create an npc
         actorFactory.addNpcAt("Steve", vec2(0f,0f))
-
-
         needsInit = false
     }
 }

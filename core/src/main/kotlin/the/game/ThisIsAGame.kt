@@ -14,7 +14,7 @@ class ThisIsAGame(private val gameSettings: GameSettings = GameSettings()) : Ktx
 
 
     override fun create() {
-        Gdx.app.logLevel = Application.LOG_ERROR
+        Gdx.app.logLevel = Application.LOG_INFO
 
         Assets.load(gameSettings)
 

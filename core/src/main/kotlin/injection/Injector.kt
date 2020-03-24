@@ -69,7 +69,10 @@ class Injector {
                 addSystem(GameInputSystem(
                         inputProcessor = context.inject(),
                         camera = inject<Camera>() as OrthographicCamera))
-                addSystem(RenderSystem(context.inject()))
+                addSystem(
+                        RenderSystem(
+                                context.inject(),
+                                context.inject()))
                 addSystem(FollowCameraSystem(inject()))
             }
         }

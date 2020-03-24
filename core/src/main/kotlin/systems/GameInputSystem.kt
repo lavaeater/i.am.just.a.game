@@ -16,6 +16,7 @@ import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 import ktx.math.vec2
 import java.util.*
+import ktx.log.info
 
 class GameInputSystem(
     private val speed: Float = 20f,
@@ -71,20 +72,34 @@ class GameInputSystem(
       Input.Keys.D, Input.Keys.RIGHT -> x = -1f
       Input.Keys.W, Input.Keys.UP -> y = -1f
       Input.Keys.S, Input.Keys.DOWN -> y = 1f
-//      Input.Keys.I -> gameState.handleEvent(GameEvents.InventoryToggled)
-//      Input.Keys.M -> gameState.handleEvent(GameEvents.DialogStarted) //Will be something like "NPC met" and handled by some
-      Input.Keys.U -> camera.zoom+=0.05f
-      Input.Keys.J -> camera.zoom-=0.05f
-      //Global object or other that manages meetings, encounters and dialogs
+      Input.Keys.U -> zoom(0.5f)
+      Input.Keys.J -> zoom(-0.5f)
+      Input.Keys.K -> rotateCam(5f)
+      Input.Keys.L -> rotateCam(-5f)
     }
     return true
   }
 
-  fun touchYtoScreenY(y: Int): Int {
+  private fun rotateCam(angle: Float) {
+    camera.rotate(angle)
+    logCameraStuff()
+  }
+
+  private fun logCameraStuff() {
+    info { "VPH: ${camera.viewportHeight}, Z: ${camera.zoom}" }
+  }
+
+
+  private fun zoom(zoom: Float) {
+    camera.zoom += zoom
+    logCameraStuff()
+  }
+
+  private fun touchYtoScreenY(y: Int): Int {
     return Gdx.graphics.height - 1 - y
   }
 
-  fun touchToVector(touchX: Int, touchY: Int):Vector2 {
+  private fun touchToVector(touchX: Int, touchY: Int):Vector2 {
     return vec2((Gdx.graphics.width / 2 - touchX).toFloat(), (Gdx.graphics.height / 2 - touchYtoScreenY(touchY)).toFloat()).nor()
   }
 

@@ -2,8 +2,8 @@ package systems
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.SortedIteratingSystem
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.Sprite
 import components.CharacterSpriteComponent
 import components.TransformComponent
 import components.VisibleComponent
@@ -11,8 +11,9 @@ import ktx.app.use
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 
-class RenderSystem(private val batch: Batch) :
-        SortedIteratingSystem(
+class RenderSystem(
+        private val batch: Batch,
+        private val camera: Camera) : SortedIteratingSystem(
                 allOf(CharacterSpriteComponent::class,
                         TransformComponent::class,
                         VisibleComponent::class
@@ -35,9 +36,11 @@ class RenderSystem(private val batch: Batch) :
 
   override fun update(deltaTime: Float) {
     forceSort()
+    batch.projectionMatrix = camera.combined
+    camera.update(true)
+
     batch.use {
       super.update(deltaTime)
     }
   }
-
 }

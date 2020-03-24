@@ -5,20 +5,20 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import components.Box2dBodyComponent
-import components.CharacterComponent
+import components.NpcComponent
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 import ktx.math.*
 
 class CharacterControlSystem : IteratingSystem(allOf(
-    CharacterComponent::class,
+    NpcComponent::class,
     Box2dBodyComponent::class).get(),10) {
 
-  val npcMpr = mapperFor<CharacterComponent>()
+  val npcMpr = mapperFor<NpcComponent>()
   val bodyMpr = mapperFor<Box2dBodyComponent>()
 
   override fun processEntity(entity: Entity, deltaTime:Float) {
-    val character = npcMpr[entity].character
+    val character = npcMpr[entity].npc
     val body = bodyMpr[entity]!!.body
   }
 

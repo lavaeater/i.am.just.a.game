@@ -10,6 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import data.GameSettings
+import factory.ActorFactory
+import factory.BodyFactory
+import ktx.box2d.createWorld
 import ktx.inject.Context
 import screens.MainGameScreen
 import systems.FollowCameraSystem
@@ -33,15 +36,26 @@ class Injector {
                             gameSettings.height,
                             this.inject())
                 }
+                bindSingleton(createWorld().apply {
+                    setContactListener(CollisionListener())
+                })
 
                 bindSingleton(getEngine(this))
+
+                bindSingleton(BodyFactory(inject()))
+
+                bindSingleton(ActorFactory(
+                        inject(),
+                        inject()
+                ))
 
                 bindSingleton(MainGameScreen(
                         inject(), //inject InputProcessor
                         inject(), //Batch
                         inject(), //Viewport
                         inject(), //Engine (ashley)
-                        inject() //camera
+                        inject(), //camera
+                inject() //ActorFactory
                 ))
             }
         }

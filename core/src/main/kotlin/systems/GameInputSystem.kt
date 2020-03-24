@@ -25,7 +25,7 @@ class GameInputSystem(
     IteratingSystem(allOf(KeyboardControlComponent::class, Box2dBodyComponent::class).get(), 45) {
 
   private var pInput = true
-  private var processInput: Boolean
+  var processInput: Boolean
     get() = this.pInput
     set(value) {
       this.pInput = processInput

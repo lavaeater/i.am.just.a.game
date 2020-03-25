@@ -7,9 +7,17 @@ import ktx.math.vec2
 import systems.TimeSystem
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
 
 class Npc(val name: String, val id: String) {
+    var robberySucceeded = false
+        private set
+    var robberyStarted = false
+        private set
+    var robbing: Boolean = false
+        private set
     var onMyWay: Boolean = false
         private set
 
@@ -23,42 +31,31 @@ class Npc(val name: String, val id: String) {
     val content get() = isContent()
 
     private fun isContent(): Boolean {
-        return !hangry || !sleepy || !povertyStricken
+        return !hangry && !sleepy && !povertyStricken
     }
 
     val povertyStricken get() = money < 50
     private var isEating = false
     private var isSleeping = false
     lateinit var lastCheck: LocalDateTime
-    var tiredness = 0
-    var fuel = 100
-    var money = 500
-
-
-    fun scavenge(): Boolean {
-        return true
-    }
-
-    fun lostInterest() {
-        TODO("Not yet implemented")
-    }
-
-    fun wander(): Boolean {
-        return true
-    }
-
-    fun walkTo(): Boolean {
-        return true
-    }
+    var tiredness = 50
+    var fuel = 50
+    var money = 100
 
     fun hasThereBeenOneHourSinceLastChecking() : Boolean {
-        return Duration.between(TimeSystem.currentDateTime, lastCheck).get(ChronoUnit.HOURS) > 1
+        val elapsedHours = Duration.between(lastCheck, TimeSystem.currentDateTime).toHours()
+        info { "For $name, $elapsedHours have passed since last checkin"}
+        return Duration.between(lastCheck, TimeSystem.currentDateTime).toHours() >= 1
+    }
+
+    private fun startSleeping() {
+        stopGoingAbout()
+        isSleeping=true
     }
 
     fun sleep(): Boolean {
         if(!isSleeping && sleepy) {
-            //Add check to see if we can sleep where we are - otherwise we need to get home!
-            isSleeping = true
+            startSleeping()
         }
 
         if(isSleeping && hasThereBeenOneHourSinceLastChecking()) {
@@ -74,27 +71,42 @@ class Npc(val name: String, val id: String) {
         return isSleeping
     }
 
+    private fun stopGoingAbout() {
+        onMyWay = false
+        reachedDestination = false
+    }
+
+    private fun startEating() {
+        stopGoingAbout()
+        checkin()
+        isEating = true
+    }
+
+    private fun stopEating() {
+        money -= 100
+        fuel += 100
+        isEating = false
+    }
+
     fun eat(): Boolean {
         if(!isEating) {
-            checkin()
-            isEating = true
+            startEating()
         }
         if(isEating && hasThereBeenOneHourSinceLastChecking()) {
-            money -= 100
-            fuel += 100
-            isEating = false
+            stopEating()
         }
         return isEating
     }
 
     private fun checkin() {
         lastCheck = TimeSystem.currentDateTime
+        info{"$name checked in at ${lastCheck.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))}"}
     }
 
     fun moveSomeWhere(): Boolean {
         if(!onMyWay) {
             //select target coordinate
-            val r = (0f amid 5f )
+            val r = (0f amid 20f )
 
             val x = r.random()
             val y = r.random()
@@ -110,6 +122,10 @@ class Npc(val name: String, val id: String) {
     }
 
     fun expendEnergyAndStuff() {
+        if(isEating || isSleeping) {
+            info { "$name is right now eating or sleeping and therefore not spending energy" }
+            return
+        }
         tiredness += 10
         fuel -= 10
         info { "$name has $fuel energy left, but is $tiredness tired. But there's $money kr in the pocket" }
@@ -117,6 +133,24 @@ class Npc(val name: String, val id: String) {
 
     fun iAmThereNow() {
         reachedDestination = true
+    }
+
+    fun tryToRobSomeone() {
+        if(!robbing && !robberyStarted) {
+            stopGoingAbout()
+            checkin()
+            robbing = true
+            robberyStarted = true
+        }
+    }
+
+    fun couldNotRob() {
+        robbing = false
+        robberySucceeded = false
+    }
+
+    fun stopRobbing() {
+        robberyStarted = false
     }
 }
 

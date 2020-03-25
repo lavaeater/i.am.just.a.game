@@ -9,6 +9,8 @@ import content:"ai.IsThisNpcContent"
 import hungry:"ai.IsThisNpcHungry"
 import tired:"ai.IsThisNpcTired"
 import poor:"ai.IsThisNpcPoor"
+import rob:"ai.RobSomeone"
+import suicide:"ai.CommitSuicide"
 import eat:"ai.Eat"
 import sleep:"ai.Sleep"
 
@@ -24,3 +26,7 @@ root
     sequence
       tired
       sleep
+    sequence
+      poor
+      rob
+      suicide

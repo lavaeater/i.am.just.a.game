@@ -5,7 +5,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.utils.viewport.Viewport
+import data.Npc
 import factory.ActorFactory
 import ktx.app.KtxScreen
 import ktx.math.amid
@@ -66,14 +68,14 @@ class MainGameScreen(
 
     private var needsInit = true
     private fun initializeGame() {
-        //Create an npc
-
         val r = 0f amid 50f
-
-        for (i in 1..10) {
-            actorFactory.addNpcAt("Steve_$i", vec2(r.random(),r.random()))
+        for(i in 0..20) {
+            MasterGameObjectWithStuff.npcs.add(actorFactory.addNpcAt(position =  vec2(r.random(), r.random())).first)
         }
-
         needsInit = false
     }
+}
+
+object MasterGameObjectWithStuff {
+    val npcs= mutableListOf<Npc>()
 }

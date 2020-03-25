@@ -14,12 +14,14 @@ class ActorFactory(
 		private val engine: Engine,
 		private val bodyFactory: BodyFactory) {
 
+  val names = listOf("Lars", "Sven", "Steve", "Harry", "James", "Carl", "Gene", "Alan", "Fredrick the Great", "Ivan", "Hal", "George", "Louis", "Felix")
   private fun randomNpcName() : String {
-    return "Randy"
+
+    return names.random()
   }
 
 
-  fun addNpcAt(name: String = randomNpcName(), position: Vector2): Entity {
+  fun addNpcAt(name: String = randomNpcName(), position: Vector2): Pair<Npc, Entity> {
     val npc = Npc(name, getNpcId(name))
 
     npcByKeys[npc.id] = npc
@@ -33,7 +35,7 @@ class ActorFactory(
       add(Box2dBodyComponent(createNpcBody(position, npc)))
     }
     engine.addEntity(entity)
-    return entity
+    return Pair(npc, entity)
   }
   
   private fun createNpcBody(position: Vector2, npc: Npc) : Body {

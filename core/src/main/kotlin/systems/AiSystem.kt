@@ -12,7 +12,6 @@ class AiSystem : IntervalIteratingSystem(allOf(AiComponent::class).get(), 1f, 5)
 
   override fun processEntity(entity: Entity?) {
     val aiComponent = mapper[entity]
-
     //And now we step the decision tree!
     aiComponent.behaviorTree.step()
   }

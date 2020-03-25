@@ -2,7 +2,6 @@ package ai
 
 import com.badlogic.gdx.ai.btree.LeafTask
 import com.badlogic.gdx.ai.btree.Task
-import com.badlogic.gdx.math.MathUtils
 import data.Npc
 import ktx.log.info
 
@@ -74,13 +73,29 @@ class IsThisNpcTired : LeafTask<Npc>() {
   }
 }
 
+class IsThisNpcDead : LeafTask<Npc>() {
+  override fun copyTo(task: Task<Npc>?): Task<Npc> {
+    TODO("Not yet implemented")
+  }
+
+  override fun execute(): Status {
+    return if(`object`.isDead) {
+      info { "${`object`.name} is dead"}
+      Status.SUCCEEDED
+    } else {
+      info { "${`object`.name} is alive"}
+      Status.FAILED
+    }
+  }
+}
+
 class IsThisNpcPoor : LeafTask<Npc>() {
   override fun copyTo(task: Task<Npc>?): Task<Npc> {
     TODO("Not yet implemented")
   }
 
   override fun execute(): Status {
-    return if(`object`.povertyStricken) Task.Status.SUCCEEDED else Task.Status.FAILED
+    return if(`object`.povertyStricken) Status.SUCCEEDED else Status.FAILED
   }
 }
 
@@ -94,10 +109,10 @@ class Eat : LeafTask<Npc>() {
     val npc = `object`
     return if(npc.eat()) {
       info { "${`object`.name} is now eating"}
-      Task.Status.RUNNING
+      Status.RUNNING
     } else {
       info { "${`object`.name} is finished eating"}
-      Task.Status.SUCCEEDED
+      Status.SUCCEEDED
     }
   }
 }
@@ -107,7 +122,7 @@ class Sleep : LeafTask<Npc>() {
     val npc = `object`
     return if(npc.sleep())  {
       info { "${`object`.name} is now sleeping"}
-      Task.Status.RUNNING
+      Status.RUNNING
     } else {
       info { "${`object`.name} is done sleeping"}
      Status.SUCCEEDED
@@ -134,10 +149,11 @@ class RobSomeone : LeafTask<Npc>() {
       Status.RUNNING
     } else if(npc.robberySucceeded ) {
       info { "${`object`.name} managed to rob someone"}
+      npc.resetRobbery()
       Status.SUCCEEDED
     } else {
       info { "${`object`.name} failed at robbery"}
-      npc.stopRobbing()
+      npc.resetRobbery()
       Status.FAILED
     }
   }
@@ -151,12 +167,7 @@ class CommitSuicide : LeafTask<Npc>() {
   override fun execute(): Status {
     //Eating takes one hour and costs 100
     val npc = `object`
-    return if(npc.eat()) {
-      info { "${`object`.name} is now eating"}
-      Task.Status.RUNNING
-    } else {
-      info { "${`object`.name} is finished eating"}
-      Task.Status.SUCCEEDED
-    }
+    npc.commitSuicide()
+    return Status.SUCCEEDED
   }
 }

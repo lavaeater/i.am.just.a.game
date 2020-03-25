@@ -13,10 +13,13 @@ import rob:"ai.RobSomeone"
 import suicide:"ai.CommitSuicide"
 import eat:"ai.Eat"
 import sleep:"ai.Sleep"
+import dead:"ai.IsThisNpcDead"
 
 # Tree definition (note that root is optional)
 root
   selector
+    sequence
+      dead
     sequence
       content
       goabout

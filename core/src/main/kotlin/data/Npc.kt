@@ -12,6 +12,8 @@ import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
 
 class Npc(val name: String, val id: String) {
+    var isDead = false
+        private set
     var robberySucceeded = false
         private set
     var robberyStarted = false
@@ -144,13 +146,26 @@ class Npc(val name: String, val id: String) {
         }
     }
 
-    fun couldNotRob() {
+    fun robberyFailed() {
         robbing = false
         robberySucceeded = false
     }
 
-    fun stopRobbing() {
+    fun robberyWin() {
+        robbing = false
+        robberySucceeded = true
+    }
+
+    fun resetRobbery() {
+        robbing = false
+        robberySucceeded = false
         robberyStarted = false
+    }
+
+    fun commitSuicide() {
+        info { "$name killed himself" }
+        fuel = 0
+        isDead = true
     }
 }
 

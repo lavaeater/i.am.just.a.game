@@ -68,8 +68,8 @@ class Injector {
                 addSystem(AiSystem())
                 addSystem(NpcControlSystem())
                 addSystem(GameInputSystem(
-                        inputProcessor = inject(),
-                        camera = inject<Camera>() as OrthographicCamera))
+                        inject(),
+                        inject<Camera>() as OrthographicCamera))
                 addSystem(PhysicsSystem(inject()))
                 addSystem(PhysicsDebugSystem(inject(), inject()))
                 addSystem(

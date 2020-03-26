@@ -10,7 +10,6 @@ import components.RobbingComponent
 import data.States
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
-import ktx.log.info
 import ktx.math.minus
 import ktx.math.times
 import ktx.math.vec2
@@ -27,14 +26,17 @@ class NpcControlSystem : IteratingSystem(allOf(
     val npc = npcMpr[entity].npc
 
     val body = bodyMpr[entity]!!.body
-    if (npc.npcState == States.MovingAbout) {
+    if (npc.npcState == States.OnTheMove) {
       npc.thisIsWhereIWantToBe.moveFromTo(body)
 
       if (npc.thisIsWhereIWantToBe.dst(body.position) < 3f)
-        npc.gotSomewhere()
+        npc.arrivedSomewhere()
     }
-    if(npc.npcState != States.MovingAbout)
+    if(npc.npcState != States.OnTheMove)
       body.linearVelocity = vec2(0f,0f)
+
+    if(npc.isDead)
+      engine.removeEntity(entity)
   }
 }
 
@@ -43,7 +45,7 @@ fun Body.isWithin(radius:Float, body:Body) : Boolean {
 }
 
 fun Vector2.moveFromTo(body:Body) {
-  body.linearVelocity = body.position.moveTowards(this, 5f)
+  body.linearVelocity = body.position.moveTowards(this, 10f)
 }
 
 fun Body.moveTowards(body:Body) {

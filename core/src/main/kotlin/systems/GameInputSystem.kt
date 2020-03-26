@@ -10,20 +10,25 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import components.Box2dBodyComponent
+import components.CameraFollowComponent
 import components.KeyboardControlComponent
+import components.NpcComponent
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
+import ktx.ashley.remove
 import ktx.math.vec2
 import java.util.*
 import ktx.log.info
 
 class GameInputSystem(
-    private val speed: Float = 20f,
     private val inputProcessor: InputProcessor,
-    private val camera: OrthographicCamera) :
+    private val camera: OrthographicCamera,
+    private val speed: Float = 20f) :
     KtxInputAdapter,
-    IteratingSystem(allOf(Box2dBodyComponent::class).get(), 45) {
+    IteratingSystem(allOf(NpcComponent::class).get(), 45) {
+
+  var currentEntityIndex = 0
 
   private var pInput = true
   var processInput: Boolean
@@ -42,11 +47,6 @@ class GameInputSystem(
   }
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
-//    val component = kbCtrlMpr[entity]!!
-//    if (ctrlId != null || ctrlId != component.id) {
-//      ctrlId = component.id
-//      ctrlBody = b2bBMpr[entity]!!.body
-//    }
   }
 
   override fun update(deltaTime: Float) {
@@ -58,7 +58,7 @@ class GameInputSystem(
   var y = 0f;
   var x = 0f
   private val kbCtrlMpr = mapperFor<KeyboardControlComponent>()
-  private val b2bBMpr = mapperFor<Box2dBodyComponent>()
+  private val npcComponentMapper = mapperFor<NpcComponent>()
 
   var ctrlId: UUID? = null
   var ctrlBody: Body? = null
@@ -68,8 +68,8 @@ class GameInputSystem(
     //Use keys to select which character to follow
     if(!processInput) return false
     when (keycode) {
-      Input.Keys.A, Input.Keys.LEFT -> x = 1f
-      Input.Keys.D, Input.Keys.RIGHT -> x = -1f
+      Input.Keys.A, Input.Keys.LEFT -> nextNpc()
+      Input.Keys.D, Input.Keys.RIGHT -> previousNpc()
       Input.Keys.W, Input.Keys.UP -> y = -1f
       Input.Keys.S, Input.Keys.DOWN -> y = 1f
       Input.Keys.U -> zoom(0.5f)
@@ -78,6 +78,29 @@ class GameInputSystem(
       Input.Keys.L -> rotateCam(-5f)
     }
     return true
+  }
+
+
+  val followMapper = mapperFor<CameraFollowComponent>()
+
+  private fun previousNpc() {
+    currentEntityIndex--
+    if(currentEntityIndex < 0 )
+      currentEntityIndex = entities.size()-1
+    val newEntityToFollow = entities.elementAt(currentEntityIndex)
+    entities.filter { followMapper.has(it) }.forEach { it.remove<CameraFollowComponent>() }
+    newEntityToFollow.add(CameraFollowComponent())
+   }
+
+  private fun nextNpc() {
+    currentEntityIndex++
+    if(currentEntityIndex > entities.size()-1)
+      currentEntityIndex = 0
+
+    val newEntityToFollow = entities.elementAt(currentEntityIndex)
+    entities.filter { followMapper.has(it) }.forEach { it.remove<CameraFollowComponent>() }
+
+    newEntityToFollow.add(CameraFollowComponent())
   }
 
   private fun rotateCam(angle: Float) {

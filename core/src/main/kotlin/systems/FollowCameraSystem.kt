@@ -1,26 +1,28 @@
 package systems
 
-import com.badlogic.ashley.core.EntitySystem
+import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.math.MathUtils
+import components.CameraFollowComponent
+import components.NpcComponent
 import components.TransformComponent
+import ktx.ashley.allOf
 import ktx.ashley.mapperFor
-import factory.ActorFactory
-import injection.Injector
-import ktx.math.vec2
 
-class FollowCameraSystem(private val camera:Camera) : EntitySystem(300) {
-	//Lets just add another character
-	private val trackedEntity by lazy { Injector.inject<ActorFactory>().addNpcAt(position = vec2(1f,1f)).second }
-	private lateinit var transformComponent: TransformComponent
-	private var needsInit = true
-	private val speed = 0.2f
+class FollowCameraSystem(private val camera:Camera) : IteratingSystem(allOf(CameraFollowComponent::class).get()) {
+	private val speed = 1f
 
-	override fun update(deltaTime: Float) {
-		if (needsInit) {
-			transformComponent = mapperFor<TransformComponent>()[trackedEntity]
+	private val transformMapper = mapperFor<TransformComponent>()
+	private val npcMapper = mapperFor<NpcComponent>()
 
-			needsInit = false
+	private var accTime = 0f
+	override fun processEntity(entity: Entity, deltaTime: Float) {
+		accTime += deltaTime
+		val transformComponent = transformMapper[entity]
+		if(accTime > 2f) {
+			accTime = 0f
+			npcMapper[entity].npc.log()
 		}
 		camera.position.x = MathUtils.lerp(camera.position.x, transformComponent.position.x, speed)
 		camera.position.y = MathUtils.lerp(camera.position.y, transformComponent.position.y, speed)

@@ -35,4 +35,15 @@ dependencies {
 	api "io.github.libktx:ktx-collections:$ktxCollectionsVersion"
 	api "com.rafaskoberg.gdx:typing-label:$typingLabelVersion"
 
+	testImplementation "org.spekframework.spek2:spek-dsl-jvm:$spek_version"
+	testRuntimeOnly "org.spekframework.spek2:spek-runner-junit5:$spek_version"
+
+	// spek requires kotlin-reflect, can be omitted if already in the classpath
+	testRuntimeOnly "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+}
+
+test {
+	useJUnitPlatform {
+		includeEngines 'spek2'
+	}
 }

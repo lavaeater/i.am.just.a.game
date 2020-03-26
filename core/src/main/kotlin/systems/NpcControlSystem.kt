@@ -33,6 +33,8 @@ class NpcControlSystem : IteratingSystem(allOf(
       if (npc.thisIsWhereIWantToBe.dst(body.position) < 3f)
         npc.gotSomewhere()
     }
+    if(npc.npcState != States.MovingAbout)
+      body.linearVelocity = vec2(0f,0f)
   }
 }
 

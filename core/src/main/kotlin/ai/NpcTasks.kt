@@ -15,8 +15,7 @@ class GoAbout: LeafTask<Npc>() {
     `object`.goSomeWhere()
     return when(`object`.npcState) {
       States.MovingAbout -> Status.RUNNING
-      States.Neutral -> Status.SUCCEEDED
-      else -> Status.FAILED
+      else -> Status.SUCCEEDED
     }
   }
 }
@@ -28,10 +27,8 @@ class IsThisNpcNeutral : LeafTask<Npc>() {
 
   override fun execute(): Status {
     return if(`object`.npcState == States.Neutral) {
-      info { "${`object`.name} is totally, like, fine"}
       Status.SUCCEEDED
     } else  {
-      info { "${`object`.name} is no longer feeling too hot"}
       Status.FAILED
     }
   }
@@ -63,8 +60,7 @@ class Eat : LeafTask<Npc>() {
     npc.startEating()
     return when (npc.npcState) {
         States.Eating -> Status.RUNNING
-        States.Neutral -> Status.SUCCEEDED
-        else -> Status.FAILED //What does failure even mean here?
+        else -> Status.SUCCEEDED //What does failure even mean here?
     }
   }
 }
@@ -85,8 +81,7 @@ class Sleep : LeafTask<Npc>() {
     npc.startSleeping()
     return when (npc.npcState) {
       States.Sleeping -> Status.RUNNING
-      States.Neutral -> Status.SUCCEEDED
-      else -> Status.FAILED //What does failure even mean here?
+      else -> Status.SUCCEEDED //What does failure even mean here?
     }
   }
 }
@@ -122,8 +117,7 @@ class Work : LeafTask<Npc>() {
     npc.startWorking()
     return when (npc.npcState) {
       States.Working -> Status.RUNNING
-      States.Neutral -> Status.SUCCEEDED
-      else -> Status.FAILED //What does failure even mean here?
+      else -> Status.SUCCEEDED //What does failure even mean here?
     }
   }
 }
@@ -152,8 +146,7 @@ class HaveFun : LeafTask<Npc>() {
     npc.startHavingFun()
     return when (npc.npcState) {
       States.HavingFun -> Status.RUNNING
-      States.Neutral -> Status.SUCCEEDED
-      else -> Status.FAILED //What does failure even mean here?
+      else -> Status.SUCCEEDED //What does failure even mean here?
     }
   }
 }
@@ -183,8 +176,7 @@ class Socialize : LeafTask<Npc>() {
     npc.startSocializing()
     return when (npc.npcState) {
       States.Socializing -> Status.RUNNING
-      States.Neutral -> Status.SUCCEEDED
-      else -> Status.FAILED //What does failure even mean here?
+      else -> Status.SUCCEEDED //What does failure even mean here?
     }
   }
 }

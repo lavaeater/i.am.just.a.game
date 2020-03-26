@@ -5,12 +5,6 @@ import ktx.math.amid
 import ktx.math.random
 import ktx.math.vec2
 import statemachine.StateMachine
-import systems.TimeSystem
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-
 
 /**
  * Sort of like what we're doing or something
@@ -54,21 +48,17 @@ class Npc(val name: String, val id: String) {
     var npcState : States = States.Neutral
         private set
 
+    val npcStats = NpcStats()
+
     private val npcStateMachine = StateMachine.buildStateMachine<States, Events>(States.Neutral, ::myStateHasChanged,{
         state(States.Neutral) {
             edge(Events.GotHungry, States.Hungry) {}
             edge(Events.GotTired, States.Tired) {}
-            edge(Events.GotBored, States.Bored) {}
-            edge(Events.GotPoor, States.Poor) {}
-            edge(Events.GotLonely, States.Lonely) {}
             edge(Events.GoSomewhere, States.MovingAbout) {}
         }
         state(States.MovingAbout) {
             edge(Events.GotHungry, States.Hungry) {}
             edge(Events.GotTired, States.Tired) {}
-            edge(Events.GotBored, States.Bored) {}
-            edge(Events.GotPoor, States.Poor) {}
-            edge(Events.GotLonely, States.Lonely) {}
             edge(Events.GotSomewhere, States.Neutral) {}
         }
         state(States.Hungry) {
@@ -83,32 +73,18 @@ class Npc(val name: String, val id: String) {
         state(States.Sleeping) {
             edge(Events.WakeUp, States.Neutral) {}
         }
-        state(States.Bored) {
-            edge(Events.StartHavingFun, States.HavingFun) {}
-        }
-        state(States.HavingFun) {
-            edge(Events.HadSomeFun, States.Neutral) {}
-        }
-        state(States.Poor) {
-            edge(Events.Work, States.Working) {}
-        }
-        state(States.Working) {
-            edge(Events.MadeSomeMoney, States.Neutral) {}
-        }
-        state(States.Lonely) {
-            edge(Events.StartSocializing, States.Socializing) {}
-        }
-        state(States.Socializing) {
-            edge(Events.MetSomePeople, States.Neutral) {}
-        }
     })
+
+    init {
+        npcStateMachine.initialize() //Required to make states possible
+    }
 
 
     private fun myStateHasChanged(newState: States) {
         /*
         React to new state, perhaps? Set a property!
          */
-        info { "$name is now $newState, used to be $npcState" }
+        info { "$name got $newState after $npcState, $npcStats" }
         npcState = newState
     }
 
@@ -116,19 +92,19 @@ class Npc(val name: String, val id: String) {
 
     fun timeHasPassed(minutesPassed: Long = 15) {
         val timeFactor = (60/minutesPassed).toInt()
-        //This is only for energy expenditure
-        when(npcState) {
-            States.HavingFun -> havingFun(timeFactor)
-            States.Eating -> eat(timeFactor)
-            States.Working -> work(timeFactor)
-            States.Sleeping -> sleep(timeFactor)
-            States.Socializing -> socialize(timeFactor)
-            else -> normalActivity(timeFactor)
-        }
 
+        applyCosts(timeFactor)
         checkNpcState()
+    }
 
-        info { "$name is now $npcState" }
+    private fun applyCosts(timeFactor: Int) {
+        val cost = NpcActivities.activities.first { it.state == npcState }
+
+        npcStats.fuel -= cost.fuelCost
+        npcStats.rested -= cost.restCost
+        npcStats.money -= cost.moneyCost
+        npcStats.social -= cost.socialCost
+        npcStats.boredom -= cost.boredomCost
     }
 
     private fun socialize(timeFactor: Int) {
@@ -150,76 +126,107 @@ class Npc(val name: String, val id: String) {
     }
 
     private fun checkNpcState() {
+
+        /*
+        The NPC can ever only be in one state.
+
+        The AI System is there for the NPC to select what he
+        will do next, based on the data he has about his own status.
+
+        How will that work, really?
+
+        The wrong idea here is that an Npc can only be one thing
+
+
+        The NPC can be many things - but he can only DO one thing at
+        a time.
+
+        So, the states have to be modified.
+
+        States can be several at a time, one can be hungry, starving, whatever.
+
+        These things only affect what you MIGHT do. So how do we use that
+        for the behavior tree, really?
+
+        We should read the NPC Stats to the NpcTasks and use them
+        for the odds of the NPC doing something. So "hungry" is no longer a
+        state one is in, it is a statement of FACT.
+
+        The state machine should be updated by the AI System only, I suppose,
+        to keep track of what the NPC is doing, not how he's feeling.
+         */
+
+
+
+
+
+
+
         if(fuel in lowRange) {
-            npcStateMachine.acceptEvent(Events.GotHungry)
+            if(npcState != States.Eating && npcState != States.Hungry) {
+                npcStateMachine.acceptEvent(Events.GotHungry)
+            }
             return
         }
 
         if(rested in lowRange) {
-            npcStateMachine.acceptEvent(Events.GotTired)
+            if (npcState != States.Sleeping && npcState != States.Tired) {
+                npcStateMachine.acceptEvent(Events.GotTired)
+            }
             return
         }
         if(money in lowRange) {
-            npcStateMachine.acceptEvent(Events.GotPoor)
+            if (npcState != States.Working && npcState != States.Poor) {
+                npcStateMachine.acceptEvent(Events.GotPoor)
+            }
             return
         }
+
         if(social in lowRange) {
-            npcStateMachine.acceptEvent(Events.GotLonely)
+            if (npcState != States.Socializing && npcState != States.Lonely) {
+                npcStateMachine.acceptEvent(Events.GotLonely)
+            }
             return
         }
         if(boredom in lowRange) {
-            npcStateMachine.acceptEvent(Events.GotBored)
+            if (npcState != States.HavingFun && npcState != States.Bored) {
+                npcStateMachine.acceptEvent(Events.GotBored)
+            }
             return
         }
     }
 
-    private val lowRange = Int.MIN_VALUE..24
+    private val lowRange = -24..24
     private val normalRange = 25..72
-    private val greatRange = 73..Int.MAX_VALUE //Max is more like close to 96, but wealth can take us higher, and drugs and so on
+    private val greatRange = 73..128 //Max is more like close to 96, but wealth can take us higher, and drugs and so on
     private val goodRange = normalRange + greatRange
-
-    private var rested = 72
-    private var fuel = 72
-    private var money = (64 amid 52).random()
-    private var social = 72
-    private var boredom = 72
 
 
     private fun sleep(timeFactor: Int) {
-        rested += 9 /timeFactor + 1
         if(rested in goodRange)
             npcStateMachine.acceptEvent(Events.WakeUp)
     }
 
     private fun work(timeFactor: Int) {
-        rested -= 6 / timeFactor
-        fuel -= 12 / timeFactor
-        social -= 1
-        boredom -= 12 / timeFactor
-        money += (6 amid 3).random()
         if(money in goodRange)
             npcStateMachine.acceptEvent(Events.MadeSomeMoney)
     }
 
     private fun eat(timeFactor: Int) {
-        fuel += 18 / timeFactor + 1
-        money -= 18 / timeFactor //Hmm.
         if(fuel in goodRange)
             npcStateMachine.acceptEvent(Events.FinishedEating)
     }
 
     private fun normalActivity(timeFactor: Int) {
-        rested -= 4 / timeFactor
-        fuel -= 9 / timeFactor + 1
-        social -= 2 / timeFactor + 1
-        boredom -= 6 / timeFactor
     }
 
     fun goSomeWhere() {
-        if(npcState != States.MovingAbout && npcStateMachine.acceptEvent(Events.GoSomewhere)) {
-            val r = 0f amid 100f
+        if(npcState == States.Neutral) {
+            val r = 0f amid 20f
             thisIsWhereIWantToBe = vec2(r.random(), r.random())
+            npcStateMachine.acceptEvent(Events.GoSomewhere)
         }
+
     }
 
     fun gotSomewhere() {
@@ -251,5 +258,26 @@ class Npc(val name: String, val id: String) {
         if(npcState == States.Lonely)
             npcStateMachine.acceptEvent(Events.StartSocializing)
     }
+
+
 }
 
+data class NpcStats(var fuel: Int = 72, var rested: Int = 72, var money: Int = 72, var social: Int = 72, var boredom: Int = 72)
+data class NpcActivity(val state: States, val fuelCost: Int = 4, val restCost:Int =4,val moneyCost:Int = 0, val socialCost:Int = 4, val boredomCost:Int = 4)
+
+object NpcActivities {
+    val activities = listOf(
+            NpcActivity(States.Bored),
+            NpcActivity(States.Lonely),
+            NpcActivity(States.Poor, socialCost = 6, boredomCost = 6),
+            NpcActivity(States.Tired, fuelCost = 1, restCost = 2),
+            NpcActivity(States.Hungry, fuelCost = 1, restCost = 6),
+            NpcActivity(States.HavingFun, fuelCost = 6, boredomCost = -12),
+            NpcActivity(States.Socializing, fuelCost = 6, moneyCost = 2, socialCost = -12, boredomCost = -4, restCost = 2),
+            NpcActivity(States.Working, fuelCost = 6, moneyCost = -16, socialCost = -4, boredomCost = 8, restCost = 8),
+            NpcActivity(States.Sleeping, fuelCost = 0, socialCost = 1, boredomCost = 0, restCost = 16),
+            NpcActivity(States.Eating, fuelCost = -16, socialCost = -4, boredomCost = -2, restCost = -2, moneyCost = 16),
+            NpcActivity(States.Neutral),
+            NpcActivity(States.MovingAbout, fuelCost = 8, restCost = 8, socialCost = -2, boredomCost = -2)
+    )
+}

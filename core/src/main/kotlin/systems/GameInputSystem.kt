@@ -82,17 +82,10 @@ class GameInputSystem(
 
   private fun rotateCam(angle: Float) {
     camera.rotate(angle)
-    logCameraStuff()
   }
-
-  private fun logCameraStuff() {
-    info { "VPH: ${camera.viewportHeight}, Z: ${camera.zoom}" }
-  }
-
 
   private fun zoom(zoom: Float) {
     camera.zoom += zoom
-    logCameraStuff()
   }
 
   private fun touchYtoScreenY(y: Int): Int {

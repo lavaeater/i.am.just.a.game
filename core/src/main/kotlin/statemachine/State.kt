@@ -50,6 +50,10 @@ class State<S,E>(val state: S) {
         }
     }
 
+    fun canAcceptEvent(event: E):Boolean  {
+        return edges.containsKey(event)
+    }
+
     override fun toString(): String {
         return state.toString()
     }

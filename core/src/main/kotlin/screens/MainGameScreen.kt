@@ -69,7 +69,7 @@ class MainGameScreen(
     private var needsInit = true
     private fun initializeGame() {
         val r = 0f amid 50f
-        for(i in 0..5) {
+        for(i in 0..1) {
             MasterGameObjectWithStuff.npcs.add(actorFactory.addNpcAt(position =  vec2(r.random(), r.random())).first)
         }
         needsInit = false

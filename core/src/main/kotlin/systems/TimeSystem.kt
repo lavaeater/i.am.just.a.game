@@ -31,7 +31,6 @@ class TimeSystem(startTime: Int = 6, interval: Float = 1f, private val minutesPe
 
     override fun updateInterval() {
         currentDateTime =  currentDateTime.plusMinutes(minutesPerTick)
-        info { currentDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)) }
         super.updateInterval()
     }
     companion object {

@@ -33,7 +33,7 @@ class StateMachine<S : kotlin.Enum<S>, E : kotlin.Enum<E>> private constructor(p
     /**
      * Gives the FSM an event to act upon, state is then changed and actions are performed
      */
-    fun acceptEvent(e: E) {
+    fun acceptEvent(e: E) : Boolean {
         try {
             val edge = currentState.getEdgeForEvent(e)
 
@@ -47,9 +47,11 @@ class StateMachine<S : kotlin.Enum<S>, E : kotlin.Enum<E>> private constructor(p
 
             currentState = state
             globalStateAction(currentState.state)
+            return true
         } catch (exc: NoSuchElementException) {
-            throw IllegalStateException("This state doesn't support " +
-                    "transition on ${e}")
+            return false
+//            throw IllegalStateException("This state doesn't support " +
+//                    "transition on ${e}")
         }
     }
 

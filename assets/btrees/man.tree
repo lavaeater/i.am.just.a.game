@@ -5,23 +5,23 @@
 # Alias definitions
 
 import goabout:"ai.GoAbout"
-import content:"ai.IsThisNpcContent"
+import neutral:"ai.IsThisNpcNeutral"
 import hungry:"ai.IsThisNpcHungry"
 import tired:"ai.IsThisNpcTired"
-import poor:"ai.IsThisNpcPoor"
-import rob:"ai.RobSomeone"
-import suicide:"ai.CommitSuicide"
 import eat:"ai.Eat"
 import sleep:"ai.Sleep"
-import dead:"ai.IsThisNpcDead"
+import poor:"ai.IsThisNpcPoor"
+import work:"ai.Work"
+import isBored:"ai.IsThisNpcBored"
+import haveFun:"ai.HaveFun"
+import isLonely:"ai.IsThisNpcLonely"
+import socialize:"ai.Socialize"
 
 # Tree definition (note that root is optional)
 root
   selector
     sequence
-      dead
-    sequence
-      content
+      neutral
       goabout
     sequence
       hungry
@@ -31,5 +31,10 @@ root
       sleep
     sequence
       poor
-      rob
-      suicide
+      work
+    sequence
+      isBored
+      haveFun
+    sequence
+      isLonely
+      socialize

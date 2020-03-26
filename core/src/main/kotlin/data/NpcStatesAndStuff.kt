@@ -1,87 +1,62 @@
 package data
 
-/*
-How to handle NPC state?
+import statemachine.StateMachine
 
-Every human has NEEDS
-
-food
-sex
-money
-power
-
-But not all humans have the same level of those
-NEEDS
-
-Need        Priority    Level
-affection   3          10
-fuel        1         5
-rest        2         6
-power       3          8
-wealth      No          7
-
-The needs and their level of fulfillment decide the
-actions of a human.
-
-If we need affection but get none, we will have lower fulfillment of that need
-
-Base needs will trigger DESPERATION in humans
-
-So, a humans state could be
-
-Socializing
-
-
-fatigue
-social status
-sociability
-
-Reduce
-
-Plan first!
-
- */
-
-enum class NeedsTier {
-    Survival,
-    Social,
-    Ego,
-    Actualization
+enum class Needs {
+    Fuel,
+    Rest,
+    Means,
+    Belonging
 }
 
-
-data class Need(val key:String, val tier: NeedsTier)
-
-object NeedsAndStuff {
-    const val fuel = "fuel"
-    const val love = "love"
-    const val friends = "friends"
-    const val wealth = "wealth"
-    const val rest = "rest"
-    const val power = "power"
-    const val safety = "safety"
-    const val knowledge = "knowledge"
-
-    val needs = listOf(
-            Need(fuel, NeedsTier.Survival),
-            Need(love, NeedsTier.Social),
-            Need(friends, NeedsTier.Social),
-            Need(wealth,NeedsTier.Ego),
-            Need(rest, NeedsTier.Survival),
-            Need(power,NeedsTier.Ego),
-            Need(knowledge,NeedsTier.Actualization),
-            Need(safety, NeedsTier.Survival)
-    )
+enum class NeedStatus {
+    Great,
+    Adequate,
+    Low,
+    Desperate
 }
 
-enum class NpcStateOfMind {
+enum class Traits {
+    Selfish,
+    Open
+}
+
+enum class Moods {
+    Happy,
     Content,
-    Anxious,
-    Tired,
-    Hungry,
-    Aggressive,
-    Afraid,
-    Violent,
-    Curious,
-    Friendly
+    Angry
+}
+
+enum class NeedLevel {
+    Below,
+    Normal,
+    Above
+}
+
+data class Need(val need:Needs, val needLevel: NeedLevel, var needValue: Int = 11) {
+    val needStatus : NeedStatus get() {
+        return when (needLevel) {
+            NeedLevel.Below -> when(needValue) {
+                in Int.MIN_VALUE..1 -> NeedStatus.Desperate
+                in 2..3 -> NeedStatus.Low
+                in 4..7 -> NeedStatus.Adequate
+                in 8..Int.MAX_VALUE -> NeedStatus.Great
+                else -> NeedStatus.Great
+            }
+            NeedLevel.Normal -> when(needValue) {
+                in Int.MIN_VALUE..2 -> NeedStatus.Desperate
+                in 3..5 -> NeedStatus.Low
+                in 6..9 -> NeedStatus.Adequate
+                in 10..Int.MAX_VALUE -> NeedStatus.Great
+                else -> NeedStatus.Great
+            }
+            NeedLevel.Above -> when(needValue) {
+                in Int.MIN_VALUE..3 -> NeedStatus.Desperate
+                in 4..7 -> NeedStatus.Low
+                in 5..9 -> NeedStatus.Adequate
+                in 10..Int.MAX_VALUE -> NeedStatus.Great
+                else -> NeedStatus.Great
+            }
+        }
+    }
 }

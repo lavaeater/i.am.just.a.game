@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import components.Box2dBodyComponent
 import components.NpcComponent
 import components.RobbingComponent
+import data.States
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 import ktx.log.info
@@ -24,28 +25,13 @@ class NpcControlSystem : IteratingSystem(allOf(
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val npc = npcMpr[entity].npc
-    if (npc.isDead)
-      engine.removeEntity(entity)
 
     val body = bodyMpr[entity]!!.body
-    if (npc.onMyWay) {
+    if (npc.npcState == States.MovingAbout) {
       npc.thisIsWhereIWantToBe.moveFromTo(body)
 
       if (npc.thisIsWhereIWantToBe.dst(body.position) < 3f)
-        npc.iAmThereNow()
-    }
-
-    if (npc.robbing && !robMapper.has(entity)) {
-      val potentialTargets = entities.filter { npcMpr[it].npc != npc } //Rob anyone but yourself
-      if (potentialTargets.any()) {
-        val entityToRob = potentialTargets.random()
-        val npcToRob = npcMpr[entityToRob].npc
-        info { "${npc.name} will now try to rob ${npcToRob.name}" }
-        entity.add(RobbingComponent(npc, entity, npcMpr[entityToRob].npc, entityToRob))
-      } else {
-        info { "${npc.name} could not find anyone to rob" }
-        npc.robberyFailed()
-      }
+        npc.gotSomewhere()
     }
   }
 }

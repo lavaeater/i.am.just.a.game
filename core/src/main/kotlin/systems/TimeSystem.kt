@@ -2,7 +2,6 @@ package systems
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IntervalIteratingSystem
-import com.badlogic.ashley.systems.IntervalSystem
 import components.NpcComponent
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
@@ -16,7 +15,7 @@ Keeps track of Time of day and date and stuff because fun fun!
  */
 
 
-class TimeSystem(startTime: Int = 6, interval: Float = 5f, private val minutesPerTick: Long = 60) : IntervalIteratingSystem(
+class TimeSystem(startTime: Int = 6, interval: Float = 1f, private val minutesPerTick: Long = 15) : IntervalIteratingSystem(
         allOf(NpcComponent::class).get(),
         interval) {
 
@@ -27,7 +26,7 @@ class TimeSystem(startTime: Int = 6, interval: Float = 5f, private val minutesPe
     }
 
     override fun processEntity(entity: Entity) {
-        mapper.get(entity).npc.expendEnergyAndStuff()
+        mapper.get(entity).npc.timeHasPassed(minutesPerTick)
     }
 
     override fun updateInterval() {

@@ -15,6 +15,11 @@ class CollisionListener() : ContactListener {
 
   }
 
+
+  /**
+   * Strategin att använda positioner kanske inte fungerar - vi bör använda kollisioner!
+   */
+
   override fun beginContact(contact: Contact) {
 
     //If both bodies are static, we're not interested, just return

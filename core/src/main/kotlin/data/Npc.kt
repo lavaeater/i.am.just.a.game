@@ -4,168 +4,252 @@ import ktx.log.info
 import ktx.math.amid
 import ktx.math.random
 import ktx.math.vec2
+import statemachine.StateMachine
 import systems.TimeSystem
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.time.temporal.ChronoUnit
+
+
+/**
+ * Sort of like what we're doing or something
+ */
+enum class States {
+    Neutral,
+    MovingAbout,
+    Hungry,
+    Tired,
+    Bored,
+    Poor,
+    Eating,
+    Sleeping,
+    Lonely,
+    Working,
+    HavingFun,
+    Socializing
+}
+
+enum class Events {
+    StartEating,
+    FinishedEating,
+    StartSleeping,
+    WakeUp,
+    GotLonely,
+    GotBored,
+    GotHungry,
+    GotTired,
+    GotPoor,
+    HadSomeFun,
+    MadeSomeMoney,
+    Work,
+    MetSomePeople,
+    GoSomewhere,
+    GotSomewhere,
+    StartHavingFun,
+    StartSocializing
+}
 
 class Npc(val name: String, val id: String) {
-    var isDead = false
+    var npcState : States = States.Neutral
         private set
-    var robberySucceeded = false
-        private set
-    var robberyStarted = false
-        private set
-    var robbing: Boolean = false
-        private set
-    var onMyWay: Boolean = false
-        private set
+
+    private val npcStateMachine = StateMachine.buildStateMachine<States, Events>(States.Neutral, ::myStateHasChanged,{
+        state(States.Neutral) {
+            edge(Events.GotHungry, States.Hungry) {}
+            edge(Events.GotTired, States.Tired) {}
+            edge(Events.GotBored, States.Bored) {}
+            edge(Events.GotPoor, States.Poor) {}
+            edge(Events.GotLonely, States.Lonely) {}
+            edge(Events.GoSomewhere, States.MovingAbout) {}
+        }
+        state(States.MovingAbout) {
+            edge(Events.GotHungry, States.Hungry) {}
+            edge(Events.GotTired, States.Tired) {}
+            edge(Events.GotBored, States.Bored) {}
+            edge(Events.GotPoor, States.Poor) {}
+            edge(Events.GotLonely, States.Lonely) {}
+            edge(Events.GotSomewhere, States.Neutral) {}
+        }
+        state(States.Hungry) {
+            edge(Events.StartEating, States.Eating) {}
+        }
+        state(States.Eating) {
+            edge(Events.FinishedEating, States.Neutral) {}
+        }
+        state(States.Tired) {
+            edge(Events.StartSleeping, States.Sleeping) {}
+        }
+        state(States.Sleeping) {
+            edge(Events.WakeUp, States.Neutral) {}
+        }
+        state(States.Bored) {
+            edge(Events.StartHavingFun, States.HavingFun) {}
+        }
+        state(States.HavingFun) {
+            edge(Events.HadSomeFun, States.Neutral) {}
+        }
+        state(States.Poor) {
+            edge(Events.Work, States.Working) {}
+        }
+        state(States.Working) {
+            edge(Events.MadeSomeMoney, States.Neutral) {}
+        }
+        state(States.Lonely) {
+            edge(Events.StartSocializing, States.Socializing) {}
+        }
+        state(States.Socializing) {
+            edge(Events.MetSomePeople, States.Neutral) {}
+        }
+    })
+
+
+    private fun myStateHasChanged(newState: States) {
+        /*
+        React to new state, perhaps? Set a property!
+         */
+        info { "$name is now $newState, used to be $npcState" }
+        npcState = newState
+    }
 
     var thisIsWhereIWantToBe = vec2(0f,0f)
-    var reachedDestination: Boolean = false
-        private set
 
-    val hangry get() =  fuel < 20
-    val sleepy get() = tiredness > 80
-    val rested get() = tiredness < 30
-    val content get() = isContent()
-
-    private fun isContent(): Boolean {
-        return !hangry && !sleepy && !povertyStricken
-    }
-
-    val povertyStricken get() = money < 50
-    private var isEating = false
-    private var isSleeping = false
-    lateinit var lastCheck: LocalDateTime
-    var tiredness = 50
-    var fuel = 50
-    var money = 100
-
-    fun hasThereBeenOneHourSinceLastChecking() : Boolean {
-        val elapsedHours = Duration.between(lastCheck, TimeSystem.currentDateTime).toHours()
-        info { "For $name, $elapsedHours have passed since last checkin"}
-        return Duration.between(lastCheck, TimeSystem.currentDateTime).toHours() >= 1
-    }
-
-    private fun startSleeping() {
-        stopGoingAbout()
-        isSleeping=true
-    }
-
-    fun sleep(): Boolean {
-        if(!isSleeping && sleepy) {
-            startSleeping()
+    fun timeHasPassed(minutesPassed: Long = 15) {
+        val timeFactor = (60/minutesPassed).toInt()
+        //This is only for energy expenditure
+        when(npcState) {
+            States.HavingFun -> havingFun(timeFactor)
+            States.Eating -> eat(timeFactor)
+            States.Working -> work(timeFactor)
+            States.Sleeping -> sleep(timeFactor)
+            States.Socializing -> socialize(timeFactor)
+            else -> normalActivity(timeFactor)
         }
 
-        if(isSleeping && hasThereBeenOneHourSinceLastChecking()) {
-            tiredness -= 10
-        }
+        checkNpcState()
 
-        if(isSleeping && rested && (1..2).random() == 2)
-            isSleeping = false
-
-        if(isSleeping && tiredness <= 0) {
-            isSleeping = false
-        }
-        return isSleeping
+        info { "$name is now $npcState" }
     }
 
-    private fun stopGoingAbout() {
-        onMyWay = false
-        reachedDestination = false
+    private fun socialize(timeFactor: Int) {
+        rested -= 6 / timeFactor
+        fuel -= 4 / timeFactor + 1
+        social += 9 / timeFactor + 1
+        boredom += 4 / timeFactor
+        if(social in goodRange)
+            npcStateMachine.acceptEvent(Events.MetSomePeople)
     }
 
-    private fun startEating() {
-        stopGoingAbout()
-        checkin()
-        isEating = true
+    private fun havingFun(timeFactor: Int) {
+        rested -= 6 / timeFactor
+        fuel -= 9 / timeFactor + 1
+        social += 2 / timeFactor + 1
+        boredom += 12 / timeFactor
+        if(boredom in goodRange)
+            npcStateMachine.acceptEvent(Events.HadSomeFun)
     }
 
-    private fun stopEating() {
-        money -= 100
-        fuel += 100
-        isEating = false
-    }
-
-    fun eat(): Boolean {
-        if(!isEating) {
-            startEating()
-        }
-        if(isEating && hasThereBeenOneHourSinceLastChecking()) {
-            stopEating()
-        }
-        return isEating
-    }
-
-    private fun checkin() {
-        lastCheck = TimeSystem.currentDateTime
-        info{"$name checked in at ${lastCheck.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))}"}
-    }
-
-    fun moveSomeWhere(): Boolean {
-        if(!onMyWay) {
-            //select target coordinate
-            val r = (0f amid 20f )
-
-            val x = r.random()
-            val y = r.random()
-
-            thisIsWhereIWantToBe = vec2(x,y)
-            onMyWay = true
-        }
-        if(reachedDestination) {
-            onMyWay = false
-            reachedDestination = false
-        }
-        return onMyWay
-    }
-
-    fun expendEnergyAndStuff() {
-        if(isEating || isSleeping) {
-            info { "$name is right now eating or sleeping and therefore not spending energy" }
+    private fun checkNpcState() {
+        if(fuel in lowRange) {
+            npcStateMachine.acceptEvent(Events.GotHungry)
             return
         }
-        tiredness += 10
-        fuel -= 10
-        info { "$name has $fuel energy left, but is $tiredness tired. But there's $money kr in the pocket" }
-    }
 
-    fun iAmThereNow() {
-        reachedDestination = true
-    }
-
-    fun tryToRobSomeone() {
-        if(!robbing && !robberyStarted) {
-            stopGoingAbout()
-            checkin()
-            robbing = true
-            robberyStarted = true
+        if(rested in lowRange) {
+            npcStateMachine.acceptEvent(Events.GotTired)
+            return
+        }
+        if(money in lowRange) {
+            npcStateMachine.acceptEvent(Events.GotPoor)
+            return
+        }
+        if(social in lowRange) {
+            npcStateMachine.acceptEvent(Events.GotLonely)
+            return
+        }
+        if(boredom in lowRange) {
+            npcStateMachine.acceptEvent(Events.GotBored)
+            return
         }
     }
 
-    fun robberyFailed() {
-        robbing = false
-        robberySucceeded = false
+    private val lowRange = Int.MIN_VALUE..24
+    private val normalRange = 25..72
+    private val greatRange = 73..Int.MAX_VALUE //Max is more like close to 96, but wealth can take us higher, and drugs and so on
+    private val goodRange = normalRange + greatRange
+
+    private var rested = 72
+    private var fuel = 72
+    private var money = (64 amid 52).random()
+    private var social = 72
+    private var boredom = 72
+
+
+    private fun sleep(timeFactor: Int) {
+        rested += 9 /timeFactor + 1
+        if(rested in goodRange)
+            npcStateMachine.acceptEvent(Events.WakeUp)
     }
 
-    fun robberyWin() {
-        robbing = false
-        robberySucceeded = true
+    private fun work(timeFactor: Int) {
+        rested -= 6 / timeFactor
+        fuel -= 12 / timeFactor
+        social -= 1
+        boredom -= 12 / timeFactor
+        money += (6 amid 3).random()
+        if(money in goodRange)
+            npcStateMachine.acceptEvent(Events.MadeSomeMoney)
     }
 
-    fun resetRobbery() {
-        robbing = false
-        robberySucceeded = false
-        robberyStarted = false
+    private fun eat(timeFactor: Int) {
+        fuel += 18 / timeFactor + 1
+        money -= 18 / timeFactor //Hmm.
+        if(fuel in goodRange)
+            npcStateMachine.acceptEvent(Events.FinishedEating)
     }
 
-    fun commitSuicide() {
-        info { "$name killed himself" }
-        fuel = 0
-        isDead = true
+    private fun normalActivity(timeFactor: Int) {
+        rested -= 4 / timeFactor
+        fuel -= 9 / timeFactor + 1
+        social -= 2 / timeFactor + 1
+        boredom -= 6 / timeFactor
+    }
+
+    fun goSomeWhere() {
+        if(npcState != States.MovingAbout && npcStateMachine.acceptEvent(Events.GoSomewhere)) {
+            val r = 0f amid 100f
+            thisIsWhereIWantToBe = vec2(r.random(), r.random())
+        }
+    }
+
+    fun gotSomewhere() {
+        //Just try to change to neutral...
+        npcStateMachine.acceptEvent(Events.GotSomewhere)
+    }
+
+    fun startEating() {
+        if(npcState == States.Hungry)
+           npcStateMachine.acceptEvent(Events.StartEating)
+    }
+
+    fun startSleeping() {
+        if(npcState == States.Tired)
+            npcStateMachine.acceptEvent(Events.StartSleeping)
+    }
+
+    fun startWorking() {
+        if(npcState == States.Poor)
+            npcStateMachine.acceptEvent(Events.Work)
+    }
+
+    fun startHavingFun() {
+        if(npcState == States.Bored)
+            npcStateMachine.acceptEvent(Events.StartHavingFun)
+    }
+
+    fun startSocializing() {
+        if(npcState == States.Lonely)
+            npcStateMachine.acceptEvent(Events.StartSocializing)
     }
 }
 

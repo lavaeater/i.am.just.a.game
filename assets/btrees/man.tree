@@ -8,16 +8,42 @@ import goabout:"ai.GoAbout"
 import neutral:"ai.IsThisNpcNeutral"
 import tired:"ai.IsThisNpcTired"
 import sleep:"ai.Sleep"
-import hungry:"ai.IsThisNpcHungry"
-import eat:"ai.Eat"
 import poor:"ai.IsThisNpcPoor"
+import canWork:"ai.CanWork"
+import moveToWork:"ai.MoveToWork"
+import canSleep:"ai.CanSleep"
+import moveToSleep:"ai.MoveToSleep"
 import work:"ai.Work"
 import bored:"ai.IsThisNpcBored"
 import haveFun:"ai.HaveFun"
 import lonely:"ai.IsThisNpcLonely"
 import socialize:"ai.MeetPeople"
+import hungry:"ai.IsThisNpcHungry"
+import canEat:"ai.CanEat"
+import moveToEat:"ai.MoveToEat"
+import eat:"ai.Eat"
 
-# Tree definition (note that root is optional)
+subtree name:"eatingTree"
+    sequence
+        selector
+            canEat
+            moveToEat
+        eat
+
+subtree name:"workingTree"
+    sequence
+        selector
+            canWork
+            moveToWork
+        work
+
+subtree name:"sleepingTree"
+    sequence
+        selector
+            canSleep
+            moveToSleep
+        sleep
+
 root
     selector
       sequence
@@ -25,16 +51,16 @@ root
         goabout
       sequence
         hungry
-        eat
+        $eatingTree
       sequence
         tired
-        sleep
+        $sleepingTree
       sequence
         bored
         haveFun
       sequence
         poor
-        work
+        $workingTree
       sequence
         lonely
         socialize

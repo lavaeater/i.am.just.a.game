@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
+import ktx.box2d.filter
 
 class BodyFactory(private val world: World) {
   fun createBody(width: Float,
@@ -20,6 +21,10 @@ class BodyFactory(private val world: World) {
       type = bodyType
       box(width, height) {
         density = densityIn
+        filter {
+          categoryBits = 0x01
+          maskBits = 0x02
+        }
       }
     }
     return body

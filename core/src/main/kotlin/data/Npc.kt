@@ -1,9 +1,10 @@
 package data
 
+import com.badlogic.gdx.math.Vector2
 import ktx.math.amid
 import ktx.math.random
 import ktx.math.vec2
-import screens.MasterGameObjectWithStuff
+import screens.Mgo
 import statemachine.StateMachine
 
 /**
@@ -16,7 +17,10 @@ enum class States {
     Sleeping,
     Working,
     HavingFun,
-    Socializing
+    Socializing,
+    GoingToEat,
+    GoingToWork,
+    GoingHomeToSleep
 }
 
 enum class Events {
@@ -26,7 +30,10 @@ enum class Events {
     LeftSomewhere,
     StartedHavingFun,
     StartedSocializing,
-    StoppedDoingIt
+    StoppedDoingIt,
+    WentToEat,
+    WentToWork,
+    WentHomeToSleep
 }
 
 object RR {
@@ -34,8 +41,11 @@ object RR {
 }
 
 class Npc(val name: String, val id: String) {
-    val workplace = MasterGameObjectWithStuff.workPlaces.keys.random()
-    val homeCoord = vec2(MasterGameObjectWithStuff.cr.random(), MasterGameObjectWithStuff.cr.random())
+    lateinit var currentPosition: Vector2
+    val workplace = Mgo.workPlaces.keys.random()
+    val homeCoord = Mgo.homeAreas.random()
+
+    val onTheMove get() = npcState in NpcDataAndStuff.movingStates
 
     var isDead = false
         private set
@@ -58,6 +68,9 @@ class Npc(val name: String, val id: String) {
             edge(Events.LeftSomewhere, States.OnTheMove) {}
             edge(Events.FellAsleep, States.Sleeping) {}
             edge(Events.StartedEating, States.Eating) {}
+            edge(Events.WentToEat, States.GoingToEat) {}
+            edge(Events.WentToWork, States.GoingToWork) {}
+            edge(Events.WentHomeToSleep, States.GoingHomeToSleep) {}
             edge(Events.StartedHavingFun, States.HavingFun) {}
             edge(Events.StartedSocializing, States.Socializing) {}
             edge(Events.StartedWorking, States.Working) {}
@@ -75,6 +88,15 @@ class Npc(val name: String, val id: String) {
             edge(Events.StoppedDoingIt, States.Neutral) {}
         }
         state(States.Eating) {
+            edge(Events.StoppedDoingIt, States.Neutral) {}
+        }
+        state(States.GoingToEat) {
+            edge(Events.StoppedDoingIt, States.Neutral) {}
+        }
+        state(States.GoingToWork) {
+            edge(Events.StoppedDoingIt, States.Neutral) {}
+        }
+        state(States.GoingHomeToSleep) {
             edge(Events.StoppedDoingIt, States.Neutral) {}
         }
         state(States.Sleeping) {
@@ -180,7 +202,7 @@ class Npc(val name: String, val id: String) {
     fun goSomeWhere() {
         if (npcState == States.Neutral) {
 
-            thisIsWhereIWantToBe = vec2(MasterGameObjectWithStuff.cr.random(), MasterGameObjectWithStuff.cr.random())
+            thisIsWhereIWantToBe = vec2(Mgo.workPlaceRange.random(), Mgo.workPlaceRange.random())
             npcStateMachine.acceptEvent(Events.LeftSomewhere)
         }
     }
@@ -222,6 +244,32 @@ class Npc(val name: String, val id: String) {
         stopDoingIt()
         npcStateMachine.acceptEvent(Events.StartedHavingFun)
     }
+
+    fun goToEatAt(restaurant: Vector2) {
+        if(npcState != States.GoingToEat) {
+            stopDoingIt()
+            thisIsWhereIWantToBe = restaurant
+            npcStateMachine.acceptEvent(Events.WentToEat)
+        }
+    }
+
+    fun goToWork() {
+        if(npcState != States.GoingToWork) {
+            stopDoingIt()
+            thisIsWhereIWantToBe = Mgo.workPlaces[workplace]!!
+            npcStateMachine.acceptEvent(Events.WentToWork)
+        }
+    }
+
+    fun goHomeToSleep() {
+        if(npcState != States.GoingHomeToSleep) {
+            stopDoingIt()
+            thisIsWhereIWantToBe = homeCoord
+            npcStateMachine.acceptEvent(Events.WentHomeToSleep)
+        }
+    }
+
+
 }
 
 data class NpcStats(var fuel: Int = 72, var rested: Int = 72, var money: Int = 72, var social: Int = 72, var boredom: Int = 72)
@@ -242,12 +290,15 @@ class NpcActivity(
 object NpcDataAndStuff {
     val activities = listOf(
             NpcActivity(States.HavingFun, fuel = 6, boredom = -12),
-            NpcActivity(States.Socializing, fuel = 6, money = 2, social = -12, boredom = -2, rest = 2),
-            NpcActivity(States.Working, fuel = 6, money = -16, social = 6, boredom = 16, rest = 8),
-            NpcActivity(States.Sleeping, fuel = 0, social = 2, boredom = 0, rest = -16),
-            NpcActivity(States.Eating, fuel = -16, social = -2, boredom = 8, rest = -2, money = 16),
+            NpcActivity(States.Socializing, fuel = 2, money = 2, social = -12, boredom = -2, rest = 2),
+            NpcActivity(States.Working, fuel = 6, money = -16, social = 2, boredom = 16, rest = 8),
+            NpcActivity(States.Sleeping, fuel = 0, social = 0, boredom = 0, rest = -16),
+            NpcActivity(States.Eating, fuel = -16, social = 0, boredom = 8, rest = -2, money = 16),
             NpcActivity(States.Neutral),
-            NpcActivity(States.OnTheMove, fuel = 8, rest = 8, social = 2, boredom = -2)
+            NpcActivity(States.OnTheMove, fuel = 8, rest = 8, social = 2, boredom = -2),
+            NpcActivity(States.GoingToEat, fuel = 0, rest = 0, social = 0, boredom = 0),
+            NpcActivity(States.GoingToWork, fuel = 0, rest = 0, social = 0, boredom = 0, money = 2),
+            NpcActivity(States.GoingHomeToSleep, fuel = 0, rest = 0, social = 0, boredom = 0, money = 0)
     )
 
     val needs = mapOf(
@@ -264,6 +315,13 @@ object NpcDataAndStuff {
             States.HavingFun to Needs.Fun.toString(),
             States.Sleeping to Needs.Rest.toString(),
             States.Eating to Needs.Fuel.toString()
+    )
+
+    val movingStates = setOf(
+            States.OnTheMove,
+            States.GoingToEat,
+            States.GoingToWork,
+            States.GoingHomeToSleep
     )
 }
 

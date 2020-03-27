@@ -15,7 +15,7 @@ Keeps track of Time of day and date and stuff because fun fun!
  */
 
 
-class TimeSystem(startTime: Int = 6, interval: Float = 3f, private val minutesPerTick: Long = 15) : IntervalIteratingSystem(
+class TimeSystem(startTime: Int = 6, interval: Float = 10f, private val minutesPerTick: Long = 15) : IntervalIteratingSystem(
         allOf(NpcComponent::class).get(),
         interval) {
 

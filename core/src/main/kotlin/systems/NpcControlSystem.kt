@@ -20,19 +20,21 @@ class NpcControlSystem : IteratingSystem(allOf(
 
   private val npcMpr = mapperFor<NpcComponent>()
   private val bodyMpr = mapperFor<Box2dBodyComponent>()
-  private val robMapper = mapperFor<RobbingComponent>()
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val npc = npcMpr[entity].npc
 
     val body = bodyMpr[entity]!!.body
-    if (npc.npcState == States.OnTheMove) {
+    if (npc.onTheMove) {
       npc.thisIsWhereIWantToBe.moveFromTo(body)
 
-      if (npc.thisIsWhereIWantToBe.dst(body.position) < 3f)
+      if (npc.thisIsWhereIWantToBe.dst(body.position) < 0.5f)
         npc.stopDoingIt()
     }
-    if(npc.npcState != States.OnTheMove)
+
+    npc.currentPosition = body.position
+
+    if(!npc.onTheMove)
       body.linearVelocity = vec2(0f,0f)
 
     if(npc.isDead)
@@ -45,7 +47,7 @@ fun Body.isWithin(radius:Float, body:Body) : Boolean {
 }
 
 fun Vector2.moveFromTo(body:Body) {
-  body.linearVelocity = body.position.moveTowards(this, 10f)
+  body.linearVelocity = body.position.moveTowards(this, 20f)
 }
 
 fun Body.moveTowards(body:Body) {

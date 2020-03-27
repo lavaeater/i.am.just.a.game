@@ -86,7 +86,8 @@ class GameInputSystem(
   private fun previousNpc() {
     currentEntityIndex--
     if(currentEntityIndex < 0 )
-      currentEntityIndex = entities.size()-1
+      currentEntityIndex = entities.indexOf(entities.last())
+
     val newEntityToFollow = entities.elementAt(currentEntityIndex)
     entities.filter { followMapper.has(it) }.forEach { it.remove<CameraFollowComponent>() }
     newEntityToFollow.add(CameraFollowComponent())

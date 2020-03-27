@@ -14,16 +14,16 @@ class FollowCameraSystem(private val camera:Camera) : IteratingSystem(allOf(Came
 	private val speed = 1f
 
 	private val transformMapper = mapperFor<TransformComponent>()
-	private val npcMapper = mapperFor<NpcComponent>()
+//	private val npcMapper = mapperFor<NpcComponent>()
 
 	private var accTime = 0f
 	override fun processEntity(entity: Entity, deltaTime: Float) {
-		accTime += deltaTime
+//		accTime += deltaTime
 		val transformComponent = transformMapper[entity]
-		if(accTime > 2f) {
-			accTime = 0f
-			npcMapper[entity].npc.log()
-		}
+//		if(accTime > 2f) {
+//			accTime = 0f
+//			npcMapper[entity].npc.log()
+//		}
 		camera.position.x = MathUtils.lerp(camera.position.x, transformComponent.position.x, speed)
 		camera.position.y = MathUtils.lerp(camera.position.y, transformComponent.position.y, speed)
 		camera.update(true)

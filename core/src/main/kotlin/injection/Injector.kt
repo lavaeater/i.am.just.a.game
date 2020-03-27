@@ -71,7 +71,6 @@ class Injector {
                         inject(),
                         inject<Camera>() as OrthographicCamera))
                 addSystem(PhysicsSystem(inject()))
-                addSystem(PhysicsDebugSystem(inject(), inject()))
                 addSystem(
                         RenderSystem(
                                 inject(),

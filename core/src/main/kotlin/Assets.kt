@@ -23,34 +23,33 @@ object Assets : Disposable {
         }
 
     private fun fixSprites() {
-        val atlas = textureAtlases["man"]!!
-        sprites["man"] = mutableMapOf(
-                "front" to atlas.createSprite("front").apply {
-                    setSize(4f, 4.5f)
-                    setOriginCenter()
-                },
-                "back" to atlas.createSprite("back").apply {
-                    setSize(4f, 4.5f)
-                    setOriginCenter()
-                },
-                "left" to atlas.createSprite("left").apply {
-                    setSize(4f, 4.5f)
-                    setOriginCenter()
-                },
-                "right" to atlas.createSprite("right").apply {
-                    setSize(4f, 4.5f)
-                    setOriginCenter()
-                }
-        )
+
+        //All of this could be converted into one giant nice little map call. This is fine for now.
+        val manAtlas = textureAtlases["man"] ?: error("No man atlas found, that's an issue")
+        sprites["man"] = manAtlas.regions.map {
+            it.name to manAtlas.createSprite(it.name).apply {
+                setSize(4f, 4.5f)
+                setOriginCenter()
+            }
+        }.toMap()
+
+        val needAtlas = textureAtlases["needs"] ?: error("No atlas for needs found, this is bad")
+        sprites["needs"] = needAtlas.regions.map {
+            it.name to needAtlas.createSprite(it.name).apply {
+                setSize(1f, 1f)
+                setOriginCenter()
+            }
+        }.toMap()
     }
 
     private val textureAtlases by lazy {
-        mapOf("man" to TextureAtlas(Gdx.files.internal("sprites/man/man.txp")))
+        mapOf("man" to TextureAtlas(Gdx.files.internal("sprites/man/man.txp")),
+        "needs" to TextureAtlas(Gdx.files.internal("sprites/needs/needs.txp")))
     }
 
 
 
-    val sprites = mutableMapOf<String, MutableMap<String, Sprite>>()
+    val sprites = mutableMapOf<String, Map<String, Sprite>>()
 
     private fun createAndAddSprite(spriteCollection: HashMap<String, MutableList<Sprite>>, atlas: TextureAtlas, region: TextureAtlas.AtlasRegion, width: Float, height: Float, spriteKey: String) {
         spriteCollection[spriteKey]!!.add(atlas.createSprite(region.name).apply {

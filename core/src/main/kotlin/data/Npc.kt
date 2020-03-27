@@ -49,7 +49,7 @@ class Npc(val name: String, val id: String) {
         private set
 
     private val _npcNeeds = mutableSetOf<NpcNeed>()
-    private val npcNeeds: List<NpcNeed>
+    val npcNeeds: List<NpcNeed>
         get() {
             return _npcNeeds.toList().sortedBy { it.priority }
         }
@@ -304,6 +304,14 @@ object NpcDataAndStuff {
             Needs.Money to NpcNeed(Needs.Money, 3),
             Needs.Fun to NpcNeed(Needs.Fun, 4),
             Needs.Social to NpcNeed(Needs.Social, 4)
+    )
+
+    val statesToNeeds = mapOf(
+            States.Socializing to Needs.Social.toString(),
+            States.Working to Needs.Money.toString(),
+            States.HavingFun to Needs.Fun.toString(),
+            States.Sleeping to Needs.Rest.toString(),
+            States.Eating to Needs.Fuel.toString()
     )
 }
 

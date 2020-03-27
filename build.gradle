@@ -3,7 +3,7 @@ buildscript {
 		mavenLocal()
 		mavenCentral()
 		google()
-		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+//		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 		jcenter()
 	}
 	dependencies {
@@ -33,7 +33,7 @@ subprojects {
 	repositories {
 		mavenLocal()
 		mavenCentral()
-		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+//		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 		maven { url 'https://jitpack.io' }
 		jcenter()
 	}

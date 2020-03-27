@@ -1,6 +1,5 @@
 package data
 
-import ktx.log.info
 import ktx.math.amid
 import ktx.math.random
 import ktx.math.vec2
@@ -21,17 +20,12 @@ enum class States {
 
 enum class Events {
     StartedEating,
-    StoppedEating,
     FellAsleep,
-    WokeUp,
-    HadSomeFun,
-    MadeSomeMoney,
     StartedWorking,
-    MetSomePeople,
     LeftSomewhere,
-    Arrived,
     StartedHavingFun,
-    StartedSocializing
+    StartedSocializing,
+    StoppedDoingIt
 }
 
 object RR {
@@ -64,40 +58,27 @@ class Npc(val name: String, val id: String) {
             edge(Events.StartedWorking, States.Working) {}
         }
         state(States.OnTheMove) {
-            edge(Events.Arrived, States.Neutral) {}
-            edge(Events.FellAsleep, States.Sleeping) {}
-            edge(Events.StartedEating, States.Eating) {}
-            edge(Events.StartedHavingFun, States.Eating) {}
-            edge(Events.StartedWorking, States.Eating) {}
-            edge(Events.StartedSocializing, States.Eating) {}
+            edge(Events.StoppedDoingIt, States.Neutral) {}
         }
         state(States.HavingFun) {
-            edge(Events.FellAsleep, States.Sleeping) {}
-            edge(Events.StartedEating, States.Eating) {}
-            edge(Events.HadSomeFun, States.Neutral) {}
+            edge(Events.StoppedDoingIt, States.Neutral) {}
         }
         state(States.Working) {
-            edge(Events.FellAsleep, States.Sleeping) {}
-            edge(Events.StartedEating, States.Eating) {}
-            edge(Events.MadeSomeMoney, States.Neutral) {}
+            edge(Events.StoppedDoingIt, States.Neutral) {}
         }
         state(States.Socializing) {
-            edge(Events.FellAsleep, States.Sleeping) {}
-            edge(Events.StartedEating, States.Eating) {}
-            edge(Events.MetSomePeople, States.Neutral) {}
+            edge(Events.StoppedDoingIt, States.Neutral) {}
         }
         state(States.Eating) {
-            edge(Events.StoppedEating, States.Neutral) {}
-            edge(Events.FellAsleep, States.Sleeping) {}
+            edge(Events.StoppedDoingIt, States.Neutral) {}
         }
         state(States.Sleeping) {
-            edge(Events.WokeUp, States.Neutral) {}
+            edge(Events.StoppedDoingIt, States.Neutral) {}
         }
     })
 
     init {
         npcStateMachine.initialize() //Required to make states possible
-        info { "$name is ALIVE! Stats: $npcStats" }
     }
 
 
@@ -181,7 +162,6 @@ class Npc(val name: String, val id: String) {
         }
         //Die
         if(npcStats.fuel <= lowRange.first + 1) {
-            info { "$name just died. Geez. Stats: $npcStats"}
             isDead = true
         }
     }
@@ -194,26 +174,20 @@ class Npc(val name: String, val id: String) {
 
     fun goSomeWhere() {
         if (npcState == States.Neutral) {
-            val r = 0f amid 500f
+            val r = 0f amid 128f
             thisIsWhereIWantToBe = vec2(r.random(), r.random())
             npcStateMachine.acceptEvent(Events.LeftSomewhere)
         }
     }
 
-    fun arrivedSomewhere() {
-        if(npcState == States.OnTheMove)
-            npcStateMachine.acceptEvent(Events.Arrived)
+    fun stopDoingIt() {
+        if(npcState != States.Neutral)
+            npcStateMachine.acceptEvent(Events.StoppedDoingIt)
     }
 
     fun startSleeping() {
-        if(npcState != States.Sleeping)
-            npcStateMachine.acceptEvent(Events.FellAsleep)
-    }
-
-    fun stopSleeping() {
-        if(npcState == States.Sleeping) {
-            npcStateMachine.acceptEvent(Events.WokeUp)
-        }
+        stopDoingIt()
+        npcStateMachine.acceptEvent(Events.FellAsleep)
     }
 
     fun hasNeed(need: Needs) : Boolean {
@@ -221,56 +195,29 @@ class Npc(val name: String, val id: String) {
     }
 
     fun startEating() {
-        if(npcState != States.Eating) {
-            npcStateMachine.acceptEvent(Events.StartedEating)
-        }
-    }
-
-    fun stopEating() {
-        if(npcState == States.Eating)
-            npcStateMachine.acceptEvent(Events.StoppedEating)
+        stopDoingIt()
+        npcStateMachine.acceptEvent(Events.StartedEating)
     }
 
     fun hasAnyNeeds(): Boolean {
         return npcNeeds.any()
     }
 
-    fun log() {
-        info { "$name is $npcState, stats: $npcStats, needs: $npcNeeds" }
-    }
-
     fun startWorking() {
-        if(npcState != States.Working) {
-            npcStateMachine.acceptEvent(Events.StartedWorking)
-        }
-    }
-    fun stopWorking() {
-        if(npcState == States.Working)
-            npcStateMachine.acceptEvent(Events.MadeSomeMoney)
+        stopDoingIt()
+        npcStateMachine.acceptEvent(Events.StartedWorking)
     }
 
     fun startSocializing() {
-        if(npcState != States.Socializing) {
-            npcStateMachine.acceptEvent(Events.StartedSocializing)
-        }
-    }
-    fun stopSocializing() {
-        if(npcState == States.Socializing)
-            npcStateMachine.acceptEvent(Events.MetSomePeople)
+        stopDoingIt()
+        npcStateMachine.acceptEvent(Events.StartedSocializing)
     }
 
     fun startHavingFun() {
-        if(npcState != States.HavingFun) {
-            npcStateMachine.acceptEvent(Events.StartedHavingFun)
-        }
+        stopDoingIt()
+        npcStateMachine.acceptEvent(Events.StartedHavingFun)
     }
-    fun stopHavingFun() {
-        if(npcState == States.HavingFun)
-            npcStateMachine.acceptEvent(Events.HadSomeFun)
-    }
-
 }
-
 
 data class NpcStats(var fuel: Int = 72, var rested: Int = 72, var money: Int = 72, var social: Int = 72, var boredom: Int = 72)
 class NpcActivity(
@@ -290,12 +237,12 @@ class NpcActivity(
 object NpcDataAndStuff {
     val activities = listOf(
             NpcActivity(States.HavingFun, fuel = 6, boredom = -12),
-            NpcActivity(States.Socializing, fuel = 6, money = 2, social = -12, boredom = -4, rest = 2),
-            NpcActivity(States.Working, fuel = 6, money = -16, social = -4, boredom = 8, rest = 8),
+            NpcActivity(States.Socializing, fuel = 6, money = 2, social = -12, boredom = -2, rest = 2),
+            NpcActivity(States.Working, fuel = 6, money = -16, social = 6, boredom = 16, rest = 8),
             NpcActivity(States.Sleeping, fuel = 0, social = 2, boredom = 0, rest = -16),
-            NpcActivity(States.Eating, fuel = -16, social = -4, boredom = -2, rest = -2, money = 16),
+            NpcActivity(States.Eating, fuel = -16, social = -2, boredom = 8, rest = -2, money = 16),
             NpcActivity(States.Neutral),
-            NpcActivity(States.OnTheMove, fuel = 8, rest = 8, social = -2, boredom = -2)
+            NpcActivity(States.OnTheMove, fuel = 8, rest = 8, social = 2, boredom = -2)
     )
 
     val needs = mapOf(
@@ -303,7 +250,7 @@ object NpcDataAndStuff {
             Needs.Rest to NpcNeed(Needs.Rest, 2),
             Needs.Money to NpcNeed(Needs.Money, 3),
             Needs.Fun to NpcNeed(Needs.Fun, 4),
-            Needs.Social to NpcNeed(Needs.Social, 4)
+            Needs.Social to NpcNeed(Needs.Social, 5)
     )
 
     val statesToNeeds = mapOf(
@@ -326,6 +273,6 @@ enum class Needs {
 
 data class NpcNeed(val need: Needs, val priority: Int)
 
-fun List<NpcNeed>.has(need: Needs, topNeed: Boolean = true) : Boolean {
-    return if(topNeed) this.firstOrNull()?.need == need else this.any { it.need == need }
+fun List<NpcNeed>.has(need: Needs) : Boolean {
+    return this.firstOrNull()?.need == need
 }

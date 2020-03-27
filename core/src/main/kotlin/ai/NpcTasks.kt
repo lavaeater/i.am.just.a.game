@@ -22,10 +22,7 @@ class GoAbout: LeafTask<Npc>() {
     val npc = `object`
     npc.goSomeWhere()
     return when {
-        npc.hasAnyNeeds() -> {
-//          info { "${npc.name} has some needs and should stop moving about" }
-          Status.FAILED
-        }
+        npc.hasAnyNeeds() -> Status.FAILED
         npc.npcState == States.OnTheMove -> Status.RUNNING
         else -> Status.SUCCEEDED
     }
@@ -40,10 +37,7 @@ class IsThisNpcNeutral : LeafTask<Npc>() {
   override fun execute(): Status {
     val npc = `object`
     return when {
-      npc.hasAnyNeeds() -> {
-//        info { "${npc.name} has some needs and is absolutely not neutral anymore" }
-        Status.FAILED
-      }
+      npc.hasAnyNeeds() ->  Status.FAILED
       npc.npcState == States.Neutral -> Status.SUCCEEDED
       else -> Status.FAILED
     }
@@ -70,11 +64,13 @@ class Sleep : LeafTask<Npc>() {
     //Eating takes one hour and costs 100
     val npc = `object`
 
-    npc.startSleeping()
+    if(npc.hasNeed(Needs.Rest))
+      npc.startSleeping()
+
     return when(npc.npcState == States.Sleeping && npc.hasNeed(Needs.Rest)) {
       true -> Status.RUNNING
       else -> {
-        npc.stopSleeping()
+        npc.stopDoingIt()
         Status.SUCCEEDED
       } //What does failure even mean here?
     }
@@ -101,11 +97,12 @@ class Eat : LeafTask<Npc>() {
     //Eating takes one hour and costs 100
     val npc = `object`
 
-    npc.startEating()
+    if(npc.hasNeed(Needs.Fuel)) npc.startEating()
+
     return when(npc.npcState == States.Eating && npc.hasNeed(Needs.Fuel)) {
       true -> Status.RUNNING
       else -> {
-        npc.stopEating()
+        npc.stopDoingIt()
         Status.SUCCEEDED
       } //What does failure even mean here?
     }
@@ -132,11 +129,12 @@ class Work : LeafTask<Npc>() {
     //Eating takes one hour and costs 100
     val npc = `object`
 
-    npc.startWorking()
+    if(npc.hasNeed(Needs.Money)) npc.startWorking()
+
     return when(npc.npcState == States.Working && npc.hasNeed(Needs.Money)) {
       true -> Status.RUNNING
       else -> {
-        npc.stopWorking()
+        npc.stopDoingIt()
         Status.SUCCEEDED
       } //What does failure even mean here?
     }
@@ -163,11 +161,13 @@ class HaveFun : LeafTask<Npc>() {
     //Eating takes one hour and costs 100
     val npc = `object`
 
-    npc.startHavingFun()
+    if(npc.hasNeed(Needs.Fun))
+      npc.startHavingFun()
+
     return when(npc.npcState == States.HavingFun && npc.hasNeed(Needs.Fun)) {
       true -> Status.RUNNING
       else -> {
-        npc.stopHavingFun()
+        npc.stopDoingIt()
         Status.SUCCEEDED
       } //What does failure even mean here?
     }
@@ -194,11 +194,13 @@ class MeetPeople : LeafTask<Npc>() {
     //Eating takes one hour and costs 100
     val npc = `object`
 
-    npc.startSocializing()
+    if(npc.hasNeed(Needs.Social))
+      npc.startSocializing()
+
     return when(npc.npcState == States.Socializing && npc.hasNeed(Needs.Social)) {
       true -> Status.RUNNING
       else -> {
-        npc.stopSocializing()
+        npc.stopDoingIt()
         Status.SUCCEEDED
       } //What does failure even mean here?
     }

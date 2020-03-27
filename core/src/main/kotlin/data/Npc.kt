@@ -67,6 +67,9 @@ class Npc(val name: String, val id: String) {
             edge(Events.Arrived, States.Neutral) {}
             edge(Events.FellAsleep, States.Sleeping) {}
             edge(Events.StartedEating, States.Eating) {}
+            edge(Events.StartedHavingFun, States.Eating) {}
+            edge(Events.StartedWorking, States.Eating) {}
+            edge(Events.StartedSocializing, States.Eating) {}
         }
         state(States.HavingFun) {
             edge(Events.FellAsleep, States.Sleeping) {}
@@ -191,7 +194,7 @@ class Npc(val name: String, val id: String) {
 
     fun goSomeWhere() {
         if (npcState == States.Neutral) {
-            val r = 0f amid 1000f
+            val r = 0f amid 500f
             thisIsWhereIWantToBe = vec2(r.random(), r.random())
             npcStateMachine.acceptEvent(Events.LeftSomewhere)
         }

@@ -78,4 +78,33 @@ class MainGameScreen(
 
 object MasterGameObjectWithStuff {
     val npcs= mutableListOf<Npc>()
+    val cr = 0f amid 500f
+    val workPlaces = mapOf(
+            "ICA" to vec2(cr.random(), cr.random()),
+            "Coop" to vec2(cr.random(), cr.random()),
+            "Vironova" to vec2(cr.random(), cr.random()),
+            "Dell" to vec2(cr.random(), cr.random()),
+            "ABB" to vec2(cr.random(), cr.random()),
+            "Beamon People" to vec2(cr.random(), cr.random()),
+            "Stockholms Universitet" to vec2(cr.random(), cr.random()),
+            "KTH" to vec2(cr.random(), cr.random()),
+            "WHO" to vec2(cr.random(), cr.random()),
+            "Folkhälsomyndigheten" to vec2(cr.random(), cr.random()),
+            "DN" to vec2(cr.random(), cr.random()),
+            "SVD" to vec2(cr.random(), cr.random()),
+            "SVT" to vec2(cr.random(), cr.random()),
+            "SR" to vec2(cr.random(), cr.random()),
+            "Asus" to vec2(cr.random(), cr.random()),
+            "Microsoft" to vec2(cr.random(), cr.random()),
+            "Hermods" to vec2(cr.random(), cr.random()),
+            "Mitsubishi" to vec2(cr.random(), cr.random()),
+            "Mieli AB" to vec2(cr.random(), cr.random()),
+            "Regeringen" to vec2(cr.random(), cr.random()))
+
+
+    val restaurants = mapOf(
+            "McDonalds" to vec2(cr.random(), cr.random()),
+            "KB" to vec2(cr.random(), cr.random()),
+            "Akropolis" to vec2(cr.random(), cr.random()),
+            "Pinchos" to vec2(cr.random(), cr.random()))
 }

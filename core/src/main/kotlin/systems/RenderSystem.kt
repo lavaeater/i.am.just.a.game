@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.SortedIteratingSystem
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import components.CharacterSpriteComponent
 import components.NpcComponent
 import components.TransformComponent
@@ -14,6 +15,7 @@ import ktx.ashley.mapperFor
 import ktx.graphics.use
 import ktx.math.amid
 import ktx.math.random
+import screens.MasterGameObjectWithStuff
 
 class RenderSystem(
         private val batch: Batch,
@@ -27,6 +29,8 @@ class RenderSystem(
   private val transformMapper = mapperFor<TransformComponent>()
   private val spriteMapper = mapperFor<CharacterSpriteComponent>()
   private val npcMapper = mapperFor<NpcComponent>()
+
+  private val shapeRenderer = ShapeRenderer()
 
   private val scaleAmount = 1f amid 0.5f
 
@@ -59,12 +63,19 @@ class RenderSystem(
 
   override fun update(deltaTime: Float) {
     forceSort()
-    batch.projectionMatrix = camera.combined
     camera.update(true)
+    batch.projectionMatrix = camera.combined
 
-    batch
+    shapeRenderer.projectionMatrix = camera.combined
+    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
+      MasterGameObjectWithStuff.workPlaces.values.forEach  { shapeRenderer.rect(it.x -10f, it.y - 5f, 20f, 10f) }
+    shapeRenderer.end()
+
 
     batch.use {
+      //Draw workplaces
+
+
       super.update(deltaTime)
     }
   }

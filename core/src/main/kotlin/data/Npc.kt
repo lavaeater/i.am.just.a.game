@@ -3,6 +3,7 @@ package data
 import ktx.math.amid
 import ktx.math.random
 import ktx.math.vec2
+import screens.MasterGameObjectWithStuff
 import statemachine.StateMachine
 
 /**
@@ -33,8 +34,12 @@ object RR {
 }
 
 class Npc(val name: String, val id: String) {
+    val workplace = MasterGameObjectWithStuff.workPlaces.keys.random()
+    val homeCoord = vec2(MasterGameObjectWithStuff.cr.random(), MasterGameObjectWithStuff.cr.random())
+
     var isDead = false
         private set
+
     var npcState: States = States.Neutral
         private set
     private var npcStats = NpcStats(RR.statsR.random(), RR.statsR.random(),RR.statsR.random(),RR.statsR.random(),RR.statsR.random())
@@ -174,8 +179,8 @@ class Npc(val name: String, val id: String) {
 
     fun goSomeWhere() {
         if (npcState == States.Neutral) {
-            val r = 0f amid 128f
-            thisIsWhereIWantToBe = vec2(r.random(), r.random())
+
+            thisIsWhereIWantToBe = vec2(MasterGameObjectWithStuff.cr.random(), MasterGameObjectWithStuff.cr.random())
             npcStateMachine.acceptEvent(Events.LeftSomewhere)
         }
     }

@@ -3,12 +3,12 @@ package statemachine
 /**
  * Builds and operates state machines
  */
-class StateMachine<S : kotlin.Enum<S>, E : kotlin.Enum<E>> private constructor(private val initialState: S, private val globalStateAction: (S) -> Unit) {
-    lateinit var currentState: State<S, E>
-    val states = mutableListOf<State<S, E>>()
+class StateMachine private constructor(private val initialState: String, private val globalStateAction: (String) -> Unit) {
+    lateinit var currentState: State
+    val states = mutableListOf<State>()
 
-    fun state(stateName: S, init: State<S, E>.() -> Unit) {
-        val state = State<S,E>(stateName)
+    fun state(stateName: String, init: State.() -> Unit) {
+        val state = State(stateName)
         state.init()
 
         states.add(state)
@@ -17,7 +17,7 @@ class StateMachine<S : kotlin.Enum<S>, E : kotlin.Enum<E>> private constructor(p
     /**
      * Translates state state to an object
      */
-    private fun getState(state: S): State<S, E> {
+    private fun getState(state: String): State {
         return states.first { s -> s.state == state  }
     }
 
@@ -33,7 +33,7 @@ class StateMachine<S : kotlin.Enum<S>, E : kotlin.Enum<E>> private constructor(p
     /**
      * Gives the FSM an event to act upon, state is then changed and actions are performed
      */
-    fun acceptEvent(e: E) {
+    fun acceptEvent(e: String) {
         try {
             val edge = currentState.getEdgeForEvent(e)
 
@@ -53,21 +53,9 @@ class StateMachine<S : kotlin.Enum<S>, E : kotlin.Enum<E>> private constructor(p
         }
     }
 
-    fun acceptEventSafely(e: E) :Boolean {
-        if(canAcceptEvent(e)) {
-            acceptEvent(e)
-            return true
-        }
-        return false
-    }
-
-    fun canAcceptEvent(event: E) : Boolean {
-        return currentState.canAcceptEvent(event)
-    }
-
     companion object {
-        fun <S : kotlin.Enum<S>,E : kotlin.Enum<E>>buildStateMachine(initialState: S, globalStateAction: (S) -> Unit, init: StateMachine<S, E>.() -> Unit): StateMachine<S, E> {
-            val stateMachine = StateMachine<S,E>(initialState, globalStateAction)
+        fun buildStateMachine(initialState: String, globalStateAction: (String) -> Unit, init: StateMachine.() -> Unit): StateMachine {
+            val stateMachine = StateMachine(initialState, globalStateAction)
             stateMachine.init()
             return stateMachine
         }

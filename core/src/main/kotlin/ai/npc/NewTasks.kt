@@ -3,27 +3,27 @@ package ai.npc
 import com.badlogic.gdx.ai.btree.LeafTask
 import com.badlogic.gdx.ai.btree.Task
 import com.badlogic.gdx.ai.btree.annotation.TaskAttribute
-import com.badlogic.gdx.math.Rectangle
 import data.Needs
-import data.Npc
 import data.NeedsAndStuff
-import data.NpcNeed
-import ktx.math.random
+import data.Npc
 import screens.Mgo
-import screens.Place
-import screens.PlaceType
+import systems.AiAndTimeSystem
 
+
+abstract class NpcTask : LeafTask<Npc>() {
+    fun timeHasPassed() {
+        `object`.timeHasPassed(AiAndTimeSystem.minutesPerTick)
+    }
+}
 /**
  * Completely disregard state machine's existince
  * for these tasks. We will consider the behavior tree
  * to be the state machine for the NPC
  */
 
-abstract class NeedTask : LeafTask<Npc>() {
+abstract class NeedTask : NpcTask() {
     @TaskAttribute(required = true)
-    var needName : String = "Fun"
-
-    val need: NpcNeed = NeedsAndStuff.needs[needName]?: error("Something is wrong, need Fun doesn't exist")
+    var need : String = "Fun"
 }
 
 
@@ -44,6 +44,7 @@ class WalkingTo: NeedTask() {
     }
 
     override fun execute(): Status {
+        timeHasPassed()
         val npc = `object`
 
         return if(npc.onTheMove) Status.RUNNING else Status.SUCCEEDED
@@ -57,11 +58,12 @@ class FindWhereToSatisfy: NeedTask() {
     }
 
     override fun execute(): Status {
+        timeHasPassed()
         val npc = `object`
 
-            val whereToSatisfy = (Sf.whereToSatisfyResolvers[need.key] ?: error("No resolver found for need ${need.key}"))(npc)
-            npc.walkTo(whereToSatisfy)
-            return Status.SUCCEEDED
+        val whereToSatisfy = (Sf.whereToSatisfyResolvers[need] ?: error("No resolver found for need ${need}"))(npc)
+        npc.walkTo(whereToSatisfy)
+        return Status.SUCCEEDED
     }
 
 }
@@ -72,10 +74,11 @@ class SatisfyNeed : NeedTask() {
     }
 
     override fun execute(): Status {
+        timeHasPassed()
         val npc = `object`
 
-        return if (npc.hasNeed(need.key )) {
-            val activity = NeedsAndStuff.activities[NeedsAndStuff.needsToActivities[need.key]]!!
+        return if (npc.hasNeed(need)) {
+            val activity = NeedsAndStuff.activities[NeedsAndStuff.needsToActivities[need]]!!
             npc.applyCosts(activity)
             Status.RUNNING
         } else {
@@ -91,13 +94,14 @@ class HasNeed : NeedTask() {
     }
 
     override fun execute(): Status {
+        timeHasPassed()
         val npc = `object`
 
         //1. Get the need we're checking (this means we can have more complex behaviors if needed
         /*
         Why the property? It is there as a check that we actually have setup the need somewhere else
          */
-        return if (npc.hasNeed(need.key))
+        return if (npc.hasNeed(need))
             Status.SUCCEEDED
         else
             Status.FAILED
@@ -111,9 +115,10 @@ class CanSatisfy: NeedTask() {
     }
 
     override fun execute(): Status {
+        timeHasPassed()
         val npc = `object`
 
-        val satisfier = Sf.satisfiableResolvers[need.key] ?: error("No satisifyResolver found for need ${need.key}")
+        val satisfier = Sf.satisfiableResolvers[need] ?: error("No satisifyResolver found for need ${need}")
         return if (satisfier(npc))
             Status.SUCCEEDED
         else
@@ -125,7 +130,6 @@ class Sf {
 
     companion object Sf {
         val satisfiableResolvers = mapOf(
-                Needs.Fun to { npc: Npc -> (0..1).random() == 1 },
                 Needs.Fuel to { npc: Npc -> canIEatHere(npc) },
                 Needs.Money to { npc: Npc -> isThisWhereIWork(npc) },
                 Needs.Rest to { npc: Npc -> canISleepHere(npc) })
@@ -133,8 +137,7 @@ class Sf {
         val whereToSatisfyResolvers = mapOf(
                 Needs.Rest to { npc: Npc -> npc.home },
                 Needs.Money to  { npc: Npc -> npc.workPlace },
-        Needs.Fuel to { npc: Npc -> Mgo.restaurants.random()},
-        Needs.Fun to { npc: Npc -> Place("random made up funny house", PlaceType.Tivoli, box = Rectangle(Mgo.workPlaceRange.random(),Mgo.workPlaceRange.random(), 10f, 10f)) }
+        Needs.Fuel to { npc: Npc -> Mgo.restaurants.random()}
         )
 
         fun isThisWhereIWork(npc: Npc) :Boolean {

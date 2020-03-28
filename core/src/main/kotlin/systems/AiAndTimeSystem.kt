@@ -9,12 +9,13 @@ import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 import java.time.LocalDateTime
 
-class AiAndTimeSystem(startTime: Int = 6, private val minutesPerTick: Long = 15, interval: Float = 3f) : IntervalIteratingSystem(allOf(AiComponent::class).get(), interval, 5) {
+class AiAndTimeSystem(startTime: Int = 6, minutes: Long = 15, interval: Float = 3f) : IntervalIteratingSystem(allOf(AiComponent::class).get(), interval, 5) {
   private val aiMapper = mapperFor<AiComponent<Npc>>()
   private val npcMapper = mapperFor<NpcComponent>()
 
   init {
     currentDateTime = LocalDateTime.of(2020, 1,1, startTime,0)
+    minutesPerTick = minutes
   }
 
   override fun processEntity(entity: Entity) {
@@ -29,6 +30,6 @@ class AiAndTimeSystem(startTime: Int = 6, private val minutesPerTick: Long = 15,
 
   companion object {
     var currentDateTime: LocalDateTime = LocalDateTime.of(2020, 1,1, 1,0)
+    var minutesPerTick :Long = 15
   }
-
 }

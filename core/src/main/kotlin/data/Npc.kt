@@ -9,34 +9,40 @@ import statemachine.StateMachine
 /**
  * Sort of like what we're doing or something
  */
-enum class Activity {
-    Neutral,
-    OnTheMove,
-    Eating,
-    Sleeping,
-    Working,
-    HavingFun,
-    Socializing,
-    GoingToEat,
-    GoingToWork,
-    GoingHomeToSleep
+class Activity {
+    companion object {
+        const val Neutral = "Neutral"
+        const val OnTheMove = "OnTheMove"
+        const val Eating = "Eating"
+        const val Sleeping = "Sleeping"
+        const val Working = "Working"
+        const val HavingFun = "HavingFun"
+        const val Socializing = "Socializing"
+        const val GoingToEat = "GoingToEat"
+        const val GoingToWork = "GoingToWork"
+        const val GoingHomeToSleep = "GoingHomeToSleep"
+    }
 }
 
-enum class Events {
-    StartedEating,
-    FellAsleep,
-    StartedWorking,
-    LeftSomewhere,
-    StartedHavingFun,
-    StartedSocializing,
-    StoppedDoingIt,
-    WentToEat,
-    WentToWork,
-    WentHomeToSleep
+class Events {
+    companion object {
+        const val StartedEating = "StartedEating"
+        const val FellAsleep = "FellAsleep"
+        const val StartedWorking = "StartedWorking"
+        const val LeftSomewhere = "LeftSomewhere"
+        const val StartedHavingFun = "StartedHavingFun"
+        const val StartedSocializing = "StartedSocializing"
+        const val StoppedDoingIt = "StoppedDoingIt"
+        const val WentToEat = "WentToEat"
+        const val WentToWork = "WentToWork"
+        const val WentHomeToSleep = "WentToHomeToSleep"
+    }
 }
 
-object RR {
-    val statsR = 64 amid 32
+class Stats {
+    companion object {
+        val range = 64 amid 32
+    }
 }
 
 class Npc(val name: String, val id: String) {
@@ -51,16 +57,16 @@ class Npc(val name: String, val id: String) {
     var isDead = false
         private set
 
-    var npcState: Activity = Activity.Neutral
+    var npcState: String = Activity.Neutral
         private set
 
     private val npcStats = NpcStats().apply {
-        statsMap[Needs.Fuel] =  RR.statsR.random()
-        statsMap[Needs.Rest] =  RR.statsR.random()
-        statsMap[Needs.Money] =  RR.statsR.random()
+        statsMap[Needs.Fuel] =  Stats.range.random()
+        statsMap[Needs.Rest] =  Stats.range.random()
+        statsMap[Needs.Money] =  Stats.range.random()
     }
 
-    private val npcStateMachine = StateMachine.buildStateMachine<Activity, Events>(Activity.Neutral, ::myStateHasChanged, {
+    private val npcStateMachine = StateMachine.buildStateMachine(Activity.Neutral, ::myStateHasChanged) {
         state(Activity.Neutral) {
             edge(Events.LeftSomewhere, Activity.OnTheMove) {}
             edge(Events.FellAsleep, Activity.Sleeping) {}
@@ -99,17 +105,14 @@ class Npc(val name: String, val id: String) {
         state(Activity.Sleeping) {
             edge(Events.StoppedDoingIt, Activity.Neutral) {}
         }
-    })
+    }
 
     init {
         npcStateMachine.initialize() //Required to make states possible
     }
 
 
-    private fun myStateHasChanged(newState: Activity) {
-        /*
-            React to new state, perhaps? Set a property!
-             */
+    private fun myStateHasChanged(newState: String) {
         npcState = newState
     }
 
@@ -224,14 +227,14 @@ data class NpcStats(val statsMap: MutableMap<String, Int> = mutableMapOf(
         Needs.Rest to 72
 ))
 
-data class Cost(val activity: Activity, val costMap: Map<String, Int> = mapOf(
+data class Cost(val activity: String, val costMap: Map<String, Int> = mapOf(
         Needs.Fuel to 4,
         Needs.Rest to 4,
         Needs.Money to 4
 ))
 
 class NeedsAndStuff {
-    companion object NpcDataAndStuff {
+    companion object {
         val activities = mapOf(
                 Activity.Working to Cost(Activity.Working, mapOf(
                     Needs.Money to -16,

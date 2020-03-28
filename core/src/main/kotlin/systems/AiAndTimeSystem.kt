@@ -11,7 +11,6 @@ import java.time.LocalDateTime
 
 class AiAndTimeSystem(startTime: Int = 6, minutes: Long = 15, interval: Float = 3f) : IntervalIteratingSystem(allOf(AiComponent::class).get(), interval, 5) {
   private val aiMapper = mapperFor<AiComponent<Npc>>()
-  private val npcMapper = mapperFor<NpcComponent>()
 
   init {
     currentDateTime = LocalDateTime.of(2020, 1,1, startTime,0)
@@ -19,7 +18,6 @@ class AiAndTimeSystem(startTime: Int = 6, minutes: Long = 15, interval: Float = 
   }
 
   override fun processEntity(entity: Entity) {
-    npcMapper[entity].npc.timeHasPassed(minutesPerTick)
     aiMapper[entity].behaviorTree.step()
   }
 

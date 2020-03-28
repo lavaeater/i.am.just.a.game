@@ -6,25 +6,59 @@
 import canSatisfy:"ai.npc.CanSatisfy"
 import satisfyNeed:"ai.npc.SatisfyNeed"
 import hasNeed:"ai.npc.HasNeed"
-import walkTo:"ai.npc.WalkTo"
+import walkTo:"ai.npc.WalkingTo"
 import findWhereToSatisfy:"ai.npc.FindWhereToSatisfy"
 
-subtree name:"satisfyIfPossible"
-    sequence
-        canSatisfy
-        satisfyNeed
-
-subtree name:"needTree"
+subtree name:"hungerTree"
     selector
         invert
-            hasNeed
+            hasNeed need:"Fuel"
         selector
-            $satisfyIfPossible
+            sequence
+                    canSatisfy need:"Fuel"
+                    satisfyNeed need:"Fuel"
             alwaysSucceed
                 sequence
-                    findWhereToSatisfy
+                    findWhereToSatisfy need:"Fuel"
                     walkTo
-                    $satisfyIfPossible
+                    sequence
+                        canSatisfy need:"Fuel"
+                        satisfyNeed need:"Fuel"
+
+subtree name:"sleepTree"
+    selector
+        invert
+            hasNeed need:"Rest"
+        selector
+            sequence
+                canSatisfy need:"Rest"
+                satisfyNeed need:"Rest"
+            alwaysSucceed
+                sequence
+                    findWhereToSatisfy need:"Rest"
+                    walkTo
+                    sequence
+                        canSatisfy need:"Rest"
+                        satisfyNeed need:"Rest"
+
+subtree name:"workTree"
+    selector
+        invert
+            hasNeed need:"Money"
+        selector
+            sequence
+                canSatisfy need:"Money"
+                satisfyNeed need:"Money"
+            alwaysSucceed
+                sequence
+                    findWhereToSatisfy need:"Money"
+                    walkTo
+                    sequence
+                        canSatisfy need:"Money"
+                        satisfyNeed need:"Money"
 
 root
-    $needTree
+    sequence
+        $hungerTree
+        $sleepTree
+        $workTree

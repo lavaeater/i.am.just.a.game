@@ -3,16 +3,42 @@ package ai.npc
 import com.badlogic.gdx.ai.btree.LeafTask
 import com.badlogic.gdx.ai.btree.Task
 import com.badlogic.gdx.ai.btree.annotation.TaskAttribute
-import data.Needs
-import data.NeedsAndStuff
-import data.Npc
+import data.*
+import data.NeedsAndStuff.Companion.fullRange
+import data.NeedsAndStuff.Companion.lowRange
 import screens.Mgo
 import systems.AiAndTimeSystem
 
 
 abstract class NpcTask : LeafTask<Npc>() {
+
+    val npc : Npc get() = `object`
+
     fun timeHasPassed() {
-        `object`.timeHasPassed(AiAndTimeSystem.minutesPerTick)
+        applyCosts()
+    }
+
+    fun checkIfNpcDied() {
+        if(npc.npcStats.statsMap[Needs.Fuel]!! <= lowRange.first + 1) {
+            npc.die()
+        }
+    }
+
+    fun hasNeed(need:String) : Boolean {
+        val stat = npc.npcStats.statsMap[need]
+        return stat in lowRange
+    }
+
+    private fun applyCosts() {
+        val cost = NeedsAndStuff.activities[npc.npcState] ?: error("No activity found")
+        applyCosts(cost)
+    }
+
+    fun applyCosts(cost: Cost) {
+
+        for((k, c) in cost.costMap) {
+            npc.npcStats.statsMap[k] = (npc.npcStats.statsMap[k]!! - c).coerceIn(fullRange)
+        }
     }
 }
 /**
@@ -22,10 +48,30 @@ abstract class NpcTask : LeafTask<Npc>() {
  */
 
 abstract class NeedTask : NpcTask() {
+    @JvmField
     @TaskAttribute(required = true)
-    var need : String = "Fun"
+    var need : String = "Money"
 }
 
+class HasNeed : NeedTask() {
+
+    override fun copyTo(task: Task<Npc>?): Task<Npc> {
+        TODO("Not yet implemented")
+    }
+
+    override fun execute(): Status {
+        timeHasPassed()
+
+        //1. Get the need we're checking (this means we can have more complex behaviors if needed
+        /*
+        Why the property? It is there as a check that we actually have setup the need somewhere else
+         */
+        return if (hasNeed(need))
+            Status.SUCCEEDED
+        else
+            Status.FAILED
+    }
+}
 
 
 class FindRandomPlace {
@@ -38,14 +84,14 @@ class FindRandomPlace {
      */
 }
 
-class WalkingTo: NeedTask() {
+class WalkingTo: NpcTask() {
     override fun copyTo(task: Task<Npc>?): Task<Npc> {
         return task as WalkingTo
     }
 
     override fun execute(): Status {
-        timeHasPassed()
-        val npc = `object`
+
+        applyCosts(NeedsAndStuff.activities[Activity.OnTheMove]?: error("Couldn't find cost for ${Activity.OnTheMove}"))
 
         return if(npc.onTheMove) Status.RUNNING else Status.SUCCEEDED
     }
@@ -59,7 +105,6 @@ class FindWhereToSatisfy: NeedTask() {
 
     override fun execute(): Status {
         timeHasPassed()
-        val npc = `object`
 
         val whereToSatisfy = (Sf.whereToSatisfyResolvers[need] ?: error("No resolver found for need ${need}"))(npc)
         npc.walkTo(whereToSatisfy)
@@ -74,37 +119,15 @@ class SatisfyNeed : NeedTask() {
     }
 
     override fun execute(): Status {
-        timeHasPassed()
-        val npc = `object`
-
-        return if (npc.hasNeed(need)) {
+        return if (hasNeed(need)) {
             val activity = NeedsAndStuff.activities[NeedsAndStuff.needsToActivities[need]]!!
-            npc.applyCosts(activity)
+            npc.acceptEvent(NeedsAndStuff.activitiesToEvents[activity.activity]?: error("Event not found for $activity"))
+            applyCosts(activity)
             Status.RUNNING
         } else {
+            npc.stopDoingIt()
             Status.SUCCEEDED
         }
-    }
-}
-
-class HasNeed : NeedTask() {
-
-    override fun copyTo(task: Task<Npc>?): Task<Npc> {
-        TODO("Not yet implemented")
-    }
-
-    override fun execute(): Status {
-        timeHasPassed()
-        val npc = `object`
-
-        //1. Get the need we're checking (this means we can have more complex behaviors if needed
-        /*
-        Why the property? It is there as a check that we actually have setup the need somewhere else
-         */
-        return if (npc.hasNeed(need))
-            Status.SUCCEEDED
-        else
-            Status.FAILED
     }
 }
 
@@ -116,7 +139,6 @@ class CanSatisfy: NeedTask() {
 
     override fun execute(): Status {
         timeHasPassed()
-        val npc = `object`
 
         val satisfier = Sf.satisfiableResolvers[need] ?: error("No satisifyResolver found for need ${need}")
         return if (satisfier(npc))

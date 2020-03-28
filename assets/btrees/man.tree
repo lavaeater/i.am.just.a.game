@@ -3,64 +3,28 @@
 #
 
 # Alias definitions
+import canSatisfy:"ai.npc.CanSatisfy"
+import satisfyNeed:"ai.npc.SatisfyNeed"
+import hasNeed:"ai.npc.HasNeed"
+import walkTo:"ai.npc.WalkTo"
+import findWhereToSatisfy:"ai.npc.FindWhereToSatisfy"
 
-import goabout:"ai.GoAbout"
-import neutral:"ai.IsThisNpcNeutral"
-import tired:"ai.IsThisNpcTired"
-import sleep:"ai.Sleep"
-import poor:"ai.IsThisNpcPoor"
-import canWork:"ai.CanWork"
-import moveToWork:"ai.MoveToWork"
-import canSleep:"ai.CanSleep"
-import moveToSleep:"ai.MoveToSleep"
-import work:"ai.Work"
-import bored:"ai.IsThisNpcBored"
-import haveFun:"ai.HaveFun"
-import lonely:"ai.IsThisNpcLonely"
-import socialize:"ai.MeetPeople"
-import hungry:"ai.IsThisNpcHungry"
-import canEat:"ai.CanEat"
-import moveToEat:"ai.MoveToEat"
-import eat:"ai.Eat"
-
-subtree name:"eatingTree"
+subtree name:"satisfyIfPossible"
     sequence
-        selector
-            canEat
-            moveToEat
-        eat
+        canSatisfy
+        satisfyNeed
 
-subtree name:"workingTree"
-    sequence
+subtree name:"needTree"
+    selector
+        invert
+            hasNeed
         selector
-            canWork
-            moveToWork
-        work
-
-subtree name:"sleepingTree"
-    sequence
-        selector
-            canSleep
-            moveToSleep
-        sleep
+            $satisfyIfPossible
+            alwaysSucceed
+                sequence
+                    findWhereToSatisfy
+                    walkTo
+                    $satisfyIfPossible
 
 root
-    selector
-      sequence
-        neutral
-        goabout
-      sequence
-        hungry
-        $eatingTree
-      sequence
-        tired
-        $sleepingTree
-      sequence
-        bored
-        haveFun
-      sequence
-        poor
-        $workingTree
-      sequence
-        lonely
-        socialize
+    $needTree

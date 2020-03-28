@@ -16,6 +16,7 @@ import ktx.graphics.use
 import ktx.math.amid
 import ktx.math.random
 import screens.Mgo
+import screens.PlaceType
 
 class RenderSystem(
         private val batch: Batch,
@@ -69,10 +70,15 @@ class RenderSystem(
     shapeRenderer.projectionMatrix = camera.combined
     shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
 
-    shapeRenderer.setColor(0f, 0f, 1f, 0f)
-    Mgo.workPlaces.values.forEach  { shapeRenderer.rect(it.x - Mgo.workPlaceSize.x / 2, it.y - Mgo.workPlaceSize.y / 2, Mgo.workPlaceSize.x, Mgo.workPlaceSize.y) }
-    shapeRenderer.setColor(0f, 1f, 0f, 0f)
-    Mgo.restaurants.values.forEach  { shapeRenderer.rect(it.x - Mgo.restaurantSize.x / 2, it.y - Mgo.restaurantSize.y / 2, Mgo.restaurantSize.x, Mgo.restaurantSize.y) }
+    Mgo.allPlaces.forEach {
+      when(it.type) {
+        PlaceType.Home ->     shapeRenderer.setColor(1f, 1f, 0f, 0f)
+        PlaceType.Workplace ->     shapeRenderer.setColor(0f, 0f, 1f, 0f)
+        PlaceType.Restaurant ->     shapeRenderer.setColor(0f, 1f, 0f, 0f)
+        PlaceType.Tivoli ->     shapeRenderer.setColor(1f, 0f, 0f, 0f)
+      }
+      shapeRenderer.rect(it.box.x, it.box.y, it.box.width, it.box.height)
+    }
     shapeRenderer.end()
 
 

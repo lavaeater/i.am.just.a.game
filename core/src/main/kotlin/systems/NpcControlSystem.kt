@@ -2,12 +2,11 @@ package systems
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
+import com.badlogic.gdx.math.Vector
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import components.Box2dBodyComponent
 import components.NpcComponent
-import components.RobbingComponent
-import data.States
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 import ktx.math.minus
@@ -20,18 +19,18 @@ class NpcControlSystem : IteratingSystem(allOf(
 
   private val npcMpr = mapperFor<NpcComponent>()
   private val bodyMpr = mapperFor<Box2dBodyComponent>()
+  private var someVector = vec2(0f,0f)
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val npc = npcMpr[entity].npc
 
     val body = bodyMpr[entity]!!.body
     if (npc.onTheMove) {
-      npc.thisIsWhereIWantToBe.moveFromTo(body)
+      npc.thePlaceIWantToBe.box.getCenter(someVector).moveFromTo(body)
 
-      if (npc.thisIsWhereIWantToBe.dst(body.position) < 0.5f)
+      if (npc.thePlaceIWantToBe.box.contains(npc.currentPosition))
         npc.stopDoingIt()
     }
-
     npc.currentPosition = body.position
 
     if(!npc.onTheMove)

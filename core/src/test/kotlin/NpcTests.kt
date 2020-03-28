@@ -7,7 +7,7 @@ object NpcTests : Spek( {
     describe("An NPC") {
         val npc = Npc("Test Bertsson", "id")
         describe("after time has passed so it has all needs") {
-            while (npc.npcNeeds.count() < 5 && !npc.npcNeeds.any { it.need == Needs.Fuel }) {
+            while (npc.npcNeeds.count() < 5 && !npc.npcNeeds.any { it.key == Needs.Fuel }) {
                 npc.timeHasPassed()
             }
             it("needs are sorted properly") {

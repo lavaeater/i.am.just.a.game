@@ -2,15 +2,29 @@ package ai.npc
 
 import com.badlogic.gdx.ai.btree.LeafTask
 import com.badlogic.gdx.ai.btree.Task
+import com.badlogic.gdx.ai.btree.annotation.TaskAttribute
 import com.badlogic.gdx.math.Rectangle
 import data.Needs
 import data.Npc
-import data.NpcDataAndStuff
+import data.NeedsAndStuff
+import data.NpcNeed
 import ktx.math.random
 import screens.Mgo
 import screens.Place
 import screens.PlaceType
 
+/**
+ * Completely disregard state machine's existince
+ * for these tasks. We will consider the behavior tree
+ * to be the state machine for the NPC
+ */
+
+abstract class NeedTask : LeafTask<Npc>() {
+    @TaskAttribute(required = true)
+    var needName : String = "Fun"
+
+    val need: NpcNeed = NeedsAndStuff.needs[needName]?: error("Something is wrong, need Fun doesn't exist")
+}
 
 
 
@@ -24,23 +38,20 @@ class FindRandomPlace {
      */
 }
 
-class WalkTo: LeafTask<Npc>() {
+class WalkingTo: NeedTask() {
     override fun copyTo(task: Task<Npc>?): Task<Npc> {
-        return task as WalkTo
+        return task as WalkingTo
     }
 
     override fun execute(): Status {
         val npc = `object`
 
-        return if(npc.onTheMove)
-            Status.RUNNING
-        else
-            Status.SUCCEEDED //This means we weren't going anywhere I suppose
+        return if(npc.onTheMove) Status.RUNNING else Status.SUCCEEDED
     }
 
 }
 
-class FindWhereToSatisfy: LeafTask<Npc>() {
+class FindWhereToSatisfy: NeedTask() {
     override fun copyTo(task: Task<Npc>?): Task<Npc> {
         TODO("Not yet implemented")
     }
@@ -48,71 +59,52 @@ class FindWhereToSatisfy: LeafTask<Npc>() {
     override fun execute(): Status {
         val npc = `object`
 
-        if(npc.hasAnyNeeds()) {
-            val topNeed = npc.getTopNeed()
-            val whereToSatisfy = (Sf.whereToSatisfyResolvers[topNeed] ?: error("No resolver found"))(npc)
+            val whereToSatisfy = (Sf.whereToSatisfyResolvers[need.key] ?: error("No resolver found for need ${need.key}"))(npc)
             npc.walkTo(whereToSatisfy)
             return Status.SUCCEEDED
-        }
-
-        return Status.FAILED //What does this mean?
     }
 
 }
 
-class SatisfyNeed : LeafTask<Npc>() {
+class SatisfyNeed : NeedTask() {
     override fun copyTo(task: Task<Npc>?): Task<Npc> {
         return task as SatisfyNeed
     }
 
-    var currentTopNeed: Needs? = null
-
     override fun execute(): Status {
         val npc = `object`
 
-        if (currentTopNeed != null) {
-
-            return if (npc.hasNeed(currentTopNeed!!)) {
-                val activity = NpcDataAndStuff.activities[NpcDataAndStuff.needsToActivities[currentTopNeed!!]]!!
-                npc.applyCosts(activity)
-                Status.RUNNING
-            } else {
-                currentTopNeed = null
-                Status.SUCCEEDED
-            }
+        return if (npc.hasNeed(need.key )) {
+            val activity = NeedsAndStuff.activities[NeedsAndStuff.needsToActivities[need.key]]!!
+            npc.applyCosts(activity)
+            Status.RUNNING
         } else {
-            return if (npc.hasAnyNeeds()) {
-                currentTopNeed = npc.getTopNeed()
-                val activity = NpcDataAndStuff.activities[NpcDataAndStuff.needsToActivities[currentTopNeed!!]]!!
-                npc.applyCosts(activity)
-                Status.RUNNING
-            } else {
-                Status.SUCCEEDED
-            }
+            Status.SUCCEEDED
         }
     }
 }
 
-/**
- * Completely disregard state machine's existince
- * for these tasks. We will consider the behavior tree
- * to be the state machine for the NPC
- */
-class HasNeed : LeafTask<Npc>() {
+class HasNeed : NeedTask() {
+
     override fun copyTo(task: Task<Npc>?): Task<Npc> {
         TODO("Not yet implemented")
     }
 
     override fun execute(): Status {
         val npc = `object`
-        return if (npc.hasAnyNeeds())
+
+        //1. Get the need we're checking (this means we can have more complex behaviors if needed
+        /*
+        Why the property? It is there as a check that we actually have setup the need somewhere else
+         */
+        return if (npc.hasNeed(need.key))
             Status.SUCCEEDED
         else
             Status.FAILED
     }
 }
 
-class CanSatisfy: LeafTask<Npc>()  {
+class CanSatisfy: NeedTask() {
     override fun copyTo(task: Task<Npc>?): Task<Npc> {
 
         return task as CanSatisfy
@@ -121,18 +113,12 @@ class CanSatisfy: LeafTask<Npc>()  {
     override fun execute(): Status {
         val npc = `object`
 
-        if(npc.hasAnyNeeds()) {
-            val topNeed = npc.getTopNeed()
-            val satisfier = Sf.satisfiableResolvers[topNeed] ?: error("No satisifyResolver found for need")
-            return if(satisfier(npc))
-                Status.SUCCEEDED
-            else
-                Status.FAILED
-        }
-        return Status.FAILED //How do we even handle this? This should never ever happen, actually
+        val satisfier = Sf.satisfiableResolvers[need.key] ?: error("No satisifyResolver found for need ${need.key}")
+        return if (satisfier(npc))
+            Status.SUCCEEDED
+        else
+            Status.FAILED
     }
-
-
 }
 
 class Sf {

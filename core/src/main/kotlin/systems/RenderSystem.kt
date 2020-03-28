@@ -9,7 +9,7 @@ import components.CharacterSpriteComponent
 import components.NpcComponent
 import components.TransformComponent
 import components.VisibleComponent
-import data.NpcDataAndStuff
+import data.NeedsAndStuff
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 import ktx.graphics.use
@@ -50,8 +50,8 @@ class RenderSystem(
       val npc = npcMapper[entity].npc
 
       val needSpritesToDraw = npc.npcNeeds.map {
-        it.need.toString() to Assets.sprites["needs"]!![it.need.toString()] ?: error("No sprite found for ${it.need}") }.forEachIndexed { index, spriteAndKey ->
-        if(NpcDataAndStuff.statesToNeeds[npc.npcState] == spriteAndKey.first) {
+        it.key.toString() to Assets.sprites["needs"]!![it.key.toString()] ?: error("No sprite found for ${it.key}") }.forEachIndexed { index, spriteAndKey ->
+        if(NeedsAndStuff.statesToNeeds[npc.npcState] == spriteAndKey.first) {
           spriteAndKey.second?.setScale(scaleAmount.random())
         }
         spriteAndKey.second?.setPosition(x + manSprite.width, y + manSprite.height - (index * spriteAndKey.second?.height!!))

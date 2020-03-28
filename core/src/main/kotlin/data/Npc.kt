@@ -1,13 +1,9 @@
 package data
 
-import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import ktx.math.amid
-import ktx.math.random
-import ktx.math.vec2
 import screens.Mgo
 import screens.Place
-import screens.PlaceType
 import statemachine.StateMachine
 
 /**
@@ -50,7 +46,7 @@ class Npc(val name: String, val id: String) {
     val home = Mgo.homeAreas.random()
     lateinit var currentPosition: Vector2
 
-    val onTheMove get() = npcState in NpcDataAndStuff.movingStates
+    val onTheMove get() = npcState in NeedsAndStuff.movingStates
 
     var isDead = false
         private set
@@ -126,7 +122,7 @@ class Npc(val name: String, val id: String) {
     }
 
     private fun applyCosts() {
-        val cost = NpcDataAndStuff.activities[npcState] ?: error("No activity found")
+        val cost = NeedsAndStuff.activities[npcState] ?: error("No activity found")
         applyCosts(cost)
     }
 
@@ -170,32 +166,32 @@ class Npc(val name: String, val id: String) {
              */
 
         when(npcStats.fuel) {
-            in lowRange -> _npcNeeds.add(NpcDataAndStuff.needs[Needs.Fuel]!!)
-            in greatRange -> _npcNeeds.remove(NpcDataAndStuff.needs[Needs.Fuel]!!)
+            in lowRange -> _npcNeeds.add(NeedsAndStuff.needs[Needs.Fuel]!!)
+            in greatRange -> _npcNeeds.remove(NeedsAndStuff.needs[Needs.Fuel]!!)
         }
 
         when(npcStats.rested) {
-            in lowRange -> _npcNeeds.add(NpcDataAndStuff.needs[Needs.Rest]!!)
-            in greatRange -> _npcNeeds.remove(NpcDataAndStuff.needs[Needs.Rest]!!)
+            in lowRange -> _npcNeeds.add(NeedsAndStuff.needs[Needs.Rest]!!)
+            in greatRange -> _npcNeeds.remove(NeedsAndStuff.needs[Needs.Rest]!!)
         }
 
         when(npcStats.money) {
-            in lowRange -> _npcNeeds.add(NpcDataAndStuff.needs[Needs.Money]!!)
-            in greatRange -> _npcNeeds.remove(NpcDataAndStuff.needs[Needs.Money]!!)
+            in lowRange -> _npcNeeds.add(NeedsAndStuff.needs[Needs.Money]!!)
+            in greatRange -> _npcNeeds.remove(NeedsAndStuff.needs[Needs.Money]!!)
         }
 
         /*
         If the npc's base need always is boredom, he / she will always do something
         Nifty.
          */
-        when(npcStats.boredom) {
-            in fullRange -> _npcNeeds.add(NpcDataAndStuff.needs[Needs.Fun]!!)
-        }
+//        when(npcStats.boredom) {
+//            in fullRange -> _npcNeeds.add(NeedsAndStuff.needs[Needs.Fun]!!)
+//        }
 
-        when(npcStats.social) {
-            in lowRange -> _npcNeeds.add(NpcDataAndStuff.needs[Needs.Social]!!)
-            in greatRange -> _npcNeeds.remove(NpcDataAndStuff.needs[Needs.Social]!!)
-        }
+//        when(npcStats.social) {
+//            in lowRange -> _npcNeeds.add(NeedsAndStuff.needs[Needs.Social]!!)
+//            in greatRange -> _npcNeeds.remove(NeedsAndStuff.needs[Needs.Social]!!)
+//        }
         //Die
         if(npcStats.fuel <= lowRange.first + 1) {
             isDead = true
@@ -214,20 +210,12 @@ class Npc(val name: String, val id: String) {
     }
 
 
-    fun hasNeed(need: Needs) : Boolean {
+    fun hasNeed(need: String) : Boolean {
         return npcNeeds.has(need)
     }
 
     fun hasAnyNeeds(): Boolean {
         return npcNeeds.any()
-    }
-
-    fun getTopNeed(): Needs {
-        return if(npcNeeds.any())
-            npcNeeds.first().need
-        else
-            Needs.Fun //Girls wanna have fun!
-
     }
 
     fun walkTo(placeToGo: Place) {
@@ -251,7 +239,7 @@ class ActivityCost(
     val boredomCost: Int get() = (boredom amid kotlin.math.abs(boredom / 2)).random()
 }
 
-class NpcDataAndStuff {
+class NeedsAndStuff {
     companion object NpcDataAndStuff {
         val activities = mapOf(
                 Activity.HavingFun to ActivityCost(Activity.HavingFun, fuel = 6, boredom = -12),
@@ -269,24 +257,18 @@ class NpcDataAndStuff {
         val needs = mapOf(
                 Needs.Fuel to NpcNeed(Needs.Fuel, 1),
                 Needs.Rest to NpcNeed(Needs.Rest, 2),
-                Needs.Money to NpcNeed(Needs.Money, 3),
-                Needs.Fun to NpcNeed(Needs.Fun, 4),
-                Needs.Social to NpcNeed(Needs.Social, 5)
-        )
+                Needs.Money to NpcNeed(Needs.Money, 3))
 
         val needsToActivities = mapOf(
                 Needs.Fuel to Activity.Eating,
                 Needs.Rest to Activity.Sleeping,
-                Needs.Money to Activity.Working,
-                Needs.Fun to Activity.HavingFun
+                Needs.Money to Activity.Working
         )
 
         val statesToNeeds = mapOf(
-                Activity.Socializing to Needs.Social.toString(),
-                Activity.Working to Needs.Money.toString(),
-                Activity.HavingFun to Needs.Fun.toString(),
-                Activity.Sleeping to Needs.Rest.toString(),
-                Activity.Eating to Needs.Fuel.toString()
+                Activity.Working to Needs.Money,
+                Activity.Sleeping to Needs.Rest,
+                Activity.Eating to Needs.Fuel
         )
 
         val movingStates = setOf(
@@ -299,16 +281,16 @@ class NpcDataAndStuff {
 }
 
 
-enum class Needs {
-    Fuel,
-    Rest,
-    Money,
-    Social,
-    Fun
+class Needs {
+    companion object {
+        const val Fuel = "Fuel"
+        const val Rest ="Rest"
+        const val Money = "Money"
+    }
 }
 
-data class NpcNeed(val need: Needs, val priority: Int)
+data class NpcNeed(val key: String, val priority: Int)
 
-fun List<NpcNeed>.has(need: Needs) : Boolean {
-    return this.firstOrNull()?.need == need
+fun List<NpcNeed>.has(need: String) : Boolean {
+    return this.firstOrNull()?.key == need
 }

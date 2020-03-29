@@ -26,7 +26,7 @@ abstract class NpcTask : LeafTask<Npc>() {
     }
 
     private fun applyCosts() {
-        val cost = NeedsAndStuff.costs[npc.npcState] ?: error("No activity found")
+        val cost = NeedsAndStuff.getCostForActivity(npc.npcState)
         applyCosts(cost)
     }
 

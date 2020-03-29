@@ -12,5 +12,6 @@ class Events {
         const val WentToEat = "WentToEat"
         const val WentToWork = "WentToWork"
         const val WentHomeToSleep = "WentToHomeToSleep"
+        const val GoingToMeetAFriend = "GoingToMeetAFriend"
     }
 }

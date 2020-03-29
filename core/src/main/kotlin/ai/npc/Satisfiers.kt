@@ -4,18 +4,25 @@ import data.Needs
 import data.Npc
 import screens.Mgo
 
-class Sf {
+class Satisfiers {
 
-    companion object Sf {
+    companion object {
         val satisfiableResolvers = mapOf(
                 Needs.Fuel to { npc: Npc -> canIEatHere(npc) },
                 Needs.Money to { npc: Npc -> isThisWhereIWork(npc) },
+                Needs.Social to { npc: Npc -> doIHaveAFriendNearby(npc) },
                 Needs.Rest to { npc: Npc -> canISleepHere(npc) })
+
+        private fun doIHaveAFriendNearby(npc: Npc) : Boolean {
+
+            val doI = npc.friends.any { npc.circleOfConcern.contains(it.currentPosition) }
+            return doI
+         }
 
         val whereToSatisfyResolvers = mapOf(
                 Needs.Rest to { npc: Npc -> npc.home },
                 Needs.Money to  { npc: Npc -> npc.workPlace },
-        Needs.Fuel to { npc: Npc -> Mgo.restaurants.random()}
+                Needs.Fuel to { npc: Npc -> Mgo.restaurants.random()}
         )
 
         fun isThisWhereIWork(npc: Npc) :Boolean {

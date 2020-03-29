@@ -11,6 +11,7 @@ import ktx.app.KtxScreen
 import ktx.math.amid
 import ktx.math.random
 import ktx.math.vec2
+import screens.Mgo.Companion.npcs
 import systems.GameInputSystem
 import systems.RenderSystem
 
@@ -49,10 +50,6 @@ class MainGameScreen(
 
     }
 
-    override fun dispose() {
-        super.dispose()
-    }
-
     private fun stopTheWorld() {
         for (system in engine.systems.filter {
             it !is RenderSystem }) {
@@ -64,12 +61,26 @@ class MainGameScreen(
         }
     }
 
+    private val friendRange = 1..10
     private var needsInit = true
     private fun initializeGame() {
         val r = 0f amid 64f
         for(i in 0..1000) {
-            Mgo.npcs.add(actorFactory.addNpcAt(position =  vec2(r.random(), r.random())).first)
+            npcs.add(actorFactory.addNpcAt(position =  vec2(r.random(), r.random())).first)
         }
+
+
+        //Set up some friends!
+        for(npc in npcs) {
+            for(i in 1..friendRange.random()) {
+                //1. Find a friend
+                val friend = npcs.random()
+                //1. add both as friends to each other!
+                npc.friends.add(friend)
+                friend.friends.add(npc)
+            }
+        }
+
         needsInit = false
     }
 }

@@ -8,6 +8,23 @@ import satisfyNeed:"ai.npc.SatisfyNeed"
 import hasNeed:"ai.npc.HasNeed"
 import walkTo:"ai.npc.WalkingTo"
 import findWhereToSatisfy:"ai.npc.FindWhereToSatisfy"
+import findAFriend:"ai.npc.FindAFriend"
+
+subtree name:"socialTree"
+    selector
+        invert
+            hasNeed need:"Social"
+        selector
+            sequence
+                canSatisfy need:"Social"
+                satisfyNeed need:"Social"
+            alwaysSucceed
+                sequence
+                    findAFriend
+                    walkTo
+                    sequence
+                        canSatisfy need:"Social"
+                        satisfyNeed need:"Social"
 
 subtree name:"hungerTree"
     selector
@@ -15,8 +32,8 @@ subtree name:"hungerTree"
             hasNeed need:"Fuel"
         selector
             sequence
-                    canSatisfy need:"Fuel"
-                    satisfyNeed need:"Fuel"
+                canSatisfy need:"Fuel"
+                satisfyNeed need:"Fuel"
             alwaysSucceed
                 sequence
                     findWhereToSatisfy need:"Fuel"
@@ -62,3 +79,4 @@ root
         $hungerTree
         $sleepTree
         $workTree
+        $socialTree

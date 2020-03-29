@@ -1,7 +1,8 @@
 package data
 
 /**
- * Sort of like what we're doing or something
+ * Sort of like what we're doing or something, used to be
+ * called states
  */
 class Activity {
     companion object {
@@ -15,5 +16,6 @@ class Activity {
         const val GoingToEat = "GoingToEat"
         const val GoingToWork = "GoingToWork"
         const val GoingHomeToSleep = "GoingHomeToSleep"
+        const val GoingToMeetAFriend = "GoingToMeetAFriend"
     }
 }

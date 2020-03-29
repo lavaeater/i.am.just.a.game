@@ -12,7 +12,7 @@ class WalkingTo: NpcTask() {
 
     override fun execute(): Status {
 
-        applyCosts(NeedsAndStuff.costs[Activity.OnTheMove]?: error("Couldn't find cost for ${Activity.OnTheMove}"))
+        applyCosts(NeedsAndStuff.getCostForActivity(Activity.OnTheMove))
 
         return if(npc.onTheMove) Status.RUNNING else Status.SUCCEEDED
     }

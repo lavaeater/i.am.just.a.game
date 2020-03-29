@@ -26,18 +26,23 @@ class NpcControlSystem : IteratingSystem(allOf(
 
     val body = bodyMpr[entity]!!.body
     if (npc.onTheMove) {
-      npc.thePlaceIWantToBe.box.getCenter(someVector).moveFromTo(body)
-
-      if (npc.thePlaceIWantToBe.box.contains(npc.currentPosition))
-        npc.stopDoingIt()
+      if(npc.meetingAFriend) {
+        npc.friendToGoTo?.currentPosition?.moveFromTo(body)
+        if(npc.circleOfConcern.contains(npc.friendToGoTo?.currentPosition))
+          npc.stopDoingIt()
+      } else {
+        npc.thePlaceIWantToBe.box.getCenter(someVector).moveFromTo(body)
+        if (npc.thePlaceIWantToBe.box.contains(npc.currentPosition))
+          npc.stopDoingIt()
+      }
     }
     npc.currentPosition = body.position
 
     if(!npc.onTheMove)
       body.linearVelocity = vec2(0f,0f)
-
-    if(npc.isDead)
-      engine.removeEntity(entity)
+//
+//    if(npc.isDead)
+//      engine.removeEntity(entity)
   }
 }
 

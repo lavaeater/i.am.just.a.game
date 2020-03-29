@@ -12,7 +12,7 @@ class CanSatisfy: NeedTask() {
     override fun execute(): Status {
         timeHasPassed()
 
-        val satisfier = Sf.satisfiableResolvers[need] ?: error("No satisifyResolver found for need ${need}")
+        val satisfier = Satisfiers.satisfiableResolvers[need] ?: error("No satisifyResolver found for need ${need}")
         return if (satisfier(npc))
             Status.SUCCEEDED
         else

@@ -2,54 +2,82 @@ package data
 
 class NeedsAndStuff {
     companion object {
-        val costs = mapOf(
+        fun getCostForNeed(need:String) : Cost {
+            return costs[needsToActivities[need]]?: (costs[Activity.Neutral] ?: error("Actitivy Neutral has no cost, this is wrong"))
+        }
+
+        fun getCostForActivity(activity: String) : Cost {
+            return costs[activity] ?: costs[Activity.Neutral] ?: error("Activity Neutral has no cost, which is wrong")
+        }
+
+        private val costs = mapOf(
                 Activity.Working to Cost(
                         Activity.Working, mapOf(
                         Needs.Money to -16,
                         Needs.Fuel to 8,
-                        Needs.Rest to 6
+                        Needs.Rest to 6,
+                        Needs.Social to 2
                 )),
                 Activity.Sleeping to Cost(
                         Activity.Sleeping, mapOf(
                         Needs.Money to 0,
                         Needs.Fuel to 0,
-                        Needs.Rest to -16
+                        Needs.Rest to -16,
+                        Needs.Social to 0
+                )),
+                Activity.Sleeping to Cost(
+                        Activity.Sleeping, mapOf(
+                        Needs.Money to 4,
+                        Needs.Fuel to 6,
+                        Needs.Rest to 6,
+                        Needs.Social to -16
                 )),
                 Activity.Eating to Cost(Activity.Eating, mapOf(
                         Needs.Money to -8,
                         Needs.Fuel to -16,
-                        Needs.Rest to 0
+                        Needs.Rest to 0,
+                        Needs.Social to 0
                 )),
-                Activity.Neutral to Cost(Activity.Neutral),
+                Activity.Neutral to Cost(Activity.Neutral),Activity.OnTheMove to Cost(
+                Activity.GoingToMeetAFriend, mapOf(
+                Needs.Money to 0,
+                Needs.Fuel to 8,
+                Needs.Rest to 8,
+                Needs.Social to 4)),
                 Activity.OnTheMove to Cost(
                         Activity.OnTheMove, mapOf(
                         Needs.Money to 0,
                         Needs.Fuel to 8,
-                        Needs.Rest to 8)))
+                        Needs.Rest to 8,
+                        Needs.Social to 4)))
 
         val needsToActivities = mapOf(
                 Needs.Fuel to Activity.Eating,
                 Needs.Rest to Activity.Sleeping,
-                Needs.Money to Activity.Working
+                Needs.Money to Activity.Working,
+                Needs.Social to Activity.Socializing
         )
 
         val statesToNeeds = mapOf(
                 Activity.Working to Needs.Money,
                 Activity.Sleeping to Needs.Rest,
-                Activity.Eating to Needs.Fuel
+                Activity.Eating to Needs.Fuel,
+                Activity.Socializing to Needs.Social
         )
 
         val activitiesToEvents = mapOf(
                 Activity.Working to Events.StartedWorking,
                 Activity.Eating to Events.StartedEating,
-                Activity.Sleeping to Events.FellAsleep
+                Activity.Sleeping to Events.FellAsleep,
+                Activity.Socializing to Events.StartedSocializing
         )
 
         val movingStates = setOf(
                 Activity.OnTheMove,
                 Activity.GoingToEat,
                 Activity.GoingToWork,
-                Activity.GoingHomeToSleep
+                Activity.GoingHomeToSleep,
+                Activity.GoingToMeetAFriend
         )
 
         val lowRange = -24..24

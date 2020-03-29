@@ -5,8 +5,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.math.Rectangle
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.viewport.Viewport
 import factory.ActorFactory
 import ktx.app.KtxScreen
@@ -75,16 +73,3 @@ class MainGameScreen(
         needsInit = false
     }
 }
-
-fun Vector2.pointIsInside(size: Vector2, point: Vector2):Boolean {
-    return point.x < this.x + size.x / 2 && point.x > this.x -size.x && point.y < this.y + size.y / 2 && point.y > this.y - size.y
-}
-
-enum class PlaceType {
-    Workplace,
-    Restaurant,
-    Home,
-    Tivoli
-}
-
-data class Place(val name: String = "Don't matter", val type: PlaceType = PlaceType.Workplace, val box: Rectangle = Rectangle(0f,0f,10f, 10f))

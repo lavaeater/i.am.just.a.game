@@ -149,7 +149,7 @@ data class Cost(val activity: String, val costMap: Map<String, Int> = mapOf(
 
 class NeedsAndStuff {
     companion object {
-        val activities = mapOf(
+        val costs = mapOf(
                 Activity.Working to Cost(
                         Activity.Working, mapOf(
                         Needs.Money to -16,

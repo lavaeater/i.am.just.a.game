@@ -7,7 +7,6 @@ import data.*
 import data.NeedsAndStuff.Companion.fullRange
 import data.NeedsAndStuff.Companion.lowRange
 import screens.Mgo
-import systems.AiAndTimeSystem
 
 
 abstract class NpcTask : LeafTask<Npc>() {
@@ -30,7 +29,7 @@ abstract class NpcTask : LeafTask<Npc>() {
     }
 
     private fun applyCosts() {
-        val cost = NeedsAndStuff.activities[npc.npcState] ?: error("No activity found")
+        val cost = NeedsAndStuff.costs[npc.npcState] ?: error("No activity found")
         applyCosts(cost)
     }
 
@@ -91,7 +90,7 @@ class WalkingTo: NpcTask() {
 
     override fun execute(): Status {
 
-        applyCosts(NeedsAndStuff.activities[Activity.OnTheMove]?: error("Couldn't find cost for ${Activity.OnTheMove}"))
+        applyCosts(NeedsAndStuff.costs[Activity.OnTheMove]?: error("Couldn't find cost for ${Activity.OnTheMove}"))
 
         return if(npc.onTheMove) Status.RUNNING else Status.SUCCEEDED
     }
@@ -120,9 +119,11 @@ class SatisfyNeed : NeedTask() {
 
     override fun execute(): Status {
         return if (hasNeed(need)) {
-            val activity = NeedsAndStuff.activities[NeedsAndStuff.needsToActivities[need]]!!
-            npc.acceptEvent(NeedsAndStuff.activitiesToEvents[activity.activity]?: error("Event not found for $activity"))
-            applyCosts(activity)
+            val cost = NeedsAndStuff.costs[NeedsAndStuff.needsToActivities[need]]!!
+            if(npc.npcState != cost.activity)
+                npc.acceptEvent(NeedsAndStuff.activitiesToEvents[cost.activity]?: error("Event not found for $cost"))
+
+            applyCosts(cost)
             Status.RUNNING
         } else {
             npc.stopDoingIt()

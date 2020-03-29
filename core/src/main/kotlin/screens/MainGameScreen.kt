@@ -65,8 +65,10 @@ class MainGameScreen(
     private var needsInit = true
     private fun initializeGame() {
         val r = 0f amid 64f
-        for(i in 0..1000) {
-            npcs.add(actorFactory.addNpcAt(position =  vec2(r.random(), r.random())).first)
+        for(i in 0..Mgo.numberOfNpcs) {
+            val npc = actorFactory.addNpcAt(position =  vec2(r.random(), r.random())).first
+            npcs.add(npc)
+            Mgo.homeAreas.add(npc.home)
         }
 
 

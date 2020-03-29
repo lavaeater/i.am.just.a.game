@@ -10,46 +10,61 @@ class NeedsAndStuff {
             return costs[activity] ?: costs[Activity.Neutral] ?: error("Activity Neutral has no cost, which is wrong")
         }
 
+        /**
+         * Costs are PER hour
+         *
+         * Timing should be so that sleep is required every 16 hours.
+         *
+         * We tick 15 minutes per tick, this means that Rest should deplete
+         * at a rate of... 96 - (16 * 60r)
+         *
+         * and costs should then be per hour! Sleep should deteriorate at
+         * rate 6, circa
+         *
+         * This means that to eat every 5 hours, food needs to deteriorate faster:
+         *
+         * around 20 per hour.
+         *
+         * To want to meet someone every day, we need social to deteriorate at 96 / 24 = 4
+         *
+         * Reverse, sleep up to full in approx 6 hours...12
+         *
+         * This is very good.
+         */
         private val costs = mapOf(
                 Activity.Working to Cost(
                         Activity.Working, mapOf(
-                        Needs.Money to -16,
-                        Needs.Fuel to 8,
-                        Needs.Rest to 6,
+                        Needs.Money to -20,
+                        Needs.Fuel to 20,
+                        Needs.Rest to 10,
                         Needs.Social to 2
                 )),
                 Activity.Sleeping to Cost(
                         Activity.Sleeping, mapOf(
                         Needs.Money to 0,
                         Needs.Fuel to 0,
-                        Needs.Rest to -16,
+                        Needs.Rest to -12,
                         Needs.Social to 0
                 )),
-                Activity.Sleeping to Cost(
-                        Activity.Sleeping, mapOf(
-                        Needs.Money to 4,
-                        Needs.Fuel to 6,
-                        Needs.Rest to 6,
-                        Needs.Social to -16
+                Activity.Socializing to Cost(
+                        Activity.Socializing, mapOf(
+                        Needs.Money to 40,
+                        Needs.Fuel to 20,
+                        Needs.Rest to 8,
+                        Needs.Social to -48
                 )),
                 Activity.Eating to Cost(Activity.Eating, mapOf(
                         Needs.Money to -8,
                         Needs.Fuel to -16,
-                        Needs.Rest to 0,
-                        Needs.Social to 0
+                        Needs.Rest to 4,
+                        Needs.Social to 4
                 )),
-                Activity.Neutral to Cost(Activity.Neutral),Activity.OnTheMove to Cost(
-                Activity.GoingToMeetAFriend, mapOf(
-                Needs.Money to 0,
-                Needs.Fuel to 8,
-                Needs.Rest to 8,
-                Needs.Social to 4)),
-                Activity.OnTheMove to Cost(
-                        Activity.OnTheMove, mapOf(
+                Activity.Neutral to Cost(Activity.Neutral),
+                Activity.OnTheMove to Cost(Activity.OnTheMove, mapOf(
                         Needs.Money to 0,
-                        Needs.Fuel to 8,
-                        Needs.Rest to 8,
-                        Needs.Social to 4)))
+                        Needs.Fuel to 24,
+                        Needs.Rest to 10,
+                        Needs.Social to 2)))
 
         val needsToActivities = mapOf(
                 Needs.Fuel to Activity.Eating,

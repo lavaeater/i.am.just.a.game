@@ -4,6 +4,6 @@ import ktx.math.amid
 
 class Stats {
     companion object {
-        val range = 64 amid 32
+        val range = 72 amid 14
     }
 }

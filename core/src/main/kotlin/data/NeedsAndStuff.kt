@@ -54,8 +54,8 @@ class NeedsAndStuff {
                         Needs.Social to -48
                 )),
                 Activity.Eating to Cost(Activity.Eating, mapOf(
-                        Needs.Money to -8,
-                        Needs.Fuel to -16,
+                        Needs.Money to 48,
+                        Needs.Fuel to -64,
                         Needs.Rest to 4,
                         Needs.Social to 4
                 )),

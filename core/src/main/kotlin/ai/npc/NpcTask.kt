@@ -35,7 +35,7 @@ abstract class NpcTask : LeafTask<Npc>() {
     fun applyCosts(cost: Cost) {
         val timeFactor = 60 / AiAndTimeSystem.minutesPerTick.toInt()
         for((k, c) in cost.costMap) {
-            val actualCost = ((c - abs(c /4))..(c + abs(c/4))).random() / timeFactor
+            val actualCost = c / timeFactor
             npc.npcStats.statsMap[k] = (npc.npcStats.statsMap[k]!! - actualCost).coerceIn(NeedsAndStuff.fullRange)
         }
     }

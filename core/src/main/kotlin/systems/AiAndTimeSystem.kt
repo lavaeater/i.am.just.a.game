@@ -7,9 +7,10 @@ import components.NpcComponent
 import data.Npc
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
+import ktx.log.info
 import java.time.LocalDateTime
 
-class AiAndTimeSystem(startTime: Int = 6, minutes: Long = 15, interval: Float = 1f) : IntervalIteratingSystem(allOf(AiComponent::class).get(), interval, 5) {
+class AiAndTimeSystem(startTime: Int = 6, minutes: Long = 15, interval: Float = 5f) : IntervalIteratingSystem(allOf(AiComponent::class).get(), interval, 5) {
   private val aiMapper = mapperFor<AiComponent<Npc>>()
 
   init {
@@ -22,9 +23,13 @@ class AiAndTimeSystem(startTime: Int = 6, minutes: Long = 15, interval: Float = 
   }
 
   override fun updateInterval() {
+
     currentDateTime =  currentDateTime.plusMinutes(minutesPerTick)
+    info { currentDateTime.toString() }
     super.updateInterval()
   }
+
+
 
   companion object {
     var currentDateTime: LocalDateTime = LocalDateTime.of(2020, 1,1, 1,0)

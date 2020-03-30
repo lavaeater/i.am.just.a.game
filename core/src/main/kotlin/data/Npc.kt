@@ -1,9 +1,7 @@
 package data
 
 import com.badlogic.gdx.math.Circle
-import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
-import ktx.math.random
 import ktx.math.vec2
 import screens.Mgo
 import screens.Place
@@ -17,7 +15,7 @@ class Npc(val name: String, val id: String) {
     lateinit var thePlaceIWantToBe: Place
         private set
     val workPlace = Mgo.workPlaces.random()
-    val home = Place(type = PlaceType.Home, box = Rectangle(Mgo.homeXRange.random(), Mgo.homeYRange.random(), Mgo.sizeRange.random(), Mgo.sizeRange.random()))
+    val home = Place(type = PlaceType.Home, box = Mgo.getRandomRectangle())
     val friends = mutableSetOf<Npc>()
     private val circleOfConcernRadius = 4f
 

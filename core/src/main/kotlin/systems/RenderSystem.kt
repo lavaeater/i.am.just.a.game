@@ -76,10 +76,11 @@ class RenderSystem(
 
     Mgo.allPlaces.forEach {
       when(it.type) {
-        PlaceType.Home ->     shapeRenderer.setColor(0.3f, 0.3f, 0f, 0.9f)
-        PlaceType.Workplace ->     shapeRenderer.setColor(.3f, .3f, 0.7f, 0.6f)
-        PlaceType.Restaurant ->     shapeRenderer.setColor(0f, .6f, 0f, .7f)
-        PlaceType.Tivoli ->     shapeRenderer.setColor(1f, 0f, 0f, 0f)
+        is PlaceType.Home ->     shapeRenderer.setColor(0.3f, 0.3f, 0f, 0.9f)
+        is PlaceType.Workplace ->     shapeRenderer.setColor(.3f, .3f, 0.7f, 0.6f)
+        is PlaceType.Restaurant ->     shapeRenderer.setColor(0f, .6f, 0f, .7f)
+        is PlaceType.Tivoli ->     shapeRenderer.setColor(1f, 0f, 0f, 0f)
+        is PlaceType.TravelHub ->     shapeRenderer.color = Color.CORAL
       }
       shapeRenderer.rect(it.box.x, it.box.y, it.box.width, it.box.height)
     }

@@ -12,8 +12,8 @@ class CanSatisfyCurrentNeed: NpcTask() {
     override fun execute(): Status {
         timeHasPassed()
 
-        val satisfier = Satisfiers.satisfiableResolvers[npc.currentNeed] ?: error("No satisifyResolver found for need ${npc.currentNeed}")
-        return if (satisfier(npc))
+        val canSatisfy = Satisfiers.satisfiableResolvers[npc.currentNeed] ?: error("No satisifyResolver found for need ${npc.currentNeed}")
+        return if (canSatisfy(npc))
             Status.SUCCEEDED
         else
             Status.FAILED

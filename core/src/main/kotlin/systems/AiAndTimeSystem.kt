@@ -9,7 +9,7 @@ import ktx.ashley.mapperFor
 import ktx.log.info
 import java.time.LocalDateTime
 
-class AiAndTimeSystem(startTime: Int = 6, minutes: Long = 15, interval: Float = 0.1f) : IntervalIteratingSystem(allOf(AiComponent::class).get(), interval, 5) {
+class AiAndTimeSystem(startTime: Int = 6, minutes: Long = 15, interval: Float = 5f) : IntervalIteratingSystem(allOf(AiComponent::class).get(), interval, 5) {
   private val aiMapper = mapperFor<AiComponent<Npc>>()
 
   init {

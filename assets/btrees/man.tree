@@ -3,80 +3,56 @@
 #
 
 # Alias definitions
-import canSatisfy:"ai.npc.CanSatisfy"
+import canSatisfy:"ai.npc.CanSatisfyCurrentNeed"
 import satisfyNeed:"ai.npc.SatisfyNeed"
-import hasNeed:"ai.npc.HasNeed"
-import walkTo:"ai.npc.WalkingTo"
+import walkTo:"ai.npc.WalkTo"
+import walkToNearestHub:"ai.npc.WalkToNearestTravelHub"
+import travelToHub:"ai.npc.TravelToHub"
+import walking:"ai.npc.WalkingTowards"
+import canWalkTo:"ai.npc.CanWalkTo"
 import findWhereToSatisfy:"ai.npc.FindWhereToSatisfy"
 import findAFriend:"ai.npc.FindAFriend"
+import whatIsMyNeed:"ai.npc.WhatIsMyNeed"
+import hasAnyNeed:"ai.npc.HasAnyNeed"
+import canTravel:"ai.npc.CanTravel"
 
-subtree name:"socialTree"
+subtree name:"walkIfNotSatisfy"
+    sequence
+        invert
+            canSatisfy
+        canWalkTo
+        walkTo
+        invert
+            walking #should fail so we move to next node in other tree
+
+subtree name:"travelToCenter"
+    selector
+        sequence
+            invert
+                canTravel
+            walkToNearestHub hubType:"Suburban"
+            invert
+                walking
+        sequence
+            canTravel
+            travelToHub hubType:"Central"
+
+subtree name:"needTree"
     selector
         invert
-            hasNeed need:"Social"
+            whatIsMyNeed
         selector
-            sequence
-                canSatisfy need:"Social"
-                satisfyNeed need:"Social"
-            alwaysSucceed
-                sequence
-                    findAFriend
-                    walkTo
-                    sequence
-                        canSatisfy need:"Social"
-                        satisfyNeed need:"Social"
+            $walkIfNotSatisfy
+            invert
+                $travelToCenter
+            $walkIfNotSatisfy
+            invert
+                satisfyNeed
 
-subtree name:"hungerTree"
-    selector
-        invert
-            hasNeed need:"Fuel"
-        selector
-            sequence
-                canSatisfy need:"Fuel"
-                satisfyNeed need:"Fuel"
-            alwaysSucceed
-                sequence
-                    findWhereToSatisfy need:"Fuel"
-                    walkTo
-                    sequence
-                        canSatisfy need:"Fuel"
-                        satisfyNeed need:"Fuel"
-
-subtree name:"sleepTree"
-    selector
-        invert
-            hasNeed need:"Rest"
-        selector
-            sequence
-                canSatisfy need:"Rest"
-                satisfyNeed need:"Rest"
-            alwaysSucceed
-                sequence
-                    findWhereToSatisfy need:"Rest"
-                    walkTo
-                    sequence
-                        canSatisfy need:"Rest"
-                        satisfyNeed need:"Rest"
-
-subtree name:"workTree"
-    selector
-        invert
-            hasNeed need:"Money"
-        selector
-            sequence
-                canSatisfy need:"Money"
-                satisfyNeed need:"Money"
-            alwaysSucceed
-                sequence
-                    findWhereToSatisfy need:"Money"
-                    walkTo
-                    sequence
-                        canSatisfy need:"Money"
-                        satisfyNeed need:"Money"
+subtree name:"needTree"
 
 root
-    sequence
-        $hungerTree
-        $sleepTree
-        $workTree
-        $socialTree
+    selector
+        invert
+            hasAnyNeed
+        $needTree

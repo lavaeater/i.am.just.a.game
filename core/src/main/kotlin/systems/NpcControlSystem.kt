@@ -39,15 +39,23 @@ class NpcControlSystem : IteratingSystem(allOf(
     if (npc.onTheMove) {
       if (npc.meetingAFriend) {
         npc.friendToGoTo?.currentPosition?.moveFromTo(body, somekindOfSpeedFactor)
-//        if (npc.circleOfConcern.contains(npc.friendToGoTo?.currentPosition))
-//          npc.stopDoingIt()
+        if (npc.circleOfConcern.contains(npc.friendToGoTo?.currentPosition))
+          npc.stopDoingIt()
       } else {
         npc.thePlaceIWantToBe.box.getCenter(someVector).moveFromTo(body, somekindOfSpeedFactor)
-//        if (npc.thePlaceIWantToBe.box.contains(npc.currentPosition))
-//          npc.stopDoingIt()
+        if (npc.thePlaceIWantToBe.box.contains(npc.currentPosition))
+          npc.stopDoingIt()
       }
     }
+
+    if(npc.zipping) {
+      body.setTransform(npc.thePlaceIWantToBe.box.x +npc.thePlaceIWantToBe.box.width / 2, npc.thePlaceIWantToBe.box.y +npc.thePlaceIWantToBe.box.height / 2, body.angle)
+      body.isAwake = true
+      npc.zipping = false
+    }
+
     npc.currentPosition = body.position
+
 
     if (!npc.onTheMove)
       body.linearVelocity = vec2(0f, 0f)

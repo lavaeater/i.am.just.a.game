@@ -1,5 +1,6 @@
 package screens
 
+import com.badlogic.gdx.math.Circle
 import com.badlogic.gdx.math.Rectangle
 import data.Npc
 import ktx.math.ImmutableVector2
@@ -14,16 +15,25 @@ class Mgo {
 
         Lets do random angles and random lengths from a center!
          */
-        val numberOfNpcs = 1000
+        val numberOfNpcs = 1
         val numberOfWorkPlaces = numberOfNpcs / 100 +1
         val numberOfRestaurants = numberOfNpcs / 50 +1
 
 
-        val restaurantRadius = 0f..(numberOfRestaurants.toFloat()*1.5f)
-        val workplaceRadius = restaurantRadius.endInclusive + 25f..(restaurantRadius.endInclusive + numberOfRestaurants / 2)
-        val homeRadius = workplaceRadius.endInclusive+50f..workplaceRadius.endInclusive + numberOfNpcs / 15f
+        val restaurantRadius = 20f..(numberOfRestaurants.toFloat() * 5f)
+        val workplaceRadius = restaurantRadius.endInclusive..(restaurantRadius.endInclusive + numberOfRestaurants / 2)
+        val homeRadius = workplaceRadius.endInclusive+200f..workplaceRadius.endInclusive +200f + numberOfNpcs / 15f
 
         val angleRange =  0f..359f
+
+        //Calculate circumference of a circle in the middle of every area
+
+        //Also, mash work and restaraurants together
+
+        //So, home radius circle:
+
+        val homeCircle = Circle(0f,0f, homeRadius.endInclusive - ((homeRadius.endInclusive - homeRadius.start) / 2))
+
 
 
 
@@ -36,12 +46,12 @@ class Mgo {
         val restaurantWidth = 10f
         val restaurantHeight = 5f
 
-
-
         val workPlaces = (1..numberOfWorkPlaces).map {
             val randomplace = getRandomPlace(workplaceRadius)
             Place(box = Rectangle(randomplace.x,randomplace.y, workPlaceHeight, workPlaceWidth))
         }
+
+        val travelHubs = mutableListOf<Place>()
 
         fun getRandomPlace(floatingPointRange: ClosedRange<Float>): ImmutableVector2 {
             val randomAngle = angleRange.random()
@@ -59,8 +69,6 @@ class Mgo {
         }
 
         val restaurants = (0..numberOfRestaurants).map {
-            val randomAngle = angleRange.random()
-            val magnitude = restaurantRadius.random()
             val randomplace =  getRandomPlace(restaurantRadius)
 
             Place(type = PlaceType.Restaurant, box = Rectangle(randomplace.x, randomplace.y, restaurantWidth, restaurantHeight))
@@ -68,6 +76,6 @@ class Mgo {
 
         val homeAreas = mutableListOf<Place>()
 
-        val allPlaces get() = workPlaces + restaurants + homeAreas
+        val allPlaces get() = workPlaces + restaurants + homeAreas  + travelHubs
     }
 }

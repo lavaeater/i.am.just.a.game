@@ -16,7 +16,7 @@ import java.time.Period
 /**
  * Interval should be same as in Ai / Time system - no, it should be 4 times that!
  */
-class InfectionSystem(interval: Float = 0.1f) : IntervalIteratingSystem(allOf(NpcComponent::class).get(), interval, 5) {
+class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcComponent::class).get(), interval, 5) {
   private var needsInit = true
   private val npcMapper = mapperFor<NpcComponent>()
 

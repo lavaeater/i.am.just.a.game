@@ -7,6 +7,7 @@ import java.lang.Math.abs
 
 abstract class NpcTask : LeafTask<Npc>() {
 
+    val walkRadius = 100f
     val npc : Npc get() = `object`
 
     fun timeHasPassed() {

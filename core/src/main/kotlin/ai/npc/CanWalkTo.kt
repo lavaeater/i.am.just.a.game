@@ -9,15 +9,17 @@ import screens.Place
 
 class CanWalkTo: NpcTask() {
     override fun copyTo(task: Task<Npc>?): Task<Npc> {
-        TODO("Not yet implemented")
+        return task as CanWalkTo
     }
-
     override fun execute(): Status {
         timeHasPassed()
 
         val whereToSatisfy = (Satisfiers.whereToSatisfyResolvers[npc.currentNeed] ?: error("No resolver found for need ${npc.currentNeed}"))(npc)
 
-        return if(npc.currentPosition.placesInRange(100f, whereToSatisfy).any()) Status.SUCCEEDED else Status.FAILED
+        return if(npc.currentPosition.placesInRange(walkRadius, whereToSatisfy).any())
+            Status.SUCCEEDED
+        else
+            Status.FAILED
     }
 }
 

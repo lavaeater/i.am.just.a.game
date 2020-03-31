@@ -16,6 +16,7 @@ import java.time.LocalDate
  * We're gonna be needin' some friendship up in here.
  */
 class Npc(val name: String, val id: String, homeArea: Rectangle) {
+    var zipping = false
     var currentNeed: String = Needs.Money
     var iWillStayAtHome = false
     var symptomatic = true
@@ -135,6 +136,11 @@ class Npc(val name: String, val id: String, homeArea: Rectangle) {
     fun goToMeet(friend: Npc) {
         friendToGoTo = friend
 
+    }
+
+    fun zipTo(place: Place) {
+        thePlaceIWantToBe = place
+        zipping = true
     }
 }
 

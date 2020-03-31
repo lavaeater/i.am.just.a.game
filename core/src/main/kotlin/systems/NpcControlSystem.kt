@@ -39,12 +39,12 @@ class NpcControlSystem : IteratingSystem(allOf(
     if (npc.onTheMove) {
       if (npc.meetingAFriend) {
         npc.friendToGoTo?.currentPosition?.moveFromTo(body, somekindOfSpeedFactor)
-        if (npc.circleOfConcern.contains(npc.friendToGoTo?.currentPosition))
-          npc.stopDoingIt()
+//        if (npc.circleOfConcern.contains(npc.friendToGoTo?.currentPosition))
+//          npc.stopDoingIt()
       } else {
         npc.thePlaceIWantToBe.box.getCenter(someVector).moveFromTo(body, somekindOfSpeedFactor)
-        if (npc.thePlaceIWantToBe.box.contains(npc.currentPosition))
-          npc.stopDoingIt()
+//        if (npc.thePlaceIWantToBe.box.contains(npc.currentPosition))
+//          npc.stopDoingIt()
       }
     }
     npc.currentPosition = body.position

@@ -5,16 +5,19 @@ import data.Activity
 import data.NeedsAndStuff
 import data.Npc
 
-class WalkingTo: NpcTask() {
+class WalkTo: NpcTask() {
     override fun copyTo(task: Task<Npc>?): Task<Npc> {
-        return task as WalkingTo
+        return task as WalkTo
     }
 
     override fun execute(): Status {
 
         applyCosts(NeedsAndStuff.getCostForActivity(Activity.OnTheMove))
-
-        return if(npc.onTheMove) Status.RUNNING else Status.SUCCEEDED
+        val whereToSatisfy = (Satisfiers.whereToSatisfyResolvers[npc.currentNeed]
+                ?: error("No resolver found for need ${npc.currentNeed}"))(npc)
+        npc.walkTo(whereToSatisfy.random())
+        return Status.SUCCEEDED
     }
 
 }
+

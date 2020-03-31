@@ -3,16 +3,16 @@ package ai.npc
 import com.badlogic.gdx.ai.btree.Task
 import data.Npc
 
-class CanSatisfy: NeedTask() {
+class CanSatisfyCurrentNeed: NpcTask() {
     override fun copyTo(task: Task<Npc>?): Task<Npc> {
 
-        return task as CanSatisfy
+        return task as CanSatisfyCurrentNeed
     }
 
     override fun execute(): Status {
         timeHasPassed()
 
-        val satisfier = Satisfiers.satisfiableResolvers[need] ?: error("No satisifyResolver found for need ${need}")
+        val satisfier = Satisfiers.satisfiableResolvers[npc.currentNeed] ?: error("No satisifyResolver found for need ${npc.currentNeed}")
         return if (satisfier(npc))
             Status.SUCCEEDED
         else

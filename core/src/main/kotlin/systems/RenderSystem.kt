@@ -45,11 +45,6 @@ class RenderSystem(
     val manSprite = Assets.sprites[spriteComponent.spriteKey]!!.entries.first().value
     val x = transform.position.x - manSprite.width / 2
     val y = transform.position.y - manSprite.height / 3
-    manSprite.setPosition(x, y)
-
-    batch.use {
-      manSprite.draw(batch)
-    }
 
     val npc = npcMapper[entity]
 
@@ -64,21 +59,11 @@ class RenderSystem(
     shapeRenderer.end()
 
 
+    manSprite.setPosition(x, y)
 
-//    if(npcMapper.has(entity)) {
-//      val npc = npcMapper[entity].npc
-//
-////      val needSpritesToDraw = npc.npcNeeds.map {
-////        it.key.toString() to Assets.sprites["needs"]!![it.key.toString()] ?: error("No sprite found for ${it.key}") }.forEachIndexed { index, spriteAndKey ->
-////        if(NeedsAndStuff.statesToNeeds[npc.npcState] == spriteAndKey.first) {
-////          spriteAndKey.second?.setScale(scaleAmount.random())
-////        }
-////        spriteAndKey.second?.setPosition(x + manSprite.width, y + manSprite.height - (index * spriteAndKey.second?.height!!))
-////        spriteAndKey.second?.draw(batch)
-////        spriteAndKey.second?.setScale(1f)
-////      }
-//    }
-
+    batch.use {
+      manSprite.draw(batch)
+    }
   }
 
   override fun update(deltaTime: Float) {

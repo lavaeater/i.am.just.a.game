@@ -3,12 +3,14 @@ package systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.SortedIteratingSystem
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import components.CharacterSpriteComponent
 import components.NpcComponent
 import components.TransformComponent
 import components.VisibleComponent
+import data.CoronaStatus
 import data.NeedsAndStuff
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
@@ -35,7 +37,7 @@ class RenderSystem(
 
   private val scaleAmount = 1f amid 0.5f
 
-  override fun processEntity(entity: Entity?, deltaTime: Float) {
+  override fun processEntity(entity: Entity, deltaTime: Float) {
     val transform = transformMapper[entity]
     val spriteComponent = spriteMapper[entity]
 
@@ -44,7 +46,24 @@ class RenderSystem(
     val x = transform.position.x - manSprite.width / 2
     val y = transform.position.y - manSprite.height / 3
     manSprite.setPosition(x, y)
-    manSprite.draw(batch)
+
+    batch.use {
+      manSprite.draw(batch)
+    }
+
+    val npc = npcMapper[entity]
+
+    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
+    when(npc.npc.coronaStatus) {
+      CoronaStatus.Susceptible ->     shapeRenderer.color = Color.BLUE
+      CoronaStatus.Infected -> if(npc.npc.symptomatic && npc.npc.iWillStayAtHome) shapeRenderer.color = Color.YELLOW else if(npc.npc.symptomatic && !npc.npc.iWillStayAtHome) shapeRenderer.color = Color.ORANGE else shapeRenderer.color = Color.RED
+      CoronaStatus.Recovered ->     shapeRenderer.color = Color.GREEN
+      CoronaStatus.Dead ->     shapeRenderer.color = Color.WHITE
+    }
+    shapeRenderer.circle(x + manSprite.width / 2,y + manSprite.height / 2, 1.5f)
+    shapeRenderer.end()
+
+
 
 //    if(npcMapper.has(entity)) {
 //      val npc = npcMapper[entity].npc
@@ -72,21 +91,15 @@ class RenderSystem(
 
     Mgo.allPlaces.forEach {
       when(it.type) {
-        PlaceType.Home ->     shapeRenderer.setColor(1f, 1f, 0f, 0f)
-        PlaceType.Workplace ->     shapeRenderer.setColor(0f, 0f, 1f, 0f)
-        PlaceType.Restaurant ->     shapeRenderer.setColor(0f, 1f, 0f, 0f)
+        PlaceType.Home ->     shapeRenderer.setColor(0.3f, 0.3f, 0f, 0.9f)
+        PlaceType.Workplace ->     shapeRenderer.setColor(.3f, .3f, 0.7f, 0.6f)
+        PlaceType.Restaurant ->     shapeRenderer.setColor(0f, .6f, 0f, .7f)
         PlaceType.Tivoli ->     shapeRenderer.setColor(1f, 0f, 0f, 0f)
       }
       shapeRenderer.rect(it.box.x, it.box.y, it.box.width, it.box.height)
     }
     shapeRenderer.end()
 
-
-    batch.use {
-      //Draw workplaces
-
-
       super.update(deltaTime)
-    }
   }
 }

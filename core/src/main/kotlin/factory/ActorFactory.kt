@@ -4,11 +4,13 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.ai.btree.BehaviorTree
 import com.badlogic.gdx.ai.btree.utils.BehaviorTreeParser
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import components.*
 import data.Npc
+import ktx.math.vec2
 
 class ActorFactory(
 		private val engine: Engine,
@@ -21,8 +23,8 @@ class ActorFactory(
   }
 
 
-  fun addNpcAt(name: String = randomNpcName(), position: Vector2): Pair<Npc, Entity> {
-    val npc = Npc(name, getNpcId(name))
+  fun addNpcAt(name: String = randomNpcName(), rect: Rectangle): Pair<Npc, Entity> {
+    val npc = Npc(name, getNpcId(name),rect)
 
     npcByKeys[npc.id] = npc
 
@@ -32,7 +34,7 @@ class ActorFactory(
       add(NpcComponent(npc))
       add(CharacterSpriteComponent("man"))
       add(VisibleComponent())
-      add(Box2dBodyComponent(createNpcBody(position, npc)))
+      add(Box2dBodyComponent(createNpcBody(vec2(rect.x, rect.y), npc)))
     }
     engine.addEntity(entity)
     return Pair(npc, entity)

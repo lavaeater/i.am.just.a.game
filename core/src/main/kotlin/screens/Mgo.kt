@@ -15,31 +15,31 @@ class Mgo {
          */
         val homeXRange = -100f amid 200f
         val homeYRange = -100f amid 200f
-        val numberOfNpcs = 50
-        val numberOfWorkPlaces = numberOfNpcs / 10
-        val numberOfRestaurants = numberOfNpcs / 5
+        val numberOfNpcs = 5000
+        val numberOfWorkPlaces = numberOfNpcs / 100 +1
+        val numberOfRestaurants = numberOfNpcs / 50 +1
 
 
-        val restaurantRadius = 0f..50f
-        val workplaceRadius = 51f..150f
-        val homeRadius = 151f..250f
+        val restaurantRadius = 0f..(numberOfRestaurants.toFloat()*1.5f)
+        val workplaceRadius = restaurantRadius.endInclusive + 25f..(restaurantRadius.endInclusive + numberOfRestaurants / 2)
+        val homeRadius = workplaceRadius.endInclusive+50f..workplaceRadius.endInclusive + numberOfNpcs / 15f
 
         val angleRange =  0f..359f
 
 
 
-        val homeWidth = 10f
-        val homeHeight = 5f
+        val homeWidth = 5f
+        val homeHeight = 2.5f
 
         val minDistance = 10f
 
-        val workPlaceWidth = 30f
-        val workPlaceHeight = 15f
+        val workPlaceWidth = 15f
+        val workPlaceHeight = 5f
 
         val travelHubSize = 15f
 
-        val restaurantWidth = 20f
-        val restaurantHeight = 10f
+        val restaurantWidth = 10f
+        val restaurantHeight = 5f
 
 
 

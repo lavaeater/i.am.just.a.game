@@ -1,10 +1,7 @@
 package ai.npc
 
 import com.badlogic.gdx.ai.btree.LeafTask
-import data.Cost
-import data.Needs
-import data.NeedsAndStuff
-import data.Npc
+import data.*
 import systems.AiAndTimeSystem
 import java.lang.Math.abs
 
@@ -24,7 +21,7 @@ abstract class NpcTask : LeafTask<Npc>() {
 
     fun hasNeed(need:String) : Boolean {
         val stat = npc.npcStats.statsMap[need]
-        return stat in NeedsAndStuff.lowRange
+        return if(need == Needs.Rest && npc.iWillStayAtHome) true else stat in NeedsAndStuff.lowRange
     }
 
     private fun applyCosts() {

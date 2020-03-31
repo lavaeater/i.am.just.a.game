@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.utils.viewport.Viewport
+import data.CoronaStatus
 import factory.ActorFactory
 import ktx.app.KtxScreen
 import ktx.math.amid
@@ -65,10 +66,19 @@ class MainGameScreen(
     private var needsInit = true
     private fun initializeGame() {
         val r = 0f amid 64f
+
+        val infectionRisk = 5
+        val dieRange = (1..100)
+
         for(i in 0..Mgo.numberOfNpcs) {
-            val npc = actorFactory.addNpcAt(position =  vec2(r.random(), r.random())).first
+            val rect = Mgo.getRandomRectangle()
+            val npc = actorFactory.addNpcAt(rect = rect).first
             npcs.add(npc)
             Mgo.homeAreas.add(npc.home)
+            if(dieRange.random() < infectionRisk) {
+                npc.coronaStatus = CoronaStatus.Infected
+                npc.symptomatic = false
+            }
         }
 
 

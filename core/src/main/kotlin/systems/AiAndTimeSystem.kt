@@ -3,14 +3,13 @@ package systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IntervalIteratingSystem
 import components.AiComponent
-import components.NpcComponent
 import data.Npc
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 import ktx.log.info
 import java.time.LocalDateTime
 
-class AiAndTimeSystem(startTime: Int = 6, minutes: Long = 15, interval: Float = 5f) : IntervalIteratingSystem(allOf(AiComponent::class).get(), interval, 5) {
+class AiAndTimeSystem(startTime: Int = 6, minutes: Long = 15, interval: Float = 0.1f) : IntervalIteratingSystem(allOf(AiComponent::class).get(), interval, 5) {
   private val aiMapper = mapperFor<AiComponent<Npc>>()
 
   init {
@@ -25,7 +24,6 @@ class AiAndTimeSystem(startTime: Int = 6, minutes: Long = 15, interval: Float = 
   override fun updateInterval() {
 
     currentDateTime =  currentDateTime.plusMinutes(minutesPerTick)
-    info { currentDateTime.toString() }
     super.updateInterval()
   }
 
@@ -38,3 +36,4 @@ class AiAndTimeSystem(startTime: Int = 6, minutes: Long = 15, interval: Float = 
     val secondsPerSecond get() = minutesPerTick * 60 / interval
   }
 }
+

@@ -34,9 +34,9 @@ class NeedsAndStuff {
         private val costs = mapOf(
                 Activity.Working to Cost(
                         Activity.Working, mapOf(
-                        Needs.Money to -20,
-                        Needs.Fuel to 20,
-                        Needs.Rest to 10,
+                        Needs.Money to -15,
+                        Needs.Fuel to 16,
+                        Needs.Rest to 8,
                         Needs.Social to 2
                 )),
                 Activity.Sleeping to Cost(
@@ -50,20 +50,20 @@ class NeedsAndStuff {
                         Activity.Socializing, mapOf(
                         Needs.Money to 40,
                         Needs.Fuel to 20,
-                        Needs.Rest to 8,
+                        Needs.Rest to 2,
                         Needs.Social to -48
                 )),
                 Activity.Eating to Cost(Activity.Eating, mapOf(
                         Needs.Money to 48,
                         Needs.Fuel to -64,
-                        Needs.Rest to 4,
+                        Needs.Rest to 0,
                         Needs.Social to 4
                 )),
                 Activity.Neutral to Cost(Activity.Neutral),
                 Activity.OnTheMove to Cost(Activity.OnTheMove, mapOf(
                         Needs.Money to 0,
-                        Needs.Fuel to 24,
-                        Needs.Rest to 10,
+                        Needs.Fuel to 2,
+                        Needs.Rest to 0,
                         Needs.Social to 2)))
 
         val needsToActivities = mapOf(

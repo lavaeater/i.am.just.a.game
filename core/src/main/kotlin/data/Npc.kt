@@ -1,23 +1,37 @@
 package data
 
 import com.badlogic.gdx.math.Circle
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import ktx.math.vec2
+import org.w3c.dom.css.Rect
 import screens.Mgo
 import screens.Place
 import screens.PlaceType
 import statemachine.StateMachine
+import systems.AiAndTimeSystem
+import java.time.LocalDate
 
 /**
  * We're gonna be needin' some friendship up in here.
  */
-class Npc(val name: String, val id: String) {
+class Npc(val name: String, val id: String, homeArea: Rectangle) {
+    var iWillStayAtHome = false
+    var symptomatic = true
     lateinit var thePlaceIWantToBe: Place
         private set
     val workPlace = Mgo.workPlaces.random()
-    val home = Place(type = PlaceType.Home, box = Mgo.getRandomRectangle())
+    val home = Place(type = PlaceType.Home, box = homeArea)
     val friends = mutableSetOf<Npc>()
     private val circleOfConcernRadius = 4f
+
+    var infectionDate = LocalDate.of(2020,1,1)
+
+    var coronaStatus = CoronaStatus.Susceptible
+        set(value) {
+            infectionDate = AiAndTimeSystem.currentDateTime.toLocalDate()
+            field = value
+        }
 
 
     var currentPosition: Vector2 = vec2(0f,0f)
@@ -37,12 +51,13 @@ class Npc(val name: String, val id: String) {
     var npcState: String = Activity.Neutral
         private set
 
-    val npcStats = NpcStats().apply {
-        statsMap[Needs.Fuel] = Stats.range.random()
-        statsMap[Needs.Rest] = Stats.range.random()
-        statsMap[Needs.Money] = Stats.range.random()
-        statsMap[Needs.Social] = Stats.range.random()
-    }
+    val npcStats = NpcStats()
+//            .apply {
+//        statsMap[Needs.Fuel] = Stats.range.random()
+//        statsMap[Needs.Rest] = Stats.range.random()
+//        statsMap[Needs.Money] = Stats.range.random()
+//        statsMap[Needs.Social] = Stats.range.random()
+//    }
 
     private val npcStateMachine = StateMachine.buildStateMachine(Activity.Neutral, ::myStateHasChanged) {
         state(Activity.Neutral) {

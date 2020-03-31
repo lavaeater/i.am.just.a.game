@@ -49,8 +49,6 @@ subtree name:"needTree"
             invert
                 satisfyNeed
 
-subtree name:"needTree"
-
 root
     selector
         invert

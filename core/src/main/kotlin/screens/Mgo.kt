@@ -15,7 +15,7 @@ class Mgo {
 
         Lets do random angles and random lengths from a center!
          */
-        val numberOfNpcs = 1
+        val numberOfNpcs = 100
         val numberOfWorkPlaces = numberOfNpcs / 100 +1
         val numberOfRestaurants = numberOfNpcs / 50 +1
 

@@ -1,9 +1,10 @@
 package screens
 
 import com.badlogic.gdx.math.Rectangle
-import com.badlogic.gdx.math.Vector2
 import data.Npc
-import ktx.math.*
+import ktx.math.ImmutableVector2
+import ktx.math.random
+import ktx.math.withRotationDeg
 
 class Mgo {
     companion object {
@@ -13,9 +14,7 @@ class Mgo {
 
         Lets do random angles and random lengths from a center!
          */
-        val homeXRange = -100f amid 200f
-        val homeYRange = -100f amid 200f
-        val numberOfNpcs = 5000
+        val numberOfNpcs = 1000
         val numberOfWorkPlaces = numberOfNpcs / 100 +1
         val numberOfRestaurants = numberOfNpcs / 50 +1
 
@@ -31,12 +30,8 @@ class Mgo {
         val homeWidth = 5f
         val homeHeight = 2.5f
 
-        val minDistance = 10f
-
         val workPlaceWidth = 15f
         val workPlaceHeight = 5f
-
-        val travelHubSize = 15f
 
         val restaurantWidth = 10f
         val restaurantHeight = 5f

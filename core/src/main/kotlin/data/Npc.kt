@@ -16,6 +16,7 @@ import java.time.LocalDate
  * We're gonna be needin' some friendship up in here.
  */
 class Npc(val name: String, val id: String, homeArea: Rectangle) {
+    var currentNeed: String = Needs.Money
     var iWillStayAtHome = false
     var symptomatic = true
     lateinit var thePlaceIWantToBe: Place

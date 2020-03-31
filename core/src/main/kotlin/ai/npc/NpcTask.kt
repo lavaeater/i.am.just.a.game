@@ -19,6 +19,10 @@ abstract class NpcTask : LeafTask<Npc>() {
         }
     }
 
+    fun hasAnyNeed() : Boolean {
+        return npc.npcStats.statsMap.values.any { it in NeedsAndStuff.lowRange }
+    }
+
     fun hasNeed(need:String) : Boolean {
         val stat = npc.npcStats.statsMap[need]
         return if(need == Needs.Rest && npc.iWillStayAtHome) true else stat in NeedsAndStuff.lowRange

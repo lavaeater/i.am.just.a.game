@@ -9,7 +9,5 @@ import com.badlogic.gdx.ai.btree.annotation.TaskAttribute
  */
 
 abstract class NeedTask : NpcTask() {
-    @JvmField
-    @TaskAttribute(required = true)
-    var need : String = "Money"
+    var need : String = "Money" //Will instead be set by the task "WhatIsMyNeed" - and we will have a default need of like "Nothing, but in this case, money!
 }

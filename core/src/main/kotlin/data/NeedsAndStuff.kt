@@ -73,6 +73,14 @@ class NeedsAndStuff {
                 Needs.Social to Activity.Socializing
         )
 
+        val prioritizedNeeds = listOf(
+            Needs.Fuel,
+            Needs.Rest,
+            Needs.Money,
+            Needs.Social,
+                Needs.Nothing
+        )
+
         val statesToNeeds = mapOf(
                 Activity.Working to Needs.Money,
                 Activity.Sleeping to Needs.Rest,

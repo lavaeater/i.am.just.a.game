@@ -1,0 +1,33 @@
+#
+# Man Tree
+#
+
+# Alias definitions
+import canSatisfy:"ai.npc.CanSatisfy"
+import satisfyNeed:"ai.npc.SatisfyNeed"
+import hasNeed:"ai.npc.HasNeed"
+import walkTo:"ai.npc.WalkingTo"
+import findWhereToSatisfy:"ai.npc.FindWhereToSatisfy"
+import findAFriend:"ai.npc.FindAFriend"
+import whatIsMyNeed:"ai.npc.WhatIsMyNeed"
+
+subtree name:"workTree"
+    selector
+        invert
+            hasNeed need:"Money"
+        selector
+            sequence
+                canSatisfy need:"Money"
+                satisfyNeed need:"Money"
+            alwaysSucceed
+                sequence
+                    findWhereToSatisfy need:"Money"
+                    walkTo
+                    sequence
+                        canSatisfy need:"Money"
+                        satisfyNeed need:"Money"
+
+root
+    selector
+        whatisMyNeed
+        $workTree

@@ -1,13 +1,12 @@
 package data
 
-import ai.npc.TMode
+import ai.npc.TravelMode
 import com.badlogic.gdx.ai.btree.BehaviorTree
 import com.badlogic.gdx.math.Circle
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Queue
 import ktx.math.vec2
-import org.w3c.dom.css.Rect
 import screens.Mgo
 import screens.Place
 import screens.PlaceType
@@ -20,11 +19,10 @@ import java.time.LocalDate
  */
 class Npc(val name: String, val id: String, homeArea: Rectangle, val walkingRange: Float = 100f) {
     lateinit var behaviorTree: BehaviorTree<Npc>
-    var zipping = false
     var currentNeed: String = Needs.Money
     var iWillStayAtHome = false
     var symptomatic = true
-    lateinit var thePlaceIWantToBe: Pair<Place, TMode>
+    lateinit var thePlaceIWantToBe: Pair<Place, TravelMode>
         private set
     val workPlace = Mgo.workPlaces.random()
     val home = Place(type = PlaceType.Home, box = homeArea)
@@ -141,9 +139,11 @@ class Npc(val name: String, val id: String, homeArea: Rectangle, val walkingRang
      * in the queue and travels there.
      */
     fun travelToFirstPlace() {
-        thePlaceIWantToBe = placesToGoTo.removeFirst()
+        thePlaceIWantToBe = placesToGoTo.first()
         npcStateMachine.acceptEvent(Events.LeftSomewhere)
     }
+
+
 
     fun die() {
         isDead
@@ -158,8 +158,8 @@ class Npc(val name: String, val id: String, homeArea: Rectangle, val walkingRang
 
     }
 
-    val placesToGoTo = Queue<Pair<Place, TMode>>()
-    fun addPlaceToGoTo(place: Place, mode: TMode) {
+    val placesToGoTo = Queue<Pair<Place, TravelMode>>()
+    fun addPlaceToGoTo(place: Place, mode: TravelMode) {
         placesToGoTo.addFirst(Pair(place, mode))
     }
 }

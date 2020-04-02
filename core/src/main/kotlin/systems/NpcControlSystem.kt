@@ -1,18 +1,17 @@
 package systems
 
+import ai.npc.TravelMode
+import atPlace
 import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.systems.IntervalIteratingSystem
 import com.badlogic.ashley.systems.IteratingSystem
-import com.badlogic.gdx.math.Vector
-import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.Body
 import components.Box2dBodyComponent
 import components.NpcComponent
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
-import ktx.math.minus
-import ktx.math.times
+import ktx.math.toMutable
 import ktx.math.vec2
+import moveFromTo
+import screens.Place
 
 /**
  * A person walks a klick per 10 minutes - meaning that every hour is 6 klicks.
@@ -23,62 +22,46 @@ import ktx.math.vec2
  * r
  */
 class NpcControlSystem : IteratingSystem(allOf(
-    NpcComponent::class,
-    Box2dBodyComponent::class).get()) {
+        NpcComponent::class,
+        Box2dBodyComponent::class).get()) {
 
-  private val npcMpr = mapperFor<NpcComponent>()
-  private val bodyMpr = mapperFor<Box2dBodyComponent>()
-  private var someVector = vec2(0f, 0f)
+    private val npcMpr = mapperFor<NpcComponent>()
+    private val bodyMpr = mapperFor<Box2dBodyComponent>()
+    private var someVector = vec2(0f, 0f)
 
-  private var somekindOfSpeedFactor = 2f * AiAndTimeSystem.secondsPerSecond
+    private lateinit var whereAreWeGoing: Pair<Place, TravelMode>
 
-  override fun processEntity(entity: Entity, deltaTime: Float) {
-    val npc = npcMpr[entity].npc
+    private var somekindOfSpeedFactor = 2f * AiAndTimeSystem.secondsPerSecond
 
-    val body = bodyMpr[entity]!!.body
-    if (npc.onTheMove) {
-      if (npc.meetingAFriend) {
-        npc.friendToGoTo?.currentPosition?.moveFromTo(body, somekindOfSpeedFactor)
-        if (npc.circleOfConcern.contains(npc.friendToGoTo?.currentPosition))
-          npc.stopDoingIt()
-      } else {
-        npc.thePlaceIWantToBe.box.getCenter(someVector).moveFromTo(body, somekindOfSpeedFactor)
-        if (npc.thePlaceIWantToBe.box.contains(npc.currentPosition))
-          npc.stopDoingIt()
-      }
+    override fun processEntity(entity: Entity, deltaTime: Float) {
+        val npc = npcMpr[entity].npc
+
+        val body = bodyMpr[entity]!!.body
+        if (npc.onTheMove) {
+
+            //Add modified social stuff later. - maybe the npc's need to arrange a meeting and so on?
+//      if (npc.meetingAFriend) {
+//        npc.friendToGoTo?.currentPosition?.moveFromTo(body, somekindOfSpeedFactor)
+//        if (npc.circleOfConcern.contains(npc.friendToGoTo?.currentPosition))
+//          npc.stopDoingIt()
+//      } else {
+
+            //get the place to go to
+            whereAreWeGoing = npc.thePlaceIWantToBe
+
+            when (whereAreWeGoing.second) {
+                TravelMode.Walking -> whereAreWeGoing.first.center.toMutable().moveFromTo(body, somekindOfSpeedFactor)
+                TravelMode.Zipping -> {
+                    body.setTransform(npc.thePlaceIWantToBe.first.center.toMutable(), body.angle)
+                    body.isAwake = true
+                }
+            }
+          npc.currentPosition = body.position
+          if (npc.atPlace(whereAreWeGoing.first))
+            npc.stopDoingIt()
+        }
+
+        if (!npc.onTheMove)
+            body.linearVelocity = vec2(0f, 0f)
     }
-
-    if(npc.zipping) {
-      body.setTransform(npc.thePlaceIWantToBe.box.x +npc.thePlaceIWantToBe.box.width / 2, npc.thePlaceIWantToBe.box.y +npc.thePlaceIWantToBe.box.height / 2, body.angle)
-      body.isAwake = true
-      npc.zipping = false
-    }
-
-    npc.currentPosition = body.position
-
-
-    if (!npc.onTheMove)
-      body.linearVelocity = vec2(0f, 0f)
-  }
-}
-
-
-fun Body.isWithin(radius:Float, body:Body) : Boolean {
-  return this.position.dst(body.position) < radius
-}
-
-fun Vector2.moveFromTo(body:Body, velocity: Float) {
-  body.linearVelocity = body.position.moveTowards(this, velocity)
-}
-
-fun Body.moveTowards(body:Body) {
-  this.linearVelocity = this.position.moveTowards(body.position, 6f)
-}
-
-fun Vector2.directionalVelocity(velocity : Float) : Vector2 {
-  return (vec2(0f,0f) - this).nor() * velocity
-}
-
-fun Vector2.moveTowards(target: Vector2, velocity: Float) : Vector2 {
-  return (target - this).nor() * velocity
 }

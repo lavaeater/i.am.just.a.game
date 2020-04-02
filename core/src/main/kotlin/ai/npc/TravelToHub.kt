@@ -13,17 +13,19 @@ class TravelToHub() : NpcTask() {
         return task as WalkToNearestTravelHub
     }
 
-    @JvmField
-    @TaskAttribute(required = true)
-    var hubType : String? = null //HubTypes are basically names - if unique, they represent a specific place, if general, just random.
-
     override fun execute(): Status {
         applyCosts(NeedsAndStuff.getCostForActivity(Activity.OnTheMove))
 
-        //Find nearest non-center travelHub
-        val hub = Mgo.travelHubs.first { (it.type as PlaceType.TravelHub).hubType == hubType!! }
 
-        npc.zipTo(hub)
+
+        //We ARE at a hub. What type is it?
+
+        //Find nearest non-center travelHub
+        when((Mgo.travelHubs.first { it.box.contains(npc.currentPosition)}.type as PlaceType.TravelHub).hubType) {
+            PlaceType.Suburban -> npc.zipTo(Mgo.travelHubs.first { (it.type as PlaceType.TravelHub).hubType == PlaceType.Central!! })
+            PlaceType.Central -> npc.zipTo(Mgo.travelHubs.filter { (it.type as PlaceType.TravelHub).hubType == PlaceType.Suburban!! }.minBy {  })
+        }
+
         return Status.SUCCEEDED
     }
 }

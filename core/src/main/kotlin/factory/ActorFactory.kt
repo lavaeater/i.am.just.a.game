@@ -63,7 +63,8 @@ fun Npc.getBehaviorTree() : BehaviorTree<Npc> {
 
   val reader = Assets.readerForTree("man.tree")
   val parser = BehaviorTreeParser<Npc>(BehaviorTreeParser.DEBUG_NONE)
-  return parser.parse(reader, this)
+  this.behaviorTree = parser.parse(reader, this)
+  return this.behaviorTree
 }
 
 //fun Npc.getBehaviorTree() : BehaviorTree<Npc> {

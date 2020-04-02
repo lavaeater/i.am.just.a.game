@@ -12,9 +12,13 @@ class WalkTo: NpcTask() {
 
     override fun execute(): Status {
         applyCosts(NeedsAndStuff.getCostForActivity(Activity.OnTheMove))
-        val whereToSatisfy = (Satisfiers.whereToSatisfyResolvers[npc.currentNeed]
-                ?: error("No resolver found for need ${npc.currentNeed}"))(npc)
-        npc.walkTo(whereToSatisfy.random())
+
+        /*
+        This makes more sense now - deque the first place in the places queue and
+        go there!
+         */
+
+        npc.travelToFirstPlace()
         return Status.SUCCEEDED
     }
 }

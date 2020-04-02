@@ -1,8 +1,11 @@
 package data
 
+import ai.npc.TMode
+import com.badlogic.gdx.ai.btree.BehaviorTree
 import com.badlogic.gdx.math.Circle
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.Queue
 import ktx.math.vec2
 import org.w3c.dom.css.Rect
 import screens.Mgo
@@ -15,12 +18,13 @@ import java.time.LocalDate
 /**
  * We're gonna be needin' some friendship up in here.
  */
-class Npc(val name: String, val id: String, homeArea: Rectangle) {
+class Npc(val name: String, val id: String, homeArea: Rectangle, val walkingRange: Float = 100f) {
+    lateinit var behaviorTree: BehaviorTree<Npc>
     var zipping = false
     var currentNeed: String = Needs.Money
     var iWillStayAtHome = false
     var symptomatic = true
-    lateinit var thePlaceIWantToBe: Place
+    lateinit var thePlaceIWantToBe: Pair<Place, TMode>
         private set
     val workPlace = Mgo.workPlaces.random()
     val home = Place(type = PlaceType.Home, box = homeArea)
@@ -34,7 +38,6 @@ class Npc(val name: String, val id: String, homeArea: Rectangle) {
             infectionDate = AiAndTimeSystem.currentDateTime.toLocalDate()
             field = value
         }
-
 
     var currentPosition: Vector2 = vec2(0f,0f)
     private val _circleOfConcern = Circle(currentPosition.x, currentPosition.y, circleOfConcernRadius)
@@ -110,6 +113,19 @@ class Npc(val name: String, val id: String, homeArea: Rectangle) {
         npcStateMachine.initialize() //Required to make states possible
     }
 
+    val status: String get() {
+        return """
+            $name
+            ${behaviorTree.status}
+            $npcState
+            $npcStats
+        """.trimIndent()
+    }
+
+    override fun toString(): String {
+        return status
+    }
+
 
     private fun myStateHasChanged(newState: String) {
         npcState = newState
@@ -120,8 +136,12 @@ class Npc(val name: String, val id: String, homeArea: Rectangle) {
             npcStateMachine.acceptEvent(Events.StoppedDoingIt)
     }
 
-    fun walkTo(placeToGo: Place) {
-        thePlaceIWantToBe = placeToGo
+    /**
+     * This takes the first place-pair
+     * in the queue and travels there.
+     */
+    fun travelToFirstPlace() {
+        thePlaceIWantToBe = placesToGoTo.removeFirst()
         npcStateMachine.acceptEvent(Events.LeftSomewhere)
     }
 
@@ -138,9 +158,9 @@ class Npc(val name: String, val id: String, homeArea: Rectangle) {
 
     }
 
-    fun zipTo(place: Place) {
-        thePlaceIWantToBe = place
-        zipping = true
+    val placesToGoTo = Queue<Pair<Place, TMode>>()
+    fun addPlaceToGoTo(place: Place, mode: TMode) {
+        placesToGoTo.addFirst(Pair(place, mode))
     }
 }
 

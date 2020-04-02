@@ -30,12 +30,12 @@ subtree name:"travelToCenter"
         sequence
             invert
                 canTravel
-            walkToNearestHub hubType:"Suburban"
+            walkToNearestHub
             invert
                 walking
         sequence
             canTravel
-            travelToHub hubType:"Central"
+            travelToHub
 
 subtree name:"needTree"
     selector

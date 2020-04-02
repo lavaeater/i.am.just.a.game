@@ -15,14 +15,14 @@ class Mgo {
 
         Lets do random angles and random lengths from a center!
          */
-        val numberOfNpcs = 100
+        val numberOfNpcs = 1
         val numberOfWorkPlaces = numberOfNpcs / 100 +1
         val numberOfRestaurants = numberOfNpcs / 50 +1
 
 
         val restaurantRadius = 20f..(numberOfRestaurants.toFloat() * 5f)
         val workplaceRadius = restaurantRadius.endInclusive..(restaurantRadius.endInclusive + numberOfRestaurants / 2)
-        val homeRadius = workplaceRadius.endInclusive+200f..workplaceRadius.endInclusive +200f + numberOfNpcs / 15f
+        val homeRadius = workplaceRadius.endInclusive+250f..workplaceRadius.endInclusive +250f + numberOfNpcs / 15f
 
         val angleRange =  0f..359f
 
@@ -33,9 +33,6 @@ class Mgo {
         //So, home radius circle:
 
         val homeCircle = Circle(0f,0f, homeRadius.endInclusive - ((homeRadius.endInclusive - homeRadius.start) / 2))
-
-
-
 
         val homeWidth = 5f
         val homeHeight = 2.5f

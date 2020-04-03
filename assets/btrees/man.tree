@@ -4,50 +4,23 @@
 
 # Alias definitions
 import canSatisfy:"ai.npc.CanSatisfyCurrentNeed"
-import satisfyNeed:"ai.npc.SatisfyNeed"
-import walkTo:"ai.npc.WalkTo"
-import walkToNearestHub:"ai.npc.WalkToNearestTravelHub"
-import travelToHub:"ai.npc.TravelToHub"
-import walking:"ai.npc.WalkingTowards"
-import canWalkTo:"ai.npc.CanWalkTo"
-import findWhereToSatisfy:"ai.npc.FindWhereToSatisfy"
 import findAFriend:"ai.npc.FindAFriend"
-import whatIsMyNeed:"ai.npc.WhatIsMyNeed"
+import findPath:"ai.npc.FindAPathToAPlace"
+import findPlaceForSatisfy:"ai.npc.FindPlaceWhereICanSatisfyNeed"
 import hasAnyNeed:"ai.npc.HasAnyNeed"
-import canTravel:"ai.npc.CanTravel"
-
-subtree name:"walkIfNotSatisfy"
-    sequence
-        invert
-            canSatisfy
-        canWalkTo
-        walkTo
-        invert
-            walking #should fail so we move to next node in other tree
-
-subtree name:"travelToCenter"
-    selector
-        sequence
-            invert
-                canTravel
-            walkToNearestHub
-            invert
-                walking
-        sequence
-            canTravel
-            travelToHub
+import satisfyNeed:"ai.npc.SatisfyNeed"
+import travel:"ai.npc.TravelByTraversing"
+import whatIsMyNeed:"ai.npc.WhatIsMyNeed"
 
 subtree name:"needTree"
     selector
         invert
             whatIsMyNeed
-        selector
-            $walkIfNotSatisfy
-            invert
-                $travelToCenter
-            $walkIfNotSatisfy
-            invert
-                satisfyNeed
+        sequence
+            findPlaceForSatisfy
+            findPath
+            travel
+            satisfyNeed
 
 root
     selector

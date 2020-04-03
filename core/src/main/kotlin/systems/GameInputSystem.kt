@@ -13,6 +13,7 @@ import components.Box2dBodyComponent
 import components.CameraFollowComponent
 import components.KeyboardControlComponent
 import components.NpcComponent
+import directionalVelocity
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor

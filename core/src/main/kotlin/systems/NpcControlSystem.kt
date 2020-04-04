@@ -11,7 +11,7 @@ import ktx.ashley.mapperFor
 import ktx.math.toMutable
 import ktx.math.vec2
 import moveFromTo
-import screens.Place
+import data.Place
 
 /**
  * A person walks a klick per 10 minutes - meaning that every hour is 6 klicks.

@@ -11,14 +11,12 @@ import components.NpcComponent
 import components.TransformComponent
 import components.VisibleComponent
 import data.CoronaStatus
-import data.NeedsAndStuff
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 import ktx.graphics.use
 import ktx.math.amid
-import ktx.math.random
 import screens.Mgo
-import screens.PlaceType
+import data.PlaceType
 
 class RenderSystem(
         private val batch: Batch,

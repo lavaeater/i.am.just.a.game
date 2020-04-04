@@ -8,55 +8,56 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import components.*
 import data.Npc
+import data.Place
+import data.PlaceType
 import getBehaviorTree
 import ktx.math.vec2
 
 class ActorFactory(
-		private val engine: Engine,
-		private val bodyFactory: BodyFactory) {
+        private val engine: Engine,
+        private val bodyFactory: BodyFactory) {
 
-  val names = listOf("Lars", "Sven", "Steve", "Harry", "James", "Carl", "Gene", "Alan", "Fredrick the Great", "Ivan", "Hal", "George", "Louis", "Felix")
-  private fun randomNpcName() : String {
+    val names = listOf("Lars", "Sven", "Steve", "Harry", "James", "Carl", "Gene", "Alan", "Fredrick the Great", "Ivan", "Hal", "George", "Louis", "Felix")
+    private fun randomNpcName(): String {
 
-    return names.random()
-  }
-
-
-  fun addNpcAt(name: String = randomNpcName(), rect: Rectangle): Pair<Npc, Entity> {
-    val npc = Npc(name, getNpcId(name),rect).apply {
-      currentPosition
+        return names.random()
     }
 
-    npcByKeys[npc.id] = npc
 
-    val entity = engine.createEntity().apply {
-      add(TransformComponent())
-      add(AiComponent(npc.getBehaviorTree()))
-      add(NpcComponent(npc))
-      add(CharacterSpriteComponent("man"))
-      add(VisibleComponent())
-      add(Box2dBodyComponent(createNpcBody(vec2(rect.x, rect.y), npc)))
-    }
-    engine.addEntity(entity)
-    return Pair(npc, entity)
-  }
-  
-  private fun createNpcBody(position: Vector2, npc: Npc) : Body {
-    return bodyFactory.createBody(0.8f, 1.6f, 15f, position, BodyDef.BodyType.DynamicBody)
-        .apply { userData = npc }
-  }
+    fun addNpcAt(home: Place, name: String = randomNpcName()): Npc {
+        val npc = Npc(name, getNpcId(name), home)
 
-  companion object {
-    val npcByKeys = mutableMapOf<String, Npc>()
-    var npcIds: Int = 0
-    fun nextCharacterId():Int {
-      return npcIds++
+        npcByKeys[npc.id] = npc
+
+        val entity = engine.createEntity().apply {
+            add(TransformComponent())
+            add(AiComponent(npc.getBehaviorTree()))
+            add(NpcComponent(npc))
+            add(CharacterSpriteComponent("man"))
+            add(VisibleComponent())
+            add(Box2dBodyComponent(createNpcBody(npc.currentPosition, npc)))
+        }
+        engine.addEntity(entity)
+        return npc
     }
 
-    fun getNpcId(name:String):String {
-      return "${name}_${nextCharacterId()}"
+    private fun createNpcBody(position: Vector2, npc: Npc): Body {
+        return bodyFactory.createBody(0.8f, 1.6f, 15f, position, BodyDef.BodyType.DynamicBody)
+                .apply { userData = npc }
     }
-  }
+
+
+    companion object {
+        val npcByKeys = mutableMapOf<String, Npc>()
+        var npcIds: Int = 0
+        fun nextCharacterId(): Int {
+            return npcIds++
+        }
+
+        fun getNpcId(name: String): String {
+            return "${name}_${nextCharacterId()}"
+        }
+    }
 }
 
 

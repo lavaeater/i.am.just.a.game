@@ -7,10 +7,7 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Queue
 import ktx.math.toMutable
-import ktx.math.vec2
 import screens.Mgo
-import screens.Place
-import screens.PlaceType
 import statemachine.StateMachine
 import systems.AiAndTimeSystem
 import java.time.LocalDate
@@ -18,15 +15,14 @@ import java.time.LocalDate
 /**
  * We're gonna be needin' some friendship up in here.
  */
-class Npc(val name: String, val id: String, homeArea: Rectangle, val walkingRange: Float = 100f) {
+class Npc(val name: String, val id: String, val home: Place,val walkingRange: Float = 100f) {
     lateinit var behaviorTree: BehaviorTree<Npc>
     var currentNeed: String = Needs.Money
     var iWillStayAtHome = false
     var symptomatic = true
     lateinit var thePlaceIWantToBe: Pair<Place, TravelMode>
         private set
-    val workPlace = Mgo.workPlaces.random()
-    val home = Place(type = PlaceType.Home, box = homeArea)
+    val workPlace = Mgo.workPlaces.random() //Aaah, perfect, random references to stuff
     val friends = mutableSetOf<Npc>()
     private val circleOfConcernRadius = 4f
 

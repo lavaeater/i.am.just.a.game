@@ -26,11 +26,10 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
   override fun processEntity(entity: Entity) {
     val npc = npcMapper[entity].npc
 
-    if(npc.npcState != Activity.OnTheMove)
-      when(npc.coronaStatus) {
-        CoronaStatus.Susceptible -> doIGetInfected(npc)
-        CoronaStatus.Infected -> haveIRecovered(npc)
-      }
+    when(npc.coronaStatus) {
+      CoronaStatus.Susceptible -> doIGetInfected(npc)
+      CoronaStatus.Infected -> haveIRecovered(npc)
+    }
   }
 
   var minutesPassed : Long= 0
@@ -81,12 +80,14 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
 
 
     if(period > 13) {
-      if (range.random() < 4) {
+      val r = range.random()
+      if (r < 4) {
         npc.coronaStatus = CoronaStatus.Dead
-      } else {
+        infectedNpcs.remove(npc)
+      } else if (r < 15) {
         npc.coronaStatus = CoronaStatus.Recovered
+        infectedNpcs.remove(npc)
       }
-      infectedNpcs.remove(npc)
     }
   }
 
@@ -95,14 +96,14 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
     //Find all npc's within a certain radius...
     //Range 3m
     val circle = Circle(npc.currentPosition, 3f)
-    val infectionRisk = infectedNpcs.count { circle.contains(it.currentPosition) }.toFloat().coerceAtMost(5f)
+    val infectionRisk = infectedNpcs.count { circle.contains(it.currentPosition) }.toFloat().coerceAtMost(1f)
     if(infectionRisk > 0f) {
       var dieRoll = (0f..100f).random()
       if (dieRoll < infectionRisk) {
         infectedNpcs.add(npc)
         npc.coronaStatus = CoronaStatus.Infected
         dieRoll = (0f..100f).random()
-        if (dieRoll < 5f)
+        if (dieRoll < 25f)
           npc.symptomatic = false
       }
     }

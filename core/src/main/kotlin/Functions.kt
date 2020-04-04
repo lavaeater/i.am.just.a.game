@@ -6,7 +6,7 @@ import data.Npc
 import ktx.math.minus
 import ktx.math.times
 import ktx.math.vec2
-import screens.Place
+import data.Place
 
 fun Vector2.pointIsInside(size: Vector2, point: Vector2):Boolean {
     return point.x < this.x + size.x / 2 && point.x > this.x -size.x && point.y < this.y + size.y / 2 && point.y > this.y - size.y
@@ -29,7 +29,8 @@ fun List<Place>.findNearest(x: Float, y:Float): Place {
 
 
 fun Npc.placeInWalkingRange(place: Place) :Boolean {
-    return this.currentPosition.dst(place.center.x, place.center.y) < this.walkingRange
+    val distance =  this.currentPosition.dst(place.x, place.y)
+    return distance < this.walkingRange
 }
 
 fun Npc.atPlace(place: Place) :Boolean {

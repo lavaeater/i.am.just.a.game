@@ -1,79 +1,93 @@
 package screens
 
-import com.badlogic.gdx.math.Circle
-import com.badlogic.gdx.math.Rectangle
-import data.Npc
+import data.*
 import ktx.math.ImmutableVector2
-import ktx.math.random
-import ktx.math.withRotationDeg
 
 class Mgo {
+
+
     companion object {
         val npcs = mutableListOf<Npc>()
+        val areas = mutableListOf<Area>()
 
-        /*
+        const val homeWidth = 5f
+        const val homeHeight = 2.5f
 
-        Lets do random angles and random lengths from a center!
-         */
-        val numberOfNodes = 4
-        val numberOfNpcs = 2000
-        val numberOfWorkPlaces = numberOfNpcs / 100 +1
-        val numberOfRestaurants = numberOfNpcs / 50 +1
+        const val commercialWidth = 10f
+        const val commercialHeight = 5f
 
+        val allPlaces get() = areas.flatMap { it.places }
 
-        val restaurantRadius = 20f..(numberOfRestaurants.toFloat() * 5f)
-        val workplaceRadius = restaurantRadius.endInclusive..(restaurantRadius.endInclusive + numberOfRestaurants / 2)
-        val homeRadius = workplaceRadius.endInclusive+250f..workplaceRadius.endInclusive +250f + numberOfNpcs / 15f
-
-        val angleRange =  0f..359f
-
-        //Calculate circumference of a circle in the middle of every area
-
-        //Also, mash work and restaraurants together
-
-        //So, home radius circle:
-
-        val homeCircle = Circle(0f,0f, homeRadius.endInclusive - ((homeRadius.endInclusive - homeRadius.start) / 2))
-
-        val homeWidth = 5f
-        val homeHeight = 2.5f
-
-        val workPlaceWidth = 15f
-        val workPlaceHeight = 5f
-
-        val restaurantWidth = 10f
-        val restaurantHeight = 5f
-
-        val workPlaces = (1..numberOfWorkPlaces).map {
-            val randomplace = getRandomPlace(workplaceRadius)
-            Place(box = Rectangle(randomplace.x,randomplace.y, workPlaceHeight, workPlaceWidth))
+        val workPlaces: List<Place> get() {
+            return allPlaces.filter { it.type == PlaceType.Workplace }
         }
 
-        val travelHubs = mutableListOf<Place>()
-
-        fun getRandomPlace(floatingPointRange: ClosedRange<Float>): ImmutableVector2 {
-            val randomAngle = angleRange.random()
-            val magnitude = floatingPointRange.random()
-            return ImmutableVector2.X.withRotationDeg(randomAngle) * magnitude
-        }
-        
-        fun getRandomRectangle() : Rectangle {
-            val randomPlace = getRandomPlaceForNpc()
-            return Rectangle(randomPlace.x, randomPlace.y, homeWidth, homeHeight)
+        val restaurants : List<Place> get() {
+            return allPlaces.filter { it.type == PlaceType.Restaurant }
         }
 
-        fun getRandomPlaceForNpc() : ImmutableVector2 {
-            return getRandomPlace(homeRadius)
+        val homes : List<Place> get() {
+            return allPlaces.filter { it.type == PlaceType.Home }
         }
 
-        val restaurants = (0..numberOfRestaurants).map {
-            val randomplace =  getRandomPlace(restaurantRadius)
-
-            Place(type = PlaceType.Restaurant, box = Rectangle(randomplace.x, randomplace.y, restaurantWidth, restaurantHeight))
+        val travelHubs: List<Place> get() {
+            return allPlaces.filter { it.type == PlaceType.TravelHub }
         }
 
-        val homeAreas = mutableListOf<Place>()
 
-        val allPlaces get() = workPlaces + restaurants + homeAreas  + travelHubs
+        fun setupAreas() {
+            /*
+            We need 12 areas.
+
+            Rows of 4. Npcs are place at their home places, so we can start at zero for
+            simplicity's sake
+             */
+            val homeClearance = 5
+            val otherClearance = 5
+            var i = 0
+
+            val r = 0..100
+
+            for (row in 0..4) {
+                for(col in 0..4) {
+                    var randomNumber = r.random()
+                    if(randomNumber < 85) {
+                        val area = Area(AreaType.Residential, ImmutableVector2( col * 200f, row * 200f))
+
+                        //number of rCols
+                        val rCols = (area.width / ( homeWidth * homeClearance)).toInt()
+                        val rRows = (area.height / (homeHeight * homeClearance)).toInt()
+                        for(c in 0..rCols)
+                            for(r in 0..rRows) {
+                                area.addChild(PlaceType.Home, c * homeWidth * homeClearance, r * homeHeight * homeClearance, homeWidth, homeHeight)
+                            }
+                        area.addChild(PlaceType.TravelHub, area.width / 2, area.height / 2, 5f, 5f) //Should place it in the middle, no?
+                        areas.add(area)
+                    } else {
+                        val area = Area(AreaType.Commercial, ImmutableVector2( col * 200f, row * 200f))
+                        /*
+                        A third of places in commercial areas are restaurants. All will now have same size for simplicity
+                         */
+                        randomNumber = r.random()
+                        var comercial = 0
+                        val rCols = (area.width / (commercialWidth * 3)).toInt()
+                        val rRows = (area.height / (commercialHeight * 3)).toInt()
+                        for(c in 0..rCols)
+                            for(r in 0..rRows) {
+                                if(randomNumber < 65) {
+                                    area.addChild(PlaceType.Restaurant, c * commercialWidth * otherClearance, r * commercialHeight * otherClearance, commercialWidth, commercialHeight)
+                                } else{
+                                    area.addChild(PlaceType.Workplace,c * commercialWidth * otherClearance, r * commercialHeight * otherClearance, commercialWidth, commercialHeight)
+                                }
+                                comercial++
+                            }
+                        area.addChild(PlaceType.TravelHub, area.width / 2, area.height / 2, 5f, 5f) //Should place it in the middle, no?
+                        areas.add(area)
+                    }
+                    i++
+                }
+            }
+
+        }
     }
 }

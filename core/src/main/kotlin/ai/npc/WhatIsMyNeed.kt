@@ -15,10 +15,6 @@ class WhatIsMyNeed : NpcTask() {
     override fun execute(): Status {
         timeHasPassed()
 
-        if(npc.coronaStatus == CoronaStatus.Infected && npc.symptomatic) {
-            npc.currentNeed = Needs.Rest
-            return Status.SUCCEEDED
-        }
         for(need in NeedsAndStuff.prioritizedNeeds) {
             if(hasNeed(need)) {
                 npc.currentNeed = need

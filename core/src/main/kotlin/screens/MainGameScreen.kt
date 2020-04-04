@@ -8,11 +8,13 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.utils.viewport.Viewport
 import data.CoronaStatus
+import data.Place
+import data.PlaceType
 import factory.ActorFactory
 import ktx.app.KtxScreen
 import ktx.math.*
+import screens.Mgo.Companion.homes
 import screens.Mgo.Companion.npcs
-import screens.Mgo.Companion.travelHubs
 import systems.GameInputSystem
 import systems.RenderSystem
 
@@ -65,22 +67,20 @@ class MainGameScreen(
     private val friendRange = 1..10
     private var needsInit = true
     private fun initializeGame() {
+        Mgo.setupAreas()
+
         val r = 0f amid 64f
 
         val infectionRisk = 5
         val dieRange = (1..100)
 
-        for(i in 1..Mgo.numberOfNpcs) {
-            val rect = Mgo.getRandomRectangle()
-            val npc = actorFactory.addNpcAt(rect = rect).first
-            npcs.add(npc)
-            Mgo.homeAreas.add(npc.home)
+        for (home in homes) {
+            val npc = actorFactory.addNpcAt(home)
             if(dieRange.random() < infectionRisk) {
                 npc.coronaStatus = CoronaStatus.Infected
                 npc.symptomatic = false
             }
         }
-
 
         //Set up some friends!
         for(npc in npcs) {
@@ -92,22 +92,6 @@ class MainGameScreen(
                 friend.friends.add(npc)
             }
         }
-
-        //Set up some travel hubs
-        val distanceBetweenHubs = 100
-        val numberOfHubs = Mgo.homeCircle.circumference() / distanceBetweenHubs
-        val angleBetweenHubs = 360f / numberOfHubs
-        var currentAngle = 0f
-        for(i in 0..numberOfHubs.toInt()) {
-            val positionOfHub = ImmutableVector2.Y.withRotationDeg(currentAngle) * Mgo.homeCircle.radius
-            Mgo.travelHubs.add(Place(type = PlaceType.TravelHub(), box = Rectangle(positionOfHub.x, positionOfHub.y, 5f, 5f)))
-            currentAngle += angleBetweenHubs
-        }
-
-        Mgo.travelHubs.add(Place(type = PlaceType.TravelHub("Central"), box = Rectangle(-25f,-25f, 5f, 5f)))
-        Mgo.travelHubs.add(Place(type = PlaceType.TravelHub("Central"), box = Rectangle(25f,-25f, 5f, 5f)))
-        Mgo.travelHubs.add(Place(type = PlaceType.TravelHub("Central"), box = Rectangle(-25f,25f, 5f, 5f)))
-        Mgo.travelHubs.add(Place(type = PlaceType.TravelHub("Central"), box = Rectangle(25f,25f, 5f, 5f)))
 
         needsInit = false
     }

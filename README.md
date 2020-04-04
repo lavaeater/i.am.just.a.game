@@ -2,7 +2,17 @@
 
 A [LibGDX](http://libgdx.badlogicgames.com/) project generated with [gdx-liftoff](https://github.com/tommyettinger/gdx-liftoff).
 
-Project template included simple launchers and an empty `ApplicationAdapter` extension.
+### Current WIP feature
+
+Areas for population etc. We have "places" of the types workplace, restaurant, etc. Now we will add "areas" where we can add houses or places as needed. The vision in my head is that every area has a travel hub, and then some number of "places". So areas are either residential or commercial, just like in a city planning scenario. They are also square-shaped. This will make it easier to divide them up for the places needed.
+
+So, an area is, say, a 100x100. It has children - places. Their positions are relative to the areas position. Easy. All this is managed by some abstract base class.
+
+
+### Done features
+
+
+
 
 ## Gradle
 

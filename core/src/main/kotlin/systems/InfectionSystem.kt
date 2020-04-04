@@ -95,14 +95,14 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
     //Find all npc's within a certain radius...
     //Range 3m
     val circle = Circle(npc.currentPosition, 3f)
-    val infectionRisk = infectedNpcs.count { circle.contains(it.currentPosition) }.toFloat() * 2f
+    val infectionRisk = infectedNpcs.count { circle.contains(it.currentPosition) }.toFloat().coerceAtMost(5f)
     if(infectionRisk > 0f) {
       var dieRoll = (0f..100f).random()
       if (dieRoll < infectionRisk) {
         infectedNpcs.add(npc)
         npc.coronaStatus = CoronaStatus.Infected
         dieRoll = (0f..100f).random()
-        if (dieRoll < 25f)
+        if (dieRoll < 5f)
           npc.symptomatic = false
       }
     }

@@ -15,7 +15,8 @@ class Mgo {
 
         Lets do random angles and random lengths from a center!
          */
-        val numberOfNpcs = 1
+        val numberOfNodes = 4
+        val numberOfNpcs = 2000
         val numberOfWorkPlaces = numberOfNpcs / 100 +1
         val numberOfRestaurants = numberOfNpcs / 50 +1
 
@@ -55,7 +56,7 @@ class Mgo {
             val magnitude = floatingPointRange.random()
             return ImmutableVector2.X.withRotationDeg(randomAngle) * magnitude
         }
-
+        
         fun getRandomRectangle() : Rectangle {
             val randomPlace = getRandomPlaceForNpc()
             return Rectangle(randomPlace.x, randomPlace.y, homeWidth, homeHeight)

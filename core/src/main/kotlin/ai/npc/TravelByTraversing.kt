@@ -43,19 +43,17 @@ class TravelByTraversing: NpcTask() {
         // Do not remove places until we are at the place.
         //1. Are we at the place we want to go to?
 
-        if(npc.atPlace(npc.placesToGoTo.first().first)) {
+        return if (!npc.placesToGoTo.any()) {
+            Status.SUCCEEDED
+        } else if(npc.atPlace(npc.placesToGoTo.first().first)) {
             //Then remove that place from the queue
             npc.placesToGoTo.removeFirst()
+            Status.RUNNING
         } else {
-            //We are NOT at our destination, keep traveling - the system will fix everything
-            return Status.RUNNING
-        }
-
-        return if(npc.placesToGoTo.any()) {
-            //We still have places to go to
             npc.travelToFirstPlace()
             Status.RUNNING
-        } else
-            Status.SUCCEEDED
+        }
+
+
     }
 }

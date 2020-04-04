@@ -16,11 +16,15 @@ subtree name:"needTree"
     selector
         invert
             whatIsMyNeed
-        sequence
-            findPlaceForSatisfy
-            findPath
-            travel
-            satisfyNeed
+        selector
+            sequence
+                canSatisfy
+                satisfyNeed
+            sequence
+                findPlaceForSatisfy
+                findPath
+                invert
+                    travel
 
 root
     selector

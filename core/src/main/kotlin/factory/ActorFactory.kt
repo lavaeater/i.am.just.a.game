@@ -23,7 +23,9 @@ class ActorFactory(
 
 
   fun addNpcAt(name: String = randomNpcName(), rect: Rectangle): Pair<Npc, Entity> {
-    val npc = Npc(name, getNpcId(name),rect)
+    val npc = Npc(name, getNpcId(name),rect).apply {
+      currentPosition
+    }
 
     npcByKeys[npc.id] = npc
 

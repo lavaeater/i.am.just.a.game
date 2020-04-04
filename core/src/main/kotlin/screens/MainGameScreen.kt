@@ -100,11 +100,14 @@ class MainGameScreen(
         var currentAngle = 0f
         for(i in 0..numberOfHubs.toInt()) {
             val positionOfHub = ImmutableVector2.Y.withRotationDeg(currentAngle) * Mgo.homeCircle.radius
-            Mgo.travelHubs.add(Place(type = PlaceType.TravelHub(), box = Rectangle(positionOfHub.x, positionOfHub.y, 10f, 10f)))
+            Mgo.travelHubs.add(Place(type = PlaceType.TravelHub(), box = Rectangle(positionOfHub.x, positionOfHub.y, 5f, 5f)))
             currentAngle += angleBetweenHubs
         }
 
-        Mgo.travelHubs.add(Place(type = PlaceType.TravelHub("Central"), box = Rectangle(-5f,-5f, 10f, 10f)))
+        Mgo.travelHubs.add(Place(type = PlaceType.TravelHub("Central"), box = Rectangle(-25f,-25f, 5f, 5f)))
+        Mgo.travelHubs.add(Place(type = PlaceType.TravelHub("Central"), box = Rectangle(25f,-25f, 5f, 5f)))
+        Mgo.travelHubs.add(Place(type = PlaceType.TravelHub("Central"), box = Rectangle(-25f,25f, 5f, 5f)))
+        Mgo.travelHubs.add(Place(type = PlaceType.TravelHub("Central"), box = Rectangle(25f,25f, 5f, 5f)))
 
         needsInit = false
     }

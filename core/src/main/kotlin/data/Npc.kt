@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Circle
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Queue
+import ktx.math.toMutable
 import ktx.math.vec2
 import screens.Mgo
 import screens.Place
@@ -37,7 +38,10 @@ class Npc(val name: String, val id: String, homeArea: Rectangle, val walkingRang
             field = value
         }
 
-    var currentPosition: Vector2 = vec2(0f,0f)
+    var currentPosition: Vector2 = home.center.toMutable()
+    set(value) {
+        field.set(value)
+    }
     private val _circleOfConcern = Circle(currentPosition.x, currentPosition.y, circleOfConcernRadius)
     val circleOfConcern : Circle get() {
         _circleOfConcern.set(currentPosition, circleOfConcernRadius)
@@ -55,12 +59,12 @@ class Npc(val name: String, val id: String, homeArea: Rectangle, val walkingRang
         private set
 
     val npcStats = NpcStats()
-//            .apply {
-//        statsMap[Needs.Fuel] = Stats.range.random()
-//        statsMap[Needs.Rest] = Stats.range.random()
-//        statsMap[Needs.Money] = Stats.range.random()
-//        statsMap[Needs.Social] = Stats.range.random()
-//    }
+            .apply {
+        statsMap[Needs.Fuel] = 72
+        statsMap[Needs.Rest] = 96
+        statsMap[Needs.Money] = 24
+        statsMap[Needs.Social] = 94
+    }
 
     private val npcStateMachine = StateMachine.buildStateMachine(Activity.Neutral, ::myStateHasChanged) {
         state(Activity.Neutral) {
@@ -139,8 +143,10 @@ class Npc(val name: String, val id: String, homeArea: Rectangle, val walkingRang
      * in the queue and travels there.
      */
     fun travelToFirstPlace() {
-        thePlaceIWantToBe = placesToGoTo.first()
-        npcStateMachine.acceptEvent(Events.LeftSomewhere)
+        if(!::thePlaceIWantToBe.isInitialized || placesToGoTo.first() != thePlaceIWantToBe) {
+            thePlaceIWantToBe = placesToGoTo.first()
+            npcStateMachine.acceptEvent(Events.LeftSomewhere)
+        }
     }
 
 

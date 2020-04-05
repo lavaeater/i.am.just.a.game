@@ -34,7 +34,7 @@ class NeedsAndStuff {
         private val costs = mapOf(
                 Activity.Working to Cost(
                         Activity.Working, mapOf(
-                        Needs.Money to -15,
+                        Needs.Money to -30,
                         Needs.Fuel to 16,
                         Needs.Rest to 8,
                         Needs.Social to 2
@@ -54,7 +54,7 @@ class NeedsAndStuff {
                         Needs.Social to -48
                 )),
                 Activity.Eating to Cost(Activity.Eating, mapOf(
-                        Needs.Money to 48,
+                        Needs.Money to 24,
                         Needs.Fuel to -64,
                         Needs.Rest to 0,
                         Needs.Social to 4
@@ -105,6 +105,7 @@ class NeedsAndStuff {
 
         val lowRange = -24..24
         val normalRange = 25..72
+        val lowNormal = lowRange.first..normalRange.last
         val greatRange = 73..128 //Max is more like close to 96, but wealth can take us higher, and drugs and so on
         val goodRange = normalRange.first..greatRange.last
         val fullRange = lowRange.first..goodRange.last

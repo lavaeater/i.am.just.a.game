@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import components.CameraFollowComponent
 import components.KeyboardControlComponent
 import components.NpcComponent
+import data.CoronaStats
 import directionalVelocity
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
@@ -86,15 +87,15 @@ class GameInputSystem(
 
     private fun centerCamera() {
         val maxX = Mgo.areas.map { it.x + it.width }.max()!!
-        val maxY = Mgo.areas.map {it.y + it.height}.max()!!
+        val maxY = Mgo.areas.map { it.y + it.height }.max()!!
 
         camera.position.x = maxX / 2
         camera.position.y = maxY / 2
     }
 
     fun clearFollow() {
-      entities.firstOrNull { followMapper.has(it) }?.remove<CameraFollowComponent>()
-
+        entities.firstOrNull { followMapper.has(it) }?.remove<CameraFollowComponent>()
+        CoronaStats.currentNpc = null
     }
 
     val followMapper = mapperFor<CameraFollowComponent>()
@@ -107,6 +108,7 @@ class GameInputSystem(
         val newEntityToFollow = entities.elementAt(currentEntityIndex)
         entities.filter { followMapper.has(it) }.forEach { it.remove<CameraFollowComponent>() }
         newEntityToFollow.add(CameraFollowComponent())
+        CoronaStats.currentNpc = npcComponentMapper[newEntityToFollow]!!.npc
     }
 
     private fun nextNpc() {
@@ -118,6 +120,8 @@ class GameInputSystem(
         entities.filter { followMapper.has(it) }.forEach { it.remove<CameraFollowComponent>() }
 
         newEntityToFollow.add(CameraFollowComponent())
+
+        CoronaStats.currentNpc = npcComponentMapper[newEntityToFollow]!!.npc
     }
 
     private fun rotateCam(angle: Float) {

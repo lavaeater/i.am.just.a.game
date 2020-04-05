@@ -68,8 +68,8 @@ class Injector {
 
         private fun getEngine() : Engine {
             return Engine().apply {
-                addSystem(AiAndTimeSystem(interval = 0.1f))
-                addSystem(InfectionSystem(interval = 0.1f))
+                addSystem(AiAndTimeSystem(interval = 1f))
+                addSystem(InfectionSystem(interval = 1f))
                 addSystem(NpcControlSystem())
                 addSystem(GameInputSystem(
                         inject(),

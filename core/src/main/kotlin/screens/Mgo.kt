@@ -39,8 +39,8 @@ class Mgo {
             Oh la la.
              */
 
-            val areaCols = 3
-            val areaRows = 3
+            val areaCols = 1
+            val areaRows = 1
             val placeWidth = 10f
             val placeHeight = 10f
             val placeClearance = 10f //Distance between places
@@ -51,8 +51,8 @@ class Mgo {
             val placeRows = (areaHeight / (placeHeight + placeClearance)).toInt()
 
 
-            val restaurantRange = 66..85
-            val workPlaceRange = 86..100
+            val restaurantRange = 85..95
+            val workPlaceRange = 96..100
 
             val totalRange = 0..workPlaceRange.last
 

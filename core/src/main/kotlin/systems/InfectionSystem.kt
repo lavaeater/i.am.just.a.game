@@ -19,8 +19,8 @@ import java.time.Period
 class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcComponent::class).get(), interval, 5) {
     private var needsInit = true
     private val npcMapper = mapperFor<NpcComponent>()
-    var npcs = listOf<Npc>()
-    val infectedNpcs = mutableSetOf<Npc>()
+    private var npcs = listOf<Npc>()
+    private val infectedNpcs = mutableSetOf<Npc>()
 
     override fun processEntity(entity: Entity) {
         val npc = npcMapper[entity].npc
@@ -29,8 +29,6 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
             CoronaStatus.Susceptible -> doIGetInfected(npc)
             CoronaStatus.Infected -> haveIRecovered(npc)
         }
-
-
     }
 
     override fun updateInterval() {
@@ -57,17 +55,17 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
         val range = 0..100
 
         //After FIVE days you will be symptomatic, at the latest
-        if (period > CoronaStats.SymptomaticLimit) {
+        if (period > CoronaStats.SymptomaticLimit && !npc.symptomatic) {
             npc.symptomatic = true
             CoronaStats.asymptomatic--
+        }
 
-            //Will I stay at home?
+        if (npc.symptomatic && !npc.iWillStayAtHome) {
             if (range.random() > 25) {
                 npc.iWillStayAtHome = true
                 CoronaStats.symptomaticThatStayAtHome++
             }
         }
-
 
         if (period > CoronaStats.RecoveryLimit) {
             val r = range.random()
@@ -75,6 +73,8 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
                 npc.coronaStatus = CoronaStatus.Dead
                 infectedNpcs.remove(npc)
                 CoronaStats.infected-- //All that die are symptomatic
+                CoronaStats.dead++
+
                 if (npc.iWillStayAtHome)
                     CoronaStats.symptomaticThatStayAtHome--
             } else if (r < CoronaStats.ChangeOfRecovery) {
@@ -88,20 +88,17 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
         }
     }
 
-
     private fun doIGetInfected(npc: Npc) {
         val circle = Circle(npc.currentPosition, 3f)
-        val infectionRisk = infectedNpcs.count { circle.contains(it.currentPosition) }.toFloat().coerceAtMost(1f)
+        val infectionRisk = infectedNpcs.count { circle.contains(it.currentPosition) }.toFloat().coerceAtMost(3f)
         if (infectionRisk > 0f) {
-            var dieRoll = (0f..100f).random()
-            if (dieRoll < infectionRisk) {
+            if ((0f..100f).random() < infectionRisk) {
                 infectedNpcs.add(npc)
                 npc.coronaStatus = CoronaStatus.Infected
 
                 CoronaStats.susceptible--
                 CoronaStats.infected++
-                dieRoll = (0f..100f).random()
-                if (dieRoll < 25f) {
+                if ((0f..100f).random() < 25f) {
                     CoronaStats.asymptomatic++
                     npc.symptomatic = false
                 }

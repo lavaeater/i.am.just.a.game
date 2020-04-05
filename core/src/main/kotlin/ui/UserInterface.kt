@@ -13,10 +13,11 @@ import ktx.scene2d.KTableWidget
 import ktx.scene2d.label
 import ktx.scene2d.table
 import data.CoronaStats
+import systems.AiAndTimeSystem
 
 class UserInterface(
     private val batch: Batch,
-    debug: Boolean = false): IUserInterface {
+    debug: Boolean = true): IUserInterface {
 
   override val hudViewPort = ExtendViewport(uiWidth, uiHeight, OrthographicCamera())
   override val stage = Stage(hudViewPort, batch)
@@ -32,6 +33,7 @@ class UserInterface(
 
   private val labelStyle = Label.LabelStyle(Assets.standardFont, Color.WHITE)
   private lateinit var infoLabel: Label
+  private lateinit var npcLabel: Label
 
   init {
     setup()
@@ -40,19 +42,29 @@ class UserInterface(
   override fun update(delta: Float) {
     batch.projectionMatrix = stage.camera.combined
     updateCoronaInfo()
+    showCurrentNpcInfo()
     stage.act(delta)
     stage.draw()
   }
 
   private fun updateCoronaInfo() {
     infoLabel.setText("""
+Date and time: ${AiAndTimeSystem.currentDateTime}
 Susceptible: ${CoronaStats.susceptible}      
 Infected: ${CoronaStats.infected}
 Recovered: ${CoronaStats.recovered}
 Dead: ${CoronaStats.dead}
 Asymptomatic: ${CoronaStats.asymptomatic}
 Symptomatic staying home: ${CoronaStats.symptomaticThatStayAtHome}
-    """.trimIndent())
+    """)
+  }
+
+  private fun showCurrentNpcInfo() {
+    if(CoronaStats.currentNpc != null){
+      npcLabel.setText(CoronaStats.currentNpc.toString())
+    } else {
+      npcLabel.setText("No current NPC selected")
+    }
   }
 
   override fun dispose() {
@@ -78,22 +90,16 @@ Symptomatic staying home: ${CoronaStats.symptomaticThatStayAtHome}
     scoreBoard = table {
       label("""
 Controls and stuff:
-WASD                  -> Control camera
-Arrow Left and right  -> Switch NPC to follow
-c                     -> Stop following NPC
-z                     -> Center camera //stop complaining
-u, j                  -> zoom in and out
-k, l                  -> rotate camera
+WASD                    -> Control camera
+Arrow Left and right    -> Switch NPC to follow
+c                       -> Stop following NPC
+z                       -> Center camera //stop complaining
+u, j                    -> zoom in and out
+k, l                    -> rotate camera
+      """)
 
-      """.trimIndent())
-      infoLabel = label("InfoLabel") {
-        setWrap(true)
-        keepWithinParent()
-      }.cell(fill = true, align = Align.bottomLeft, padLeft = 16f, padBottom = 2f)
-      isVisible = true
-      pack()
-      width = 300f
-
+      infoLabel = label("InfoLabel")
+      npcLabel = label("NpcInfo")
     }
 
     rootTable = table {

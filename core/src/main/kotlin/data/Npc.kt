@@ -56,9 +56,9 @@ class Npc(val name: String, val id: String, val home: Place,val walkingRange: Fl
 
     val npcStats = NpcStats()
             .apply {
-        statsMap[Needs.Fuel] = 72
+        statsMap[Needs.Fuel] = 96
         statsMap[Needs.Rest] = 96
-        statsMap[Needs.Money] = 24
+        statsMap[Needs.Money] = 96
         statsMap[Needs.Social] = 94
     }
 
@@ -92,6 +92,7 @@ class Npc(val name: String, val id: String, val home: Place,val walkingRange: Fl
         }
         state(Activity.Eating) {
             edge(Events.StoppedDoingIt, Activity.Neutral) {}
+            edge(Events.LeftSomewhere, Activity.OnTheMove) {}
         }
         state(Activity.GoingToEat) {
             edge(Events.StoppedDoingIt, Activity.Neutral) {}
@@ -114,9 +115,14 @@ class Npc(val name: String, val id: String, val home: Place,val walkingRange: Fl
     val status: String get() {
         return """
             $name
-            ${behaviorTree.status}
-            $npcState
-            $npcStats
+            Status: $coronaStatus
+            Symptomatic: $symptomatic
+            Stays at home: $iWillStayAtHome
+            State: $npcState
+            Current Top Need: $currentNeed 
+            Fuel: ${npcStats.statsMap[Needs.Fuel]}
+            Rest: ${npcStats.statsMap[Needs.Rest]}
+            Money: ${npcStats.statsMap[Needs.Money]}
         """.trimIndent()
     }
 

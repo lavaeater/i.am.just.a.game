@@ -4,7 +4,13 @@ A [LibGDX](http://libgdx.badlogicgames.com/) project generated with [gdx-liftoff
 
 ## WIP feature of the day
 
-None for now, I have to have a life.
+### Social needs 
+
+So, I removed social needs because they worked by making people just walk up to their closest friend. That seems a bit dull, let's have them do something else - the easiest is of course for them to arrange to meet at someones's house or at a restaurant. What we are going towards here is of course changing the entire need economy to something more abstract. Perhaps we need "work hours" - defined by some job a person has at a workplace, instead of just spots where they replenish their money stat.
+
+Why do I want to do that? Do I want to do that?
+
+### Ambling and free time
 
 ## Done features
 ### Hud Showing Corona Progress

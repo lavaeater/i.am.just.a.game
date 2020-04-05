@@ -3,12 +3,6 @@ package data
 import com.badlogic.gdx.math.Rectangle
 import ktx.math.ImmutableVector2
 
-sealed class AreaType {
-    object MultiType : AreaType()
-    object Residential: AreaType()
-    object Commercial: AreaType()
-}
-
 class Area(val type: AreaType,  val center: ImmutableVector2 = ImmutableVector2(0f, 0f), size: ImmutableVector2 = ImmutableVector2(100f, 100f)) {
     private val children: MutableList<Place> = mutableListOf()
     val places get() = children.toList()
@@ -23,7 +17,7 @@ class Area(val type: AreaType,  val center: ImmutableVector2 = ImmutableVector2(
         children.add(Place(placeType, x + relativeX, y + relativeY, width, height))
     }
 
-    val box = Rectangle(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y )
+    private val box = Rectangle(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y )
     val x = box.x
     val y = box.y
     val centerX = center.x

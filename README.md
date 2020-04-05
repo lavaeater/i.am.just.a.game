@@ -4,14 +4,12 @@ A [LibGDX](http://libgdx.badlogicgames.com/) project generated with [gdx-liftoff
 
 ## WIP feature of the day
 
-### OK, a HUD
-
-So I've done HUDs before, it's not *that* hard, but Scene2D is, in my mind, kind of a pain. Wrapping text, getting stuff to align, everything is a bit clunky and not "just working". That's what working as a "regular" developer for 20 years gets you, I guess, laziness and expecting stuff to hand everything to you for free. But the HUD will show updated info on the number of Infected, Removed (and Dead) and Susceptible. Maybe it could even give us a count of how many idiots there are that won't stay at home even with symptoms?
-
-This will be implemented in the feature/hud branch.
-
+None for now, I have to have a life.
 
 ## Done features
+### Hud Showing Corona Progress
+
+So I've done HUDs before, it's not *that* hard, but Scene2D is, in my mind, kind of a pain. Wrapping text, getting stuff to align, everything is a bit clunky and not "just working". That's what working as a "regular" developer for 20 years gets you, I guess, laziness and expecting stuff to hand everything to you for free. But the HUD will show updated info on the number of Infected, Removed (and Dead) and Susceptible. Maybe it could even give us a count of how many idiots there are that won't stay at home even with symptoms?
 
 ### Areas
 Areas are now setup so that every area can contain anything, houses, restaurants, workplaces. They all have at least one travelhub, so that people can teleport to and from them easily. This makes the map at least slightly nicer-looking.

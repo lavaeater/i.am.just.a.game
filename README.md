@@ -2,15 +2,19 @@
 
 A [LibGDX](http://libgdx.badlogicgames.com/) project generated with [gdx-liftoff](https://github.com/tommyettinger/gdx-liftoff).
 
-### Current WIP feature
+## WIP feature of the day
 
-Areas for population etc. We have "places" of the types workplace, restaurant, etc. Now we will add "areas" where we can add houses or places as needed. The vision in my head is that every area has a travel hub, and then some number of "places". So areas are either residential or commercial, just like in a city planning scenario. They are also square-shaped. This will make it easier to divide them up for the places needed.
+### OK, a HUD
 
-So, an area is, say, a 100x100. It has children - places. Their positions are relative to the areas position. Easy. All this is managed by some abstract base class.
+So I've done HUDs before, it's not *that* hard, but Scene2D is, in my mind, kind of a pain. Wrapping text, getting stuff to align, everything is a bit clunky and not "just working". That's what working as a "regular" developer for 20 years gets you, I guess, laziness and expecting stuff to hand everything to you for free. But the HUD will show updated info on the number of Infected, Removed (and Dead) and Susceptible. Maybe it could even give us a count of how many idiots there are that won't stay at home even with symptoms?
+
+This will be implemented in the feature/hud branch.
 
 
-### Done features
+## Done features
 
+### Areas
+Areas are now setup so that every area can contain anything, houses, restaurants, workplaces. They all have at least one travelhub, so that people can teleport to and from them easily. This makes the map at least slightly nicer-looking.
 
 
 

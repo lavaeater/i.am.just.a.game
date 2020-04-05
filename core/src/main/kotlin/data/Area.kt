@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Rectangle
 import ktx.math.ImmutableVector2
 
 sealed class AreaType {
+    object MultiType : AreaType()
     object Residential: AreaType()
     object Commercial: AreaType()
 }

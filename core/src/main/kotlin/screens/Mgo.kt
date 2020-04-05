@@ -2,6 +2,7 @@ package screens
 
 import data.*
 import ktx.math.ImmutableVector2
+import ktx.math.amid
 
 class Mgo {
 
@@ -10,84 +11,78 @@ class Mgo {
         val npcs = mutableListOf<Npc>()
         val areas = mutableListOf<Area>()
 
-        const val homeWidth = 5f
-        const val homeHeight = 2.5f
+        private const val homeWidth = 5f
+        private const val homeHeight = 2.5f
 
-        const val commercialWidth = 10f
-        const val commercialHeight = 5f
+        private const val commercialWidth = 10f
+        private const val commercialHeight = 5f
 
-        val allPlaces get() = areas.flatMap { it.places }
+        val allPlaces by lazy { areas.flatMap { it.places } }
 
-        val workPlaces: List<Place> get() {
-            return allPlaces.filter { it.type == PlaceType.Workplace }
-        }
+        val workPlaces by lazy { allPlaces.filter { it.type == PlaceType.Workplace } }
 
-        val restaurants : List<Place> get() {
-            return allPlaces.filter { it.type == PlaceType.Restaurant }
-        }
+        val restaurants by lazy { allPlaces.filter { it.type == PlaceType.Restaurant } }
 
-        val homes : List<Place> get() {
-            return allPlaces.filter { it.type == PlaceType.Home }
-        }
+        val homes by lazy { allPlaces.filter { it.type == PlaceType.Home } }
 
-        val travelHubs: List<Place> get() {
-            return allPlaces.filter { it.type == PlaceType.TravelHub }
-        }
+        val travelHubs by lazy { allPlaces.filter { it.type == PlaceType.TravelHub } }
 
-
-        fun setupAreas() {
+        fun setupAreas2() {
             /*
-            We need 12 areas.
+            Goal: Non-overlapping, not so boring structure
+            Areas are city blocks. They start with a travel hub
 
-            Rows of 4. Npcs are place at their home places, so we can start at zero for
-            simplicity's sake
+            So the residential / commercial aspect of a block could be ignored and we could just handle
+            overlapping instead. Which we can handle easily by making everything the same goddamned size.
+
+            So, all blocks contain width / size items and we just need to determine proportions for them.
+            Oh la la.
              */
-            val homeClearance = 5
-            val otherClearance = 5
-            var i = 0
 
-            val r = 0..100
+            val areaCols = 3
+            val areaRows = 3
+            val placeWidth = 10f
+            val placeHeight = 10f
+            val placeClearance = 10f //Distance between places
+            val areaWidth = 100f
+            val areaHeight = 100f
+            val areaPositionThingie = 200f //This is to make walking between areas impractical
+            val placeCols = (areaWidth / (placeWidth + placeClearance)).toInt()
+            val placeRows = (areaHeight / (placeHeight + placeClearance)).toInt()
 
-            for (row in 0..4) {
-                for(col in 0..4) {
-                    var randomNumber = r.random()
-                    if(randomNumber < 85) {
-                        val area = Area(AreaType.Residential, ImmutableVector2( col * 200f, row * 200f))
 
-                        //number of rCols
-                        val rCols = (area.width / ( homeWidth * homeClearance)).toInt()
-                        val rRows = (area.height / (homeHeight * homeClearance)).toInt()
-                        for(c in 0..rCols)
-                            for(r in 0..rRows) {
-                                area.addChild(PlaceType.Home, c * homeWidth * homeClearance, r * homeHeight * homeClearance, homeWidth, homeHeight)
+            val restaurantRange = 66..85
+            val workPlaceRange = 86..100
+
+            val totalRange = 0..workPlaceRange.last
+
+            for (cArea in 0 amid areaCols)
+                for (rArea in 0 amid areaRows) {
+                    var travelHubRange = 0..5
+                    val area = Area(AreaType.MultiType, ImmutableVector2(cArea * areaPositionThingie, rArea * areaPositionThingie))
+
+                    for (cPlace in 0..placeCols)
+                        for (rPlace in 0..placeRows) {
+                            //Now, add some places to it, but at least ONE travelHub... how do we accomplish this?
+                            /*
+                            For every place added, we raise the possibility of a travel hub being placed, all the way
+                            up to 100 - after it is placed, it returns to 0
+                             */
+                            when (totalRange.random()) {
+                                in travelHubRange -> area.addChild(PlaceType.TravelHub, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance),placeWidth, placeHeight)
+                                in restaurantRange -> area.addChild(PlaceType.Restaurant, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance),placeWidth, placeHeight)
+                                in workPlaceRange -> area.addChild(PlaceType.Workplace, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance),placeWidth, placeHeight)
+                                else -> area.addChild(PlaceType.Home, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance),placeWidth, placeHeight) //This is actually homeRange
                             }
-                        area.addChild(PlaceType.TravelHub, area.width / 2, area.height / 2, 5f, 5f) //Should place it in the middle, no?
-                        areas.add(area)
-                    } else {
-                        val area = Area(AreaType.Commercial, ImmutableVector2( col * 200f, row * 200f))
-                        /*
-                        A third of places in commercial areas are restaurants. All will now have same size for simplicity
-                         */
-                        randomNumber = r.random()
-                        var comercial = 0
-                        val rCols = (area.width / (commercialWidth * 3)).toInt()
-                        val rRows = (area.height / (commercialHeight * 3)).toInt()
-                        for(c in 0..rCols)
-                            for(r in 0..rRows) {
-                                if(randomNumber < 65) {
-                                    area.addChild(PlaceType.Restaurant, c * commercialWidth * otherClearance, r * commercialHeight * otherClearance, commercialWidth, commercialHeight)
-                                } else{
-                                    area.addChild(PlaceType.Workplace,c * commercialWidth * otherClearance, r * commercialHeight * otherClearance, commercialWidth, commercialHeight)
-                                }
-                                comercial++
+                            if(travelHubRange.last != 0 && !area.places.any { it.type == PlaceType.TravelHub }) {
+                                travelHubRange = travelHubRange.first..travelHubRange.last + 1
+                            } else {
+                                travelHubRange = 0..0
                             }
-                        area.addChild(PlaceType.TravelHub, area.width / 2, area.height / 2, 5f, 5f) //Should place it in the middle, no?
-                        areas.add(area)
-                    }
-                    i++
+                        }
+                    areas.add(area)
+
                 }
-            }
-
         }
     }
 }

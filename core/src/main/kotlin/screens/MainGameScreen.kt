@@ -67,7 +67,7 @@ class MainGameScreen(
     private val friendRange = 1..10
     private var needsInit = true
     private fun initializeGame() {
-        Mgo.setupAreas()
+        Mgo.setupAreas2()
 
         val r = 0f amid 64f
 

@@ -75,7 +75,7 @@ class GameInputSystem(
             Input.Keys.LEFT -> nextNpc()
             Input.Keys.RIGHT -> previousNpc()
             Input.Keys.C -> clearFollow()
-            Input.Keys.Z -> zoomAll()
+            Input.Keys.Z -> centerCamera()
             Input.Keys.U -> zoom(0.5f)
             Input.Keys.J -> zoom(-0.5f)
             Input.Keys.K -> rotateCam(5f)
@@ -84,15 +84,12 @@ class GameInputSystem(
         return true
     }
 
-    private fun zoomAll() {
+    private fun centerCamera() {
         val maxX = Mgo.areas.map { it.x + it.width }.max()!!
         val maxY = Mgo.areas.map {it.y + it.height}.max()!!
 
         camera.position.x = maxX / 2
         camera.position.y = maxY / 2
-
-        camera.viewportHeight = maxX
-        camera.viewportWidth = maxY
     }
 
     fun clearFollow() {

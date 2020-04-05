@@ -4,30 +4,13 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IntervalIteratingSystem
 import com.badlogic.gdx.math.Circle
 import components.NpcComponent
+import data.CoronaStats
 import data.CoronaStatus
 import data.Npc
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
-import ktx.log.info
 import ktx.math.random
 import java.time.Period
-
-
-class CoronaStats {
-  companion object {
-    var infected = 0
-    var susceptible = 0
-    var dead = 0
-    var recovered = 0
-    var asymptomatic = 0
-    var symptomaticThatStayAtHome = 0
-    const val SymptomaticLimit = 5
-    const val RecoveryLimit = 13
-    const val ChanceOfDeath = 4
-    const val ChangeOfRecovery = 15
-  }
-}
-
 
 
 /**

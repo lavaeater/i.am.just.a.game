@@ -12,7 +12,7 @@ import ktx.actors.keepWithinParent
 import ktx.scene2d.KTableWidget
 import ktx.scene2d.label
 import ktx.scene2d.table
-import systems.CoronaStats
+import data.CoronaStats
 
 class UserInterface(
     private val batch: Batch,

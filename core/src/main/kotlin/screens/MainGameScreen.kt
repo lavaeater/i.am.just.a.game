@@ -17,6 +17,7 @@ import screens.Mgo.Companion.homes
 import screens.Mgo.Companion.npcs
 import systems.GameInputSystem
 import systems.RenderSystem
+import ui.IUserInterface
 
 class MainGameScreen(
         inputProcessor: InputProcessor,
@@ -24,14 +25,16 @@ class MainGameScreen(
         private val viewPort: Viewport,
         private val engine: Engine,
         private val camera: Camera,
-        private val actorFactory: ActorFactory) : KtxScreen {
+        private val actorFactory: ActorFactory,
+        private val ui: IUserInterface) : KtxScreen {
 
     init {
         Gdx.input.inputProcessor = inputProcessor
     }
 
-    private fun update(delta:Float) {
+    private fun update(delta: Float) {
         engine.update(delta)
+        ui.update(delta)
     }
 
     override fun show() {
@@ -55,7 +58,8 @@ class MainGameScreen(
 
     private fun stopTheWorld() {
         for (system in engine.systems.filter {
-            it !is RenderSystem }) {
+            it !is RenderSystem
+        }) {
             system.setProcessing(false)
             if (system is GameInputSystem) {
                 system.processInput = false
@@ -76,15 +80,15 @@ class MainGameScreen(
 
         for (home in homes) {
             val npc = actorFactory.addNpcAt(home)
-            if(dieRange.random() < infectionRisk) {
+            if (dieRange.random() < infectionRisk) {
                 npc.coronaStatus = CoronaStatus.Infected
                 npc.symptomatic = false
             }
         }
 
         //Set up some friends!
-        for(npc in npcs) {
-            for(i in 1..friendRange.random()) {
+        for (npc in npcs) {
+            for (i in 1..friendRange.random()) {
                 //1. Find a friend
                 val friend = npcs.random()
                 //1. add both as friends to each other!

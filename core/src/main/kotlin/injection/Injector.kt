@@ -16,6 +16,8 @@ import ktx.box2d.createWorld
 import ktx.inject.Context
 import screens.MainGameScreen
 import systems.*
+import ui.IUserInterface
+import ui.UserInterface
 
 class Injector {
 
@@ -47,14 +49,16 @@ class Injector {
                         inject()
                 ))
 
+                bindSingleton<IUserInterface>(UserInterface(inject()))
+
                 bindSingleton(MainGameScreen(
                         inject(), //inject InputProcessor
                         inject(), //Batch
                         inject(), //Viewport
                         inject(), //Engine (ashley)
                         inject(), //camera
-                inject() //ActorFactory
-                ))
+                inject(), //ActorFactory
+                inject()))
             }
         }
 

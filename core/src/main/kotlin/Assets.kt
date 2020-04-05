@@ -1,9 +1,16 @@
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.Disposable
 import data.GameSettings
+import ktx.scene2d.Scene2DSkin
+import ktx.style.skin
+import ktx.style.textButton
 import java.io.Reader
 
 
@@ -11,12 +18,14 @@ import java.io.Reader
  * Created by barry on 12/9/15 @ 11:17 PM.
  */
 object Assets : Disposable {
+    val standardFont by lazy { fixAFont() }
     lateinit var gameSettings: GameSettings
     lateinit var am: AssetManager
 
         fun load(gameSettings: GameSettings): AssetManager {
             Assets.gameSettings = gameSettings
             am = AssetManager()
+            fixScene2DSkin()
             fixSprites()
 
             return am
@@ -56,6 +65,25 @@ object Assets : Disposable {
                 setSize(width, height)
                 setOriginCenter()
         })
+    }
+
+    private fun fixScene2DSkin() {
+
+        Scene2DSkin.defaultSkin = Skin(Gdx.files.internal("ui/skin.json"))
+    }
+
+    private fun fixAFont() : BitmapFont {
+        val fontGenerator = FreeTypeFontGenerator(Gdx.files.internal("fonts/PressStart2P.ttf"))
+
+        val fontParams = FreeTypeFontGenerator.FreeTypeFontParameter().apply {
+            color = Color.WHITE
+            size = gameSettings.baseFontSize
+        }
+
+        val standardFont =  fontGenerator.generateFont(fontParams)
+
+        fontGenerator.dispose()
+        return standardFont
     }
 
     fun readerForTree(treeFileName: String): Reader {

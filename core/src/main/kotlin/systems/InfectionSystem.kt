@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IntervalIteratingSystem
 import com.badlogic.gdx.math.Circle
 import components.NpcComponent
-import data.Activity
 import data.CoronaStatus
 import data.Npc
 import ktx.ashley.allOf
@@ -13,13 +12,30 @@ import ktx.log.info
 import ktx.math.random
 import java.time.Period
 
+
+class CoronaStats {
+  companion object {
+    var infected = 0
+    var susceptible = 0
+    var dead = 0
+    var recovered = 0
+    var asymptomatic = 0
+    var symptomaticThatStayAtHome = 0
+    const val SymptomaticLimit = 5
+    const val RecoveryLimit = 13
+    const val ChanceOfDeath = 4
+    const val ChangeOfRecovery = 15
+  }
+}
+
+
+
 /**
  * Interval should be same as in Ai / Time system - no, it should be 4 times that!
  */
 class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcComponent::class).get(), interval, 5) {
   private var needsInit = true
   private val npcMapper = mapperFor<NpcComponent>()
-
   var npcs = listOf<Npc>()
   val infectedNpcs = mutableSetOf<Npc>()
 
@@ -30,34 +46,24 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
       CoronaStatus.Susceptible -> doIGetInfected(npc)
       CoronaStatus.Infected -> haveIRecovered(npc)
     }
-  }
 
-  var minutesPassed : Long= 0
-  var daysPassed = 0
+
+
+  }
 
   override fun updateInterval() {
     initIfNeeded()
-
-    minutesPassed += AiAndTimeSystem.minutesPerTick
-    if(minutesPassed % 720 == 0L) {
-      npcs = entities.map { npcMapper[it]!!.npc }
-      val asymptomatic = infectedNpcs.count { !it.symptomatic }
-      val recovered = npcs.filter { it.coronaStatus == CoronaStatus.Recovered }.count()
-      val susceptible = npcs.filter { it.coronaStatus == CoronaStatus.Susceptible }.count()
-      val dead = npcs.filter { it.coronaStatus == CoronaStatus.Dead }.count()
-      info { "Day $daysPassed. ${infectedNpcs.count()} infected, $asymptomatic without symptoms. \n$recovered recovered and $susceptible still at risk. \n$dead deaths - so far" }
-    }
-
-    if(minutesPassed % 1440 == 0L)
-      daysPassed++
-
     super.updateInterval()
   }
 
   private fun initIfNeeded() {
     if(needsInit) {
       needsInit = false
-      infectedNpcs.addAll(entities.map{ npcMapper[it]!!.npc }.filter { it.coronaStatus == CoronaStatus.Infected })
+      npcs = entities.map { npcMapper[it]!!.npc }
+      infectedNpcs.addAll(npcs.filter { it.coronaStatus == CoronaStatus.Infected })
+      CoronaStats.infected = infectedNpcs.count()
+      CoronaStats.asymptomatic = infectedNpcs.count { !it.symptomatic }
+      CoronaStats.susceptible = npcs.count { it.coronaStatus == CoronaStatus.Susceptible }
     }
   }
 
@@ -69,24 +75,33 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
     val range = 0..100
 
     //After FIVE days you will be symptomatic, at the latest
-    if(period > 5) {
+    if(period > CoronaStats.SymptomaticLimit) {
       npc.symptomatic = true
+      CoronaStats.asymptomatic--
+
+      //Will I stay at home?
       if(range.random() > 25) {
         npc.iWillStayAtHome = true
+        CoronaStats.symptomaticThatStayAtHome++
       }
     }
 
-    //Will I stay at home?
 
-
-    if(period > 13) {
+    if(period > CoronaStats.RecoveryLimit) {
       val r = range.random()
-      if (r < 4) {
+      if (r < CoronaStats.ChanceOfDeath) {
         npc.coronaStatus = CoronaStatus.Dead
         infectedNpcs.remove(npc)
-      } else if (r < 15) {
+        CoronaStats.infected-- //All that die are symptomatic
+        if(npc.iWillStayAtHome)
+          CoronaStats.symptomaticThatStayAtHome--
+      } else if (r < CoronaStats.ChangeOfRecovery) {
         npc.coronaStatus = CoronaStatus.Recovered
         infectedNpcs.remove(npc)
+        CoronaStats.infected--
+        CoronaStats.recovered++
+        if(npc.iWillStayAtHome)
+          CoronaStats.symptomaticThatStayAtHome--
       }
     }
   }
@@ -103,9 +118,14 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
         if (dieRoll < infectionRisk) {
           infectedNpcs.add(npc)
           npc.coronaStatus = CoronaStatus.Infected
+
+          CoronaStats.susceptible--
+          CoronaStats.infected++
           dieRoll = (0f..100f).random()
-          if (dieRoll < 25f)
+          if (dieRoll < 25f) {
+            CoronaStats.asymptomatic++
             npc.symptomatic = false
+          }
         }
       }
     }

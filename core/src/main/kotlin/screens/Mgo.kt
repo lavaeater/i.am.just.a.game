@@ -5,21 +5,21 @@ import graph.Graph
 import graph.Node
 import ktx.math.ImmutableVector2
 import ktx.math.amid
+import ktx.math.random
 
 class Mgo {
 
 
     companion object {
         val npcs = mutableListOf<Npc>()
-        val areas = mutableListOf<Area>()
+        val allPlaces = mutableListOf<Place>()
+        val graphOfItAll = Graph<ImmutableVector2>()
 
         private const val homeWidth = 5f
         private const val homeHeight = 2.5f
 
         private const val commercialWidth = 10f
         private const val commercialHeight = 5f
-
-        val allPlaces by lazy { areas.flatMap { it.places } }
 
         val workPlaces by lazy { allPlaces.filter { it.type == PlaceType.Workplace } }
 
@@ -41,24 +41,16 @@ class Mgo {
             Oh la la.
              */
 
-            val areaCols = 1
-            val areaRows = 1
             val placeWidth = 10f
             val placeHeight = 10f
-            val placeClearance = 5f //Distance between places
-            val areaWidth = 100f
-            val areaHeight = 100f
-            val areaClearance = 20f //This is to make walking between areas impractical
-            val placeCols = (areaWidth / (placeWidth + placeClearance)).toInt()
-            val placeRows = (areaHeight / (placeHeight + placeClearance)).toInt()
+            val placeClearance = 0f //Distance between places
 
-
+            var travelHubRange = 0..5
             val restaurantRange = 85..95
             val workPlaceRange = 96..100
 
             val totalRange = 0..workPlaceRange.last
             //What about some streets? Imagine a graph. Nodes are crossroads. And stops, of course.
-            val g = Graph<ImmutableVector2>(mapOf()) //We provide an empty map for now.
 
             /*
             Aaah, graphs of places and stuff. Let's do it. This will be more organic. So we have nodes of...
@@ -78,81 +70,80 @@ class Mgo {
 
              */
 
-            val nodeCols = 5
-            val nodeRows = 5
-
-            for (nodeCol in 0 amid nodeCols) {
-                for (nodeRow in 0 amid nodeRows) {
-                    if(nodeRow % 2 != 0) {
-                        if(nodeCol % 2 != 0) {
-
-                        }
-                    }
-
-                }
-            }
-
-
-            for (cArea in 0 amid areaCols)
-                for (rArea in 0 amid areaRows) {
-                    var travelHubRange = 0..5
-                    val area = Area(AreaType.MultiType, ImmutableVector2(cArea * areaWidth + areaClearance + placeClearance, rArea * areaHeight + areaClearance + placeClearance))
-
-                    for (cPlace in 0..placeCols)
-                        for (rPlace in 0..placeRows) {
-                            /*
-                            Skip conditions for now, create cool nodes first, fix EVERYTHING later
-
-                            But make sure we only add ONE node for every crossroad
-
-                             */
-
-                            //Now, add some places to it, but at least ONE travelHub... how do we accomplish this?
-                            /*
-                            For every place added, we raise the possibility of a travel hub being placed, all the way
-                            up to 100 - after it is placed, it returns to 0
-                             */
-                            val nP = when (totalRange.random()) {
-                                in travelHubRange -> area.addChild(PlaceType.TravelHub, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance), placeWidth, placeHeight)
-                                in restaurantRange -> area.addChild(PlaceType.Restaurant, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance), placeWidth, placeHeight)
-                                in workPlaceRange -> area.addChild(PlaceType.Workplace, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance), placeWidth, placeHeight)
-                                else -> area.addChild(PlaceType.Home, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance), placeWidth, placeHeight) //This is actually homeRange
-                            }
-
-                            for (n in 0..1) {
-                                for (m in 0..1) {
-                                    //OK, calculate like a corner or something.
-                                    var relCornerX = placeWidth / 2 + placeClearance / 2
-                                    var relCornerY = placeHeight / 2 + placeClearance / 2
-                                    relCornerX = if (n % 2 == 0) relCornerX else -relCornerX
-                                    relCornerY = if (m % 2 == 0) relCornerY else -relCornerY
-                                    val corner = nP.center + ImmutableVector2(relCornerX, relCornerY)
-                                    if (!g.nodes.any { it.data == corner}) {
-                                        //There is no node with this coordinate, so we add this particular coord
-                                        g.addNode(Node(corner))
-                                    }
-                                }
-                            }
-
-                            //But what about RELATIONS for the nodes? Ehrmagerd
-
-                            travelHubRange = if (travelHubRange.last != 0 && !area.places.any { it.type == PlaceType.TravelHub }) {
-                                travelHubRange.first..travelHubRange.last + 1
-                            } else {
-                                0..0
-                            }
-                        }
-                    areas.add(area)
-
-                }
+            val nodeCols = 40
+            val nodeRows = 40
 
 
             /*
-            So, for every place, we can check if it has a neighbour, right? Since everything is squared, the distance
-            between all nodes is 1, for now. It could be actual distance, why not, I mean? So if we were to add a node
-            for every row of areas... how do we keep track? we do it in the loop above, of course.
-             */
+            We must traverse a graph, using some kind of insanity-based way of doing it. Do we need directions for the
+            relations as I did it before? Maybe not. If they have coordinates everything should work anyways?
 
+            Maybe we should create the graph using a weird recursive algorithm where we create nodes as we go and connect
+            them as we go... aah.
+
+
+            Nah, the easiest way to do it is probably a very large matrix of nodes (first)
+
+             */
+            val columnRange = 0 amid nodeCols
+            val rowRange = 0 amid nodeRows
+
+            val numberOfCols = columnRange.count()
+            val numberOfRows = rowRange.count()
+
+            val colSize = placeWidth + placeClearance
+            val rowSize = placeHeight + placeClearance
+
+            val giantMatrixOfNodes = Array<Array<Node<ImmutableVector2>>>(numberOfCols) { c ->
+                Array(numberOfRows) { r ->
+                    if (c == 0 || r == 0 || c == numberOfCols - 1 || r == numberOfRows - 1 || c % 2 == 0 || r % 2 == 0) {
+                        val n = Node(ImmutableVector2(c * colSize, r * colSize))
+                        graphOfItAll.addNode(n)
+                        graphOfItAll.addLabelToNode("Road", n)
+                        n
+                    } else {
+                        val n = Node(ImmutableVector2(c * colSize, r * rowSize)) //Is this the center? Yes, yes it is.
+                        graphOfItAll.addNode(n)
+                        graphOfItAll.addLabelToNode("Place", n)
+                        val p = when (totalRange.random()) {
+                            in travelHubRange -> Place(PlaceType.TravelHub, n, placeWidth, placeHeight)
+                            in restaurantRange -> Place(PlaceType.Restaurant, n, placeWidth, placeHeight)
+                            in workPlaceRange -> Place(PlaceType.Workplace, n, placeWidth, placeHeight)
+                            else -> Place(PlaceType.Home, n, placeWidth, placeHeight)
+                        }
+                        travelHubRange = if(p.type != PlaceType.TravelHub) {
+                            0..travelHubRange.last + 5
+                        } else {
+                            0..5
+                        }
+                        allPlaces.add(p)
+                        n
+                    }
+                }
+            }
+
+            /*
+            So, how do we set up the relations? Well, we loop over the array of arrays, of course.
+
+            Then we keep track of above, below, side to side, for instance...
+             */
+            for ((x, c) in giantMatrixOfNodes.withIndex()) {
+                for ((y, currentNode) in c.withIndex()) {
+                    //Ah, how easy things are!
+                    for (i in 0 amid 1) {
+                        for (j in 0 amid 1) {
+                            if (i != 0 || j != 0) {
+                                val cX = x + i
+                                val cY = y + j
+                                if (cX in giantMatrixOfNodes.indices && cY in c.indices) {
+                                    val neighbourNode = giantMatrixOfNodes[cX][cY]
+                                    currentNode.addRelation("Neighbour", neighbourNode)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

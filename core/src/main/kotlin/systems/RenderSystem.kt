@@ -20,7 +20,8 @@ import data.PlaceType
 
 class RenderSystem(
         private val batch: Batch,
-        private val camera: Camera) : SortedIteratingSystem(
+        private val camera: Camera,
+        private val renderNodes: Boolean = false) : SortedIteratingSystem(
                 allOf(CharacterSpriteComponent::class,
                         TransformComponent::class,
                         VisibleComponent::class
@@ -82,6 +83,14 @@ class RenderSystem(
       }
       shapeRenderer.rect(it.box.x, it.box.y, it.box.width, it.box.height)
     }
+    if(renderNodes) {
+      shapeRenderer.color = Color.WHITE
+
+      for (node in Mgo.graphOfItAll.nodes) {
+        shapeRenderer.circle(node.data.x, node.data.y, 2f)
+      }
+    }
+
     shapeRenderer.end()
 
       super.update(deltaTime)

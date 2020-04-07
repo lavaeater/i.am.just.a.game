@@ -22,7 +22,8 @@ class Satisfiers {
         val whereToSatisfyResolvers = mapOf(
                 Needs.Rest to { npc: Npc -> npc.home },
                 Needs.Money to  { npc: Npc -> npc.workPlace },
-                Needs.Fuel to { npc: Npc -> Mgo.restaurants.random() }
+                Needs.Fuel to { npc: Npc -> Mgo.restaurants.random() },
+                Needs.Social to { npc: Npc -> Mgo.restaurants.random() }
         )
 
         fun isThisWhereIWork(npc: Npc) :Boolean {

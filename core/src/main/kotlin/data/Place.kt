@@ -1,9 +1,12 @@
 package data
 
 import com.badlogic.gdx.math.Rectangle
+import graph.Node
 import ktx.math.ImmutableVector2
 
-data class Place(val type: PlaceType = PlaceType.Workplace, val x : Float = 0f, val y : Float  = 0f, val width : Float  = 10f, val height : Float  = 10f) {
-    val box = Rectangle(x, y, width, height)
-    val center = ImmutableVector2(x + width / 2, y + height / 2)
+data class Place(val type: PlaceType = PlaceType.Workplace, val node: Node<ImmutableVector2>, val width : Float  = 10f, val height : Float  = 10f) {
+    val box = Rectangle(node.data.x - width / 2, node.data.y - height / 2, width, height)
+    val x = box.x
+    val y = box.y
+    val center = node.data
 }

@@ -86,8 +86,8 @@ class GameInputSystem(
     }
 
     private fun centerCamera() {
-        val maxX = Mgo.areas.map { it.x + it.width }.max()!!
-        val maxY = Mgo.areas.map { it.y + it.height }.max()!!
+        val maxX = Mgo.allPlaces.map { it.center.x }.max()!!
+        val maxY = Mgo.allPlaces.map { it.center.y }.max()!!
 
         camera.position.x = maxX / 2
         camera.position.y = maxY / 2

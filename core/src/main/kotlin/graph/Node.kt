@@ -27,13 +27,13 @@ data class Node<T>(val data: T) {
 		return relations.containsKey(relation)
 	}
 
-	private val properties = mutableMapOf<String, Property<Any>>()
+	val properties = mutableMapOf<String, Property>()
 
-	fun addProperty(property: Property<Any>) {
+	fun addProperty(property: Property) {
 		properties[property.name] = property
 	}
 
-	fun removeProperty(property: Property<Any>) {
+	fun removeProperty(property: Property) {
 		properties.remove(property.name)
 	}
 }

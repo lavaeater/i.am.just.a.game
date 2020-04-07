@@ -60,6 +60,39 @@ class Mgo {
             //What about some streets? Imagine a graph. Nodes are crossroads. And stops, of course.
             val g = Graph<ImmutableVector2>(mapOf()) //We provide an empty map for now.
 
+            /*
+            Aaah, graphs of places and stuff. Let's do it. This will be more organic. So we have nodes of...
+            something.
+
+            Nodes will have, for insanity's sake, two types of relations... no. That's dull.
+
+            The graph is a pure and beautiful thing. It will describe a grid. Some nodes will have
+            places attached to them. So, these nodes will be in the middle of a "grid" of several other nodes:
+
+            n n n n n
+            n p n p n
+            n n n n p
+
+            We don't even need areas anymore. Even rows will not have places, only odd, same for columns
+
+
+             */
+
+            val nodeCols = 5
+            val nodeRows = 5
+
+            for (nodeCol in 0 amid nodeCols) {
+                for (nodeRow in 0 amid nodeRows) {
+                    if(nodeRow % 2 != 0) {
+                        if(nodeCol % 2 != 0) {
+
+                        }
+                    }
+
+                }
+            }
+
+
             for (cArea in 0 amid areaCols)
                 for (rArea in 0 amid areaRows) {
                     var travelHubRange = 0..5
@@ -103,10 +136,10 @@ class Mgo {
 
                             //But what about RELATIONS for the nodes? Ehrmagerd
 
-                            if (travelHubRange.last != 0 && !area.places.any { it.type == PlaceType.TravelHub }) {
-                                travelHubRange = travelHubRange.first..travelHubRange.last + 1
+                            travelHubRange = if (travelHubRange.last != 0 && !area.places.any { it.type == PlaceType.TravelHub }) {
+                                travelHubRange.first..travelHubRange.last + 1
                             } else {
-                                travelHubRange = 0..0
+                                0..0
                             }
                         }
                     areas.add(area)

@@ -2,6 +2,7 @@ package screens
 
 import data.*
 import graph.Graph
+import graph.Node
 import ktx.math.ImmutableVector2
 import ktx.math.amid
 
@@ -56,6 +57,8 @@ class Mgo {
             val workPlaceRange = 96..100
 
             val totalRange = 0..workPlaceRange.last
+            //What about some streets? Imagine a graph. Nodes are crossroads. And stops, of course.
+            val g = Graph<ImmutableVector2>(mapOf()) //We provide an empty map for now.
 
             for (cArea in 0 amid areaCols)
                 for (rArea in 0 amid areaRows) {
@@ -64,18 +67,43 @@ class Mgo {
 
                     for (cPlace in 0..placeCols)
                         for (rPlace in 0..placeRows) {
+                            /*
+                            Skip conditions for now, create cool nodes first, fix EVERYTHING later
+
+                            But make sure we only add ONE node for every crossroad
+
+                             */
+
                             //Now, add some places to it, but at least ONE travelHub... how do we accomplish this?
                             /*
                             For every place added, we raise the possibility of a travel hub being placed, all the way
                             up to 100 - after it is placed, it returns to 0
                              */
-                            when (totalRange.random()) {
-                                in travelHubRange -> area.addChild(PlaceType.TravelHub, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance),placeWidth, placeHeight)
-                                in restaurantRange -> area.addChild(PlaceType.Restaurant, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance),placeWidth, placeHeight)
-                                in workPlaceRange -> area.addChild(PlaceType.Workplace, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance),placeWidth, placeHeight)
-                                else -> area.addChild(PlaceType.Home, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance),placeWidth, placeHeight) //This is actually homeRange
+                            val nP = when (totalRange.random()) {
+                                in travelHubRange -> area.addChild(PlaceType.TravelHub, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance), placeWidth, placeHeight)
+                                in restaurantRange -> area.addChild(PlaceType.Restaurant, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance), placeWidth, placeHeight)
+                                in workPlaceRange -> area.addChild(PlaceType.Workplace, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance), placeWidth, placeHeight)
+                                else -> area.addChild(PlaceType.Home, cPlace * (placeWidth + placeClearance), rPlace * (placeHeight + placeClearance), placeWidth, placeHeight) //This is actually homeRange
                             }
-                            if(travelHubRange.last != 0 && !area.places.any { it.type == PlaceType.TravelHub }) {
+
+                            for (n in 0..1) {
+                                for (m in 0..1) {
+                                    //OK, calculate like a corner or something.
+                                    var relCornerX = placeWidth / 2 + placeClearance / 2
+                                    var relCornerY = placeHeight / 2 + placeClearance / 2
+                                    relCornerX = if (n % 2 == 0) relCornerX else -relCornerX
+                                    relCornerY = if (m % 2 == 0) relCornerY else -relCornerY
+                                    val corner = nP.center + ImmutableVector2(relCornerX, relCornerY)
+                                    if (!g.nodes.any { it.data == corner}) {
+                                        //There is no node with this coordinate, so we add this particular coord
+                                        g.addNode(Node(corner))
+                                    }
+                                }
+                            }
+
+                            //But what about RELATIONS for the nodes? Ehrmagerd
+
+                            if (travelHubRange.last != 0 && !area.places.any { it.type == PlaceType.TravelHub }) {
                                 travelHubRange = travelHubRange.first..travelHubRange.last + 1
                             } else {
                                 travelHubRange = 0..0
@@ -85,10 +113,13 @@ class Mgo {
 
                 }
 
-            //What about some streets? Imagine a graph. Nodes are crossroads. And stops, of course.
-            val g = Graph<ImmutableVector2>(mapOf()) //We provide an empty map for now.
 
-            
+            /*
+            So, for every place, we can check if it has a neighbour, right? Since everything is squared, the distance
+            between all nodes is 1, for now. It could be actual distance, why not, I mean? So if we were to add a node
+            for every row of areas... how do we keep track? we do it in the loop above, of course.
+             */
+
         }
     }
 }

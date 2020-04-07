@@ -22,6 +22,7 @@ import ui.UserInterface
 class Injector {
 
     companion object {
+        val timeInterval = 1f //Time between ticks in seconds
         val context = Context()
 
         fun buildContext(gameSettings: GameSettings) {
@@ -68,8 +69,8 @@ class Injector {
 
         private fun getEngine() : Engine {
             return Engine().apply {
-                addSystem(AiAndTimeSystem(interval = 1f))
-                addSystem(InfectionSystem(interval = 1f))
+                addSystem(AiAndTimeSystem(interval = timeInterval))
+                addSystem(InfectionSystem(interval = timeInterval))
                 addSystem(NpcControlSystem())
                 addSystem(GameInputSystem(
                         inject(),

@@ -24,9 +24,21 @@ abstract class NpcTask : LeafTask<Npc>() {
         return npc.npcStats.statsMap.values.any { it in NeedsAndStuff.lowRange }
     }
 
+    /**
+     * Returns true if the need in question is in the low Range of stats
+     */
     fun hasNeed(need:String) : Boolean {
         val stat = npc.npcStats.statsMap[need]
         return if(need == Needs.Rest && npc.iWillStayAtHome) true else stat in NeedsAndStuff.lowRange
+    }
+
+    /**
+     * This makes npc:s stay at work and restaurants longer, maybe,
+     * making their days more constant.
+     */
+    fun stillHasNeed(need:String) : Boolean {
+        val stat = npc.npcStats.statsMap[need]
+        return if(need == Needs.Rest && npc.iWillStayAtHome) true else stat in NeedsAndStuff.lowNormal
     }
 
     private fun applyCosts() {

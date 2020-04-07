@@ -1,6 +1,7 @@
 package screens
 
 import data.*
+import graph.Graph
 import ktx.math.ImmutableVector2
 import ktx.math.amid
 
@@ -43,10 +44,10 @@ class Mgo {
             val areaRows = 1
             val placeWidth = 10f
             val placeHeight = 10f
-            val placeClearance = 10f //Distance between places
+            val placeClearance = 5f //Distance between places
             val areaWidth = 100f
             val areaHeight = 100f
-            val areaPositionThingie = 200f //This is to make walking between areas impractical
+            val areaClearance = 20f //This is to make walking between areas impractical
             val placeCols = (areaWidth / (placeWidth + placeClearance)).toInt()
             val placeRows = (areaHeight / (placeHeight + placeClearance)).toInt()
 
@@ -59,7 +60,7 @@ class Mgo {
             for (cArea in 0 amid areaCols)
                 for (rArea in 0 amid areaRows) {
                     var travelHubRange = 0..5
-                    val area = Area(AreaType.MultiType, ImmutableVector2(cArea * areaPositionThingie, rArea * areaPositionThingie))
+                    val area = Area(AreaType.MultiType, ImmutableVector2(cArea * areaWidth + areaClearance + placeClearance, rArea * areaHeight + areaClearance + placeClearance))
 
                     for (cPlace in 0..placeCols)
                         for (rPlace in 0..placeRows) {
@@ -83,6 +84,11 @@ class Mgo {
                     areas.add(area)
 
                 }
+
+            //What about some streets? Imagine a graph. Nodes are crossroads. And stops, of course.
+            val g = Graph<ImmutableVector2>(mapOf()) //We provide an empty map for now.
+
+            
         }
     }
 }

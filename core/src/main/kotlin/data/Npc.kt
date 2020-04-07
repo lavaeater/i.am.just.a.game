@@ -58,7 +58,7 @@ class Npc(val name: String, val id: String, val home: Place,val walkingRange: Fl
             .apply {
         statsMap[Needs.Fuel] = 96
         statsMap[Needs.Rest] = 96
-        statsMap[Needs.Money] = 96
+        statsMap[Needs.Money] = 0
         statsMap[Needs.Social] = 94
     }
 

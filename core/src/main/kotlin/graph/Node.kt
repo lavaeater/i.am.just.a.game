@@ -28,6 +28,20 @@ data class Node<T>(val data: T) {
 	}
 
 	val properties = mutableMapOf<String, Property>()
+	private val _labels = mutableSetOf<String>()
+	val labels : Set<String> get() = _labels.toSet()
+
+	fun addLabel(label:String) {
+		_labels.add(label)
+	}
+
+	fun hasLabel(label:String) : Boolean {
+		return _labels.contains(label)
+	}
+
+	fun removeLabel(label:String) {
+		_labels.remove(label)
+	}
 
 	fun addProperty(property: Property) {
 		properties[property.name] = property

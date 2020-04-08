@@ -146,7 +146,7 @@ class Mgo {
                 }
             }
 
-//WHat does the breadthfirst really get us?
+            //WHat does the breadthfirst really get us?
             var start = graphOfItAll.withLabels("Place").toList().random()
             var goal = graphOfItAll.withLabels("Place").toList().random()
 
@@ -162,31 +162,8 @@ class Mgo {
             path.add(start)
 
             for (p in path) {
-                p.addLabel("Breadth")
+                p.addLabel("A Star")
             }
-
-            /* D
-            Do it with Dijkstra
-             */
-
-//            start = graphOfItAll.withLabels("Place").toList().random()
-//            goal = graphOfItAll.withLabels("Place").toList().random()
-//
-//            cameFrom = StarIsBorn.findPath(start, goal)
-//
-//            path = mutableListOf()
-//            current = goal
-//            while (current != start) {
-//                path.add(current)
-//                current = cameFrom[current]!!
-//            }
-//
-//            path.add(start)
-//
-//            for (p in path) {
-//                p.addLabel("Dijkstra")
-//            }
-
         }
 
         const val Neighbour = "Neighbour"

@@ -87,7 +87,7 @@ class RenderSystem(
             for (node in Mgo.graphOfItAll.withLabels("Road")) {
                 if (node.hasLabel("Breadth"))
                     shapeRenderer.color = Color.GREEN
-                else if (node.hasLabel("Dijkstra"))
+                else if (node.hasLabel("A Star"))
                   shapeRenderer.color = Color.RED
                 else
                     shapeRenderer.color = Color.WHITE

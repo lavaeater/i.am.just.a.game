@@ -74,8 +74,8 @@ class Mgo {
 
              */
 
-            val nodeCols = 10
-            val nodeRows = 10
+            val nodeCols = 30
+            val nodeRows = 30
 
 
             /*
@@ -145,25 +145,14 @@ class Mgo {
                     }
                 }
             }
+//
+//            //WHat does the breadthfirst really get us?
+//            var start = graphOfItAll.withLabels("Place").toList().random()
+//            var goal = graphOfItAll.withLabels("Place").toList().random()
+//
+//            var cameFrom = StarIsBorn.findPath(start, goal) { from, to -> StarIsBorn.cost(from, to) }
+//
 
-            //WHat does the breadthfirst really get us?
-            var start = graphOfItAll.withLabels("Place").toList().random()
-            var goal = graphOfItAll.withLabels("Place").toList().random()
-
-            var cameFrom = StarIsBorn.findPath(start, goal) { from, to -> StarIsBorn.cost(from, to) }
-
-            var path = mutableListOf<Node<ImmutableVector2>>()
-            var current = goal
-            while (current != start) {
-                path.add(current)
-                current = cameFrom[current]!!
-            }
-
-            path.add(start)
-
-            for (p in path) {
-                p.addLabel("A Star")
-            }
         }
 
         const val Neighbour = "Neighbour"

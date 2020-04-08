@@ -1,11 +1,14 @@
 package data
 
 import ai.npc.TravelMode
+import ai.pathfinding.StarIsBorn
 import com.badlogic.gdx.ai.btree.BehaviorTree
 import com.badlogic.gdx.math.Circle
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Queue
+import graph.Node
+import ktx.math.ImmutableVector2
 import ktx.math.toMutable
 import screens.Mgo
 import statemachine.StateMachine
@@ -16,6 +19,7 @@ import java.time.LocalDate
  * We're gonna be needin' some friendship up in here.
  */
 class Npc(val name: String, val id: String, val home: Place,val walkingRange: Float = 100f) {
+    lateinit var currentPath: Pair<Node<ImmutableVector2>, MutableList<Node<ImmutableVector2>>>
     lateinit var behaviorTree: BehaviorTree<Npc>
     var currentNeed: String = Needs.Money
     var iWillStayAtHome = false
@@ -147,10 +151,22 @@ class Npc(val name: String, val id: String, val home: Place,val walkingRange: Fl
     fun travelToFirstPlace() {
         if(!::thePlaceIWantToBe.isInitialized || placesToGoTo.first() != thePlaceIWantToBe) {
             thePlaceIWantToBe = placesToGoTo.first()
+
+            if(thePlaceIWantToBe.second == TravelMode.Walking && (!::currentPath.isInitialized || currentPath.first != thePlaceIWantToBe.first.node)) {
+                //Find the currently closest node
+                val start = Mgo.graphOfItAll.nodes.minBy { it.data.dst2(currentPosition) }!! //Potentially slow, might wanna do this some other way
+                val goal = thePlaceIWantToBe.first.node
+                currentPath = Pair(goal, StarIsBorn.calculatePath(start, goal, ::cost))
+                //So, we have a path from where we are to where we want to go.
+            }
             npcStateMachine.acceptEvent(Events.LeftSomewhere)
         }
     }
 
+
+    fun cost(from: Node<ImmutableVector2>, to: Node<ImmutableVector2>): Int {
+        return from.data.dst2(to.data).toInt()
+    }
 
 
     fun die() {
@@ -172,4 +188,7 @@ class Npc(val name: String, val id: String, val home: Place,val walkingRange: Fl
     }
 }
 
+private fun ImmutableVector2.dst2(position: Vector2): Float {
+    return this.dst2(ImmutableVector2(position.x, position.y))
+}
 

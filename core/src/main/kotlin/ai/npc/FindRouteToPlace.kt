@@ -7,9 +7,9 @@ import findPlaceNearby
 import placeInWalkingRange
 import screens.Mgo
 
-class FindAPathToAPlace: NpcTask() {
+class FindRouteToPlace: NpcTask() {
     override fun copyTo(task: Task<Npc>?): Task<Npc> {
-        return task as FindAPathToAPlace
+        return task as FindRouteToPlace
     }
     override fun execute(): Status {
         timeHasPassed()

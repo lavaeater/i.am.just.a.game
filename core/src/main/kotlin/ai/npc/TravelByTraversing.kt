@@ -16,32 +16,29 @@ class TravelByTraversing: NpcTask() {
         applyCosts(NeedsAndStuff.getCostForActivity(Activity.OnTheMove))
 
         /*
-        The complicated bit here is the cost application
-        and the timing of the AI System
+        we get here every tick
 
-        The AI isn't thinking or doing things that often, which is fine.
+        If we use pathfinding and node-based travel,
+        then the npc can simply have a path to work on and when that path is done,
+        it just returns true, I guess?
 
-        But something has to control the npc's movement,
-        and that is the npc control system.
+        This is for walking destinations, only
 
-        So, this system (the AI system) should be active on certain parts of the
-        npcs values and stats, and the npc control system on others. So
+        The npc himself will now completely know where he is going. How do we
+        handle that in the NPC Control System? That system
 
-        the AI system should say stuff like "walk to", "zip to" and the NPC control,
-        which isn't a control system as much as a "where is this physics body going
-        and how"-system, should make sure it graphically and technically happens.
+        should only control movement. So, let's do this, but how?
 
-        This system is totally fine with the npc NOT being in some certain state
-        etc, it will check the position to determine the next ACTION, not some state.
+        All destinations are now NODES, so no need to check boxes and stuff anymore,
+        or maybe we could, of course... here's how it goes... this
+        stuff controls properties on the npc so that the control
+        system can move the character around and stuff.
 
-        Again, states are for controlling sprites etc, I would assume, perhaps, maybe.
+        Since places have nodes, the paths are really easy to find - but it is also
+        easy to teleport folks to the node they need to be at.
 
-        So, we should have a place we want to be. If we are walking to it,
-        the Npc travel mode should be Walking. Use WalkTo
          */
 
-        // Do not remove places until we are at the place.
-        //1. Are we at the place we want to go to?
 
         return if (!npc.placesToGoTo.any()) {
             Status.SUCCEEDED

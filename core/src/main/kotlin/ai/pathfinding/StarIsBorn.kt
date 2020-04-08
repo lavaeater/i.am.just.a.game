@@ -15,7 +15,20 @@ class StarIsBorn {
             return from.data.dst2(to.data).toInt()
         }
 
-        fun<T> findPath(start: Node<T>, goal: Node<T>, heuristic: (from: Node<T>, to: Node<T>) -> Int ): MutableMap<Node<T>, Node<T>?> {
+        fun<T> calculatePath(start: Node<T>, goal: Node<T>, heuristic: (from: Node<T>, to: Node<T>) -> Int ): MutableList<Node<T>> {
+            val cameFrom = aStarIsBorn(start, goal, heuristic)
+            val path = mutableListOf<Node<T>>()
+            var current = goal
+            while (current != start) {
+                path.add(0, current)
+                current = cameFrom[current]!!
+            }
+
+            path.add(0, start)
+            return path
+        }
+
+        fun<T> aStarIsBorn(start: Node<T>, goal: Node<T>, heuristic: (from: Node<T>, to: Node<T>) -> Int ): MutableMap<Node<T>, Node<T>?> {
             val frontier = PriorityQueue<Node<T>>()
             val cameFrom = mutableMapOf<Node<T>, Node<T>?>(start to null)
             val costSoFar = mutableMapOf(start to 0)

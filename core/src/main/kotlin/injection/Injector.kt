@@ -22,7 +22,7 @@ import ui.UserInterface
 class Injector {
 
     companion object {
-        val timeInterval = 1f //Time between ticks in seconds
+        private const val timeInterval = 1f //Time between ticks in seconds
         val context = Context()
 
         fun buildContext(gameSettings: GameSettings) {
@@ -79,102 +79,10 @@ class Injector {
                 addSystem(
                         RenderSystem(
                                 inject(),
-                                inject(), true))
+                                inject(), false))
                 addSystem(FollowCameraSystem(inject()))
             }
         }
     }
 }
-
-
-//                bindSingleton(createWorld().apply {
-//                    setContactListener(CollisionListener(this@register.inject()))
-//                })
-//                bindSingleton(BodyFactory(this.inject()))
-//                bindSingleton<IMapManager>(MapManager(
-//                        this.inject(),
-//                        this.inject()))
-
-//                bind {
-//                    ActorFactory(
-//                            this.inject(),
-//                            this.inject(),
-//                            this.inject(),
-//                            this.inject(),
-//                            this.inject())
-//                }
-
-//                bindSingleton(getEngine(this))
-
-//                bindSingleton(TileManager())
-//                bindSingleton(Player(name = "William Hamparsomian"))
-
-//Bind provider for a viewport with the correct settings for this game!
-
-//                bindSingleton<Telegraph>(MessageTelegraph(this.inject()))
-
-//                bindSingleton<MessageDispatcher>(
-//                        com.badlogic.gdx.ai.msg.MessageManager
-//                                .getInstance().apply {
-//                                    addListeners(this@register.inject(),
-//                                            Messages.CollidedWithImpassibleTerrain,
-//                                            Messages.EncounterOver,
-//                                            Messages.PlayerWentToAPlace,
-//                                            Messages.FactsUpdated,
-//                                            Messages.PlayerMetSomeone,
-//                                            Messages.StoryCompleted)
-//                                })
-//
-
-
-
-//                bindSingleton<IUserInterface>(
-//                        UserInterface(
-//                                this.inject(),
-//                                this.inject(),
-//                                this.inject<InputProcessor>() as InputMultiplexer,
-//                                this.inject()))
-//
-//                bindSingleton(ConversationManager(
-//                        this.inject(),
-//                        this.inject()
-//                ))
-//
-//                bindSingleton(StoryManager())
-//
-//                bindSingleton(PlacesOfTheWorld())
-//
-//                bindSingleton(GameManager(
-//                        this.inject(),
-//                        this.inject(),
-//                        this.inject(),
-//                        this.provider(),
-//                        this.inject(),
-//                        this.provider(),
-//                        this.inject(),
-//                        this.inject(),
-//                        this.inject(),
-//                        this.inject()))
-
-
-//        addSystem(PlayerEntityDiscoverySystem())
-//        addSystem(FeatureDiscoverySystem())
-//        addSystem(RenderFeatureSystem(context.inject()))
-//        addSystem(AiSystem())
-//        addSystem(PhysicsSystem(context.inject()))
-//			  addSystem(PhysicsDebugSystem(
-//						context.inject(),
-//						context.inject()))
-//        addSystem(WorldFactsSystem())
-
-
-
-
-//bindSingleton(FactsOfTheWorld(Gdx.app.getPreferences("default"))
-//.apply {
-//    setupInitialFacts()
-//})
-//bindSingleton(RulesOfTheWorld()) //Might be pointless
-//bindSingleton(GameState())
-
 

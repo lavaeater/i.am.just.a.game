@@ -5,7 +5,7 @@
 # Alias definitions
 import canSatisfy:"ai.npc.CanSatisfyCurrentNeed"
 import findAFriend:"ai.npc.FindAFriend"
-import findPath:"ai.npc.FindAPathToAPlace"
+import findRoute:"ai.npc.FindRouteToPlace"
 import findPlaceForSatisfy:"ai.npc.FindPlaceWhereICanSatisfyNeed"
 import hasAnyNeed:"ai.npc.HasAnyNeed"
 import satisfyNeed:"ai.npc.SatisfyNeed"
@@ -22,7 +22,7 @@ subtree name:"needTree"
                 satisfyNeed
             sequence
                 findPlaceForSatisfy
-                findPath
+                findRoute
                 invert
                     travel
 

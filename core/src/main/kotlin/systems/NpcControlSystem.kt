@@ -4,8 +4,10 @@ import ai.npc.TravelMode
 import atPlace
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
+import com.badlogic.gdx.physics.box2d.Body
 import components.Box2dBodyComponent
 import components.NpcComponent
+import data.Npc
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 import ktx.math.toMutable
@@ -39,18 +41,11 @@ class NpcControlSystem : IteratingSystem(allOf(
         val body = bodyMpr[entity]!!.body
         if (npc.onTheMove) {
 
-            //Add modified social stuff later. - maybe the npc's need to arrange a meeting and so on?
-//      if (npc.meetingAFriend) {
-//        npc.friendToGoTo?.currentPosition?.moveFromTo(body, somekindOfSpeedFactor)
-//        if (npc.circleOfConcern.contains(npc.friendToGoTo?.currentPosition))
-//          npc.stopDoingIt()
-//      } else {
-
             //get the place to go to
             whereAreWeGoing = npc.thePlaceIWantToBe
 
             when (whereAreWeGoing.second) {
-                TravelMode.Walking -> whereAreWeGoing.first.center.toMutable().moveFromTo(body, somekindOfSpeedFactor)
+                TravelMode.Walking -> walk(npc, body)
                 TravelMode.Zipping -> {
                     body.setTransform(npc.thePlaceIWantToBe.first.center.toMutable(), body.angle)
                     body.isAwake = true
@@ -63,5 +58,14 @@ class NpcControlSystem : IteratingSystem(allOf(
 
         if (!npc.onTheMove)
             body.linearVelocity = vec2(0f, 0f)
+    }
+
+    private fun walk(npc: Npc, body: Body) {
+        //Walking now means traversing a list of items.
+
+        if(npc.currentPosition == npc.currentPath.second.first()!!.data.toMutable()) {
+            npc.currentPath.second.removeAt(0) //Remove the first node
+        }
+        npc.currentPath.second.first()!!.data.toMutable().moveFromTo(body, somekindOfSpeedFactor)
     }
 }

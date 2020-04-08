@@ -74,8 +74,8 @@ class Mgo {
 
              */
 
-            val nodeCols = 30
-            val nodeRows = 30
+            val nodeCols = 50
+            val nodeRows = 50
 
 
             /*

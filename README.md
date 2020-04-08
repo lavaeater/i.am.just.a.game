@@ -1,18 +1,31 @@
-# iamjustagame
+# I am just a game
 
 A [LibGDX](http://libgdx.badlogicgames.com/) project generated with [gdx-liftoff](https://github.com/tommyettinger/gdx-liftoff).
 
 ## WIP feature of the day
 
+It appears that I can come up with features that I perform no valuable work on, whatsoever. This time it seems my thought process was that I was going to start working on Social Needs, but hey, I implemented Path Finding instead. So, social needs is on some kind of todo-list for now.
+
+### Time step
+
+The time steps, fifteen minutes at a time. Fine and dandy. But a bit dull, innit? This means the AI only makes decisions every fifteen minutes, which perhaps is fine, but it also means that every single NPC makes their decisions at basically the same exact time. I will start by just changing the time step, that should make a difference to begin with. 
+
+This is a very interesting area. I want to be able to speed up the game if needed... and slow it down. But also we want to avoid the NPCs making expensive choices ALL the time. Hmm.
+
 ### Social needs 
 
 So, I removed social needs because they worked by making people just walk up to their closest friend. That seems a bit dull, let's have them do something else - the easiest is of course for them to arrange to meet at someones's house or at a restaurant. What we are going towards here is of course changing the entire need economy to something more abstract. Perhaps we need "work hours" - defined by some job a person has at a workplace, instead of just spots where they replenish their money stat.
 
-Why do I want to do that? Do I want to do that?
-
 ### Ambling and free time
 
+To be described.
+
 ## Done features
+
+### Path finding
+
+So, the entire map was changed into a glorious messy graph-based structure instead of, well, nothing. Previously only places and NPCs had coordinates and I check if players were inside boxes and stuff to keep track of them arriving to places and stuff. That changed with this. Places have nodes, which makes it easy to figure out what the "goal" node for the path finding module is. This now makes it so that people only walk on the streets. The only issue with this is that people now "stack up" and seem to be fewer than they really are... or?
+
 ### Hud Showing Corona Progress
 
 So I've done HUDs before, it's not *that* hard, but Scene2D is, in my mind, kind of a pain. Wrapping text, getting stuff to align, everything is a bit clunky and not "just working". That's what working as a "regular" developer for 20 years gets you, I guess, laziness and expecting stuff to hand everything to you for free. But the HUD will show updated info on the number of Infected, Removed (and Dead) and Susceptible. Maybe it could even give us a count of how many idiots there are that won't stay at home even with symptoms?

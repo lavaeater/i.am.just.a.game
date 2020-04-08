@@ -66,6 +66,6 @@ class NpcControlSystem : IteratingSystem(allOf(
         if(npc.currentPosition == npc.currentPath.second.first()!!.data.toMutable()) {
             npc.currentPath.second.removeAt(0) //Remove the first node
         }
-        npc.currentPath.second.first()!!.data.toMutable().moveFromTo(body, somekindOfSpeedFactor)
+        npc.currentPath.second.first()!!.data.toMutable().moveFromTo(body, npc.speed * AiAndTimeSystem.secondsPerSecond)
     }
 }

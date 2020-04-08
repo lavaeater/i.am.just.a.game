@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Queue
 import graph.Node
 import ktx.math.ImmutableVector2
+import ktx.math.random
 import ktx.math.toMutable
 import screens.Mgo
 import statemachine.StateMachine
@@ -19,6 +20,7 @@ import java.time.LocalDate
  * We're gonna be needin' some friendship up in here.
  */
 class Npc(val name: String, val id: String, val home: Place,val walkingRange: Float = 100f) {
+    val speed = (1f..3f).random()
     lateinit var currentPath: Pair<Node<ImmutableVector2>, MutableList<Node<ImmutableVector2>>>
     lateinit var behaviorTree: BehaviorTree<Npc>
     var currentNeed: String = Needs.Money

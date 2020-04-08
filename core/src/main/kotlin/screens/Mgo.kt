@@ -116,7 +116,7 @@ class Mgo {
                             else -> Place(PlaceType.Home, n, placeWidth, placeHeight)
                         }
                         travelHubRange = if (p.type != PlaceType.TravelHub) {
-                            0..travelHubRange.last + 5
+                            0..travelHubRange.last + 1
                         } else {
                             0..5
                         }

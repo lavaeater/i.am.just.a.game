@@ -16,12 +16,6 @@ class Mgo {
         val allPlaces = mutableListOf<Place>()
         val graphOfItAll = Graph<ImmutableVector2>()
 
-        private const val homeWidth = 5f
-        private const val homeHeight = 2.5f
-
-        private const val commercialWidth = 10f
-        private const val commercialHeight = 5f
-
         val workPlaces by lazy { allPlaces.filter { it.type == PlaceType.Workplace } }
 
         val restaurants by lazy { allPlaces.filter { it.type == PlaceType.Restaurant } }
@@ -31,19 +25,8 @@ class Mgo {
         val travelHubs by lazy { allPlaces.filter { it.type == PlaceType.TravelHub } }
 
         fun setupAreas2() {
-            /*
-            Goal: Non-overlapping, not so boring structure
-            Areas are city blocks. They start with a travel hub
-
-            So the residential / commercial aspect of a block could be ignored and we could just handle
-            overlapping instead. Which we can handle easily by making everything the same goddamned size.
-
-            So, all blocks contain width / size items and we just need to determine proportions for them.
-            Oh la la.
-             */
-
-            val placeWidth = 10f
-            val placeHeight = 10f
+            val placeWidth = 8f
+            val placeHeight = 8f
             val placeClearance = 0f //Distance between places
 
             var travelHubRange = 0..5
@@ -54,41 +37,9 @@ class Mgo {
 
             val nbList = listOf(Pair(0, 1), Pair(0, -1), Pair(1, 0), Pair(-1, 0))
 
-            //What about some streets? Imagine a graph. Nodes are crossroads. And stops, of course.
+            val nodeCols = 25
+            val nodeRows = 25
 
-            /*
-            Aaah, graphs of places and stuff. Let's do it. This will be more organic. So we have nodes of...
-            something.
-
-            Nodes will have, for insanity's sake, two types of relations... no. That's dull.
-
-            The graph is a pure and beautiful thing. It will describe a grid. Some nodes will have
-            places attached to them. So, these nodes will be in the middle of a "grid" of several other nodes:
-
-            n n n n n
-            n p n p n
-            n n n n p
-
-            We don't even need areas anymore. Even rows will not have places, only odd, same for columns
-
-
-             */
-
-            val nodeCols = 50
-            val nodeRows = 50
-
-
-            /*
-            We must traverse a graph, using some kind of insanity-based way of doing it. Do we need directions for the
-            relations as I did it before? Maybe not. If they have coordinates everything should work anyways?
-
-            Maybe we should create the graph using a weird recursive algorithm where we create nodes as we go and connect
-            them as we go... aah.
-
-
-            Nah, the easiest way to do it is probably a very large matrix of nodes (first)
-
-             */
             val columnRange = 0 amid nodeCols
             val rowRange = 0 amid nodeRows
 
@@ -125,12 +76,6 @@ class Mgo {
                     }
                 }
             }
-
-            /*
-            So, how do we set up the relations? Well, we loop over the array of arrays, of course.
-
-            Then we keep track of above, below, side to side, for instance...
-             */
             for ((x, c) in giantMatrixOfNodes.withIndex()) {
                 for ((y, currentNode) in c.withIndex()) {
                     //Ah, how easy things are!
@@ -145,14 +90,6 @@ class Mgo {
                     }
                 }
             }
-//
-//            //WHat does the breadthfirst really get us?
-//            var start = graphOfItAll.withLabels("Place").toList().random()
-//            var goal = graphOfItAll.withLabels("Place").toList().random()
-//
-//            var cameFrom = StarIsBorn.findPath(start, goal) { from, to -> StarIsBorn.cost(from, to) }
-//
-
         }
 
         const val Neighbour = "Neighbour"

@@ -12,6 +12,10 @@ import ktx.ashley.mapperFor
 import ktx.math.random
 import java.time.Period
 
+/*
+Infections must be managed from within the crazy time system. The time system will be slightly bloated
+but we can refactor this.
+ */
 
 /**
  * Interval should be same as in Ai / Time system - no, it should be 4 times that!
@@ -21,6 +25,11 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
     private val npcMapper = mapperFor<NpcComponent>()
     private var npcs = listOf<Npc>()
     private val infectedNpcs = mutableSetOf<Npc>()
+
+    fun reset() {
+        infectedNpcs.clear()
+        needsInit = true
+    }
 
     override fun processEntity(entity: Entity) {
         val npc = npcMapper[entity].npc

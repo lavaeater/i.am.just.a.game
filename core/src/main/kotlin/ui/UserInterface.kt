@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import ktx.actors.keepWithinParent
 import ktx.scene2d.KTableWidget
 import ktx.scene2d.label
 import ktx.scene2d.table
@@ -84,18 +83,19 @@ Symptomatic staying home: ${CoronaStats.symptomaticThatStayAtHome}
 
   private lateinit var rootTable: KTableWidget
 
-  private lateinit var scoreBoard: KTableWidget
+  private lateinit var infoBoard: KTableWidget
 
   private fun setupCoronaStats() {
-    scoreBoard = table {
+    infoBoard = table {
       label("""
 Controls and stuff:
 WASD                    -> Control camera
-Arrow Left and right    -> Switch NPC to follow
+Left and Right          -> Switch NPC to follow
 c                       -> Stop following NPC
 z                       -> Center camera //stop complaining
 u, j                    -> zoom in and out
 k, l                    -> rotate camera
+r                       -> Reset Sim
       """)
 
       infoLabel = label("InfoLabel")
@@ -106,7 +106,8 @@ k, l                    -> rotate camera
       setFillParent(true)
       bottom()
       left()
-      add(scoreBoard).expand().align(Align.bottomLeft)
+      add(infoBoard).expand().align(Align.bottomLeft)
+      pad(10f)
     }
 
     stage.addActor(rootTable)

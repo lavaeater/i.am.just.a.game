@@ -13,6 +13,7 @@ import components.CameraFollowComponent
 import components.KeyboardControlComponent
 import components.NpcComponent
 import data.CoronaStats
+import data.CoronaStatus
 import directionalVelocity
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
@@ -77,12 +78,37 @@ class GameInputSystem(
             Input.Keys.RIGHT -> previousNpc()
             Input.Keys.C -> clearFollow()
             Input.Keys.Z -> centerCamera()
+            Input.Keys.R -> resetSim()
             Input.Keys.U -> zoom(0.5f)
             Input.Keys.J -> zoom(-0.5f)
             Input.Keys.K -> rotateCam(5f)
             Input.Keys.L -> rotateCam(-5f)
         }
         return true
+    }
+
+    private fun resetSim() {
+        for (e in entities) {
+            val n = npcComponentMapper[e].npc
+            n.coronaStatus = CoronaStatus.Susceptible
+            n.symptomatic = false
+            n.iWillStayAtHome = false
+        }
+        CoronaStats.dead = 0
+        CoronaStats.infected = 0
+        CoronaStats.susceptible = entities.count { npcComponentMapper.has(it) }
+        CoronaStats.asymptomatic = 0
+        CoronaStats.recovered = 0
+        CoronaStats.symptomaticThatStayAtHome = 0
+
+        /*
+        Set up some infected npcs!
+         */
+        val numberOfInfected = (5..15).random()
+        for(i in 0..numberOfInfected) {
+            npcComponentMapper[entities[i]].npc.coronaStatus = CoronaStatus.Infected
+            npcComponentMapper[entities[i]].npc.infectionDate = AiAndTimeSystem.currentDateTime.toLocalDate()
+        }
     }
 
     private fun centerCamera() {

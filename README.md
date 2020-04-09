@@ -6,6 +6,12 @@ A [LibGDX](http://libgdx.badlogicgames.com/) project generated with [gdx-liftoff
 
 It appears that I can come up with features that I perform no valuable work on, whatsoever. This time it seems my thought process was that I was going to start working on Social Needs, but hey, I implemented Path Finding instead. So, social needs is on some kind of todo-list for now.
 
+### Time steps are boring and should die
+
+No, what I will do now is change the map generation, again. We "must" have a more organic way of describing the world. All nodes are coordinates and can, actually, be spread out however they please. How do we accomplish this? 
+
+Let's have some fun with that. But we will add generation strategies, not remove them, this time.
+
 ### Time step
 
 The time steps, fifteen minutes at a time. Fine and dandy. But a bit dull, innit? This means the AI only makes decisions every fifteen minutes, which perhaps is fine, but it also means that every single NPC makes their decisions at basically the same exact time. I will start by just changing the time step, that should make a difference to begin with. 

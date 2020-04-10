@@ -62,7 +62,7 @@ class GameInputSystem(
     private val kbCtrlMpr = mapperFor<KeyboardControlComponent>()
     private val npcComponentMapper = mapperFor<NpcComponent>()
 
-    var ctrlId: UUID? = null
+    var ctrlId:                      UUID? = null
     var ctrlBody: Body? = null
 
     override fun keyDown(keycode: Int): Boolean {
@@ -89,10 +89,21 @@ class GameInputSystem(
         return true
     }
 
+    private fun previousHub() {
+        clearFollow()
+        hubIndex = (hubIndex-1).goAround(Mgo.travelHubs.indices)
+
+        camera.position.x = Mgo.travelHubs[hubIndex].center.x
+        camera.position.y = Mgo.travelHubs[hubIndex].center.y
+    }
+
     var hubIndex = 0
     private fun nextHub() {
         clearFollow()
-        camera.position.x = Mgo.graph.withLabels("")
+        hubIndex = (hubIndex+1).goAround(Mgo.travelHubs.indices)
+
+        camera.position.x = Mgo.travelHubs[hubIndex].center.x
+        camera.position.y = Mgo.travelHubs[hubIndex].center.y
     }
 
     private fun resetSim() {
@@ -208,5 +219,13 @@ class GameInputSystem(
             Input.Keys.S, Input.Keys.DOWN -> y = 0f
         }
         return true
+    }
+}
+
+private fun Int.goAround(range: IntRange): Int {
+    return when {
+        this < range.first -> range.last
+        this > range.last -> range.first
+        else -> this
     }
 }

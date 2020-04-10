@@ -44,7 +44,7 @@ class StarIsBorn {
 
                 for(next in current.neighbours(Mgo.Neighbour)) {
                     newCost = costSoFar[current]!! + 1
-                    if((!costSoFar.containsKey(next) || newCost < costSoFar[next]!! ) && (next.hasLabel("Road") || next == goal)) {
+                    if((!costSoFar.containsKey(next) || newCost < costSoFar[next]!! )) {
                         costSoFar[next] = newCost
                         priority = newCost + heuristic(goal, next)
                         frontier.push(next, priority)

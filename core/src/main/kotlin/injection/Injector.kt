@@ -22,8 +22,8 @@ import ui.UserInterface
 class Injector {
 
     companion object {
-        private const val timeInterval = 1f //Time between ticks in seconds
-        private const val minutesPerTick = 15L
+        private const val timeInterval = 0.1f //Time between ticks in seconds
+        private const val minutesPerTick = 5L
         val context = Context()
 
         fun buildContext(gameSettings: GameSettings) {

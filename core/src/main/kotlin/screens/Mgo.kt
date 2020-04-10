@@ -1,9 +1,13 @@
 package screens
 
 import data.*
+import factory.ActorFactory
 import graph.Graph
 import graph.Node
+import injection.Injector
 import ktx.math.*
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 
 class MapNode(data: ImmutableVector2) : Node<ImmutableVector2>(data)
 
@@ -24,53 +28,39 @@ class Mgo {
         val travelHubs by lazy { allPlaces.filter { it.type == PlaceType.TravelHub } }
 
         fun buildWithBuilder() {
-
-            node{
-                addLabel("Street")
-                val numberOfHubs = (0..10).random()
-                var degreesPerHub = 360f / numberOfHubs
-                for (hub in 0 until numberOfHubs) {
-                    displacedChild((ImmutableVector2.X * 500f).withAngleDeg(hub * degreesPerHub)) {
-                        addLabel("TravelHub")
-                        val numberOfStreets = (5..10).random()
-                        val degreesPerStreet = 360f / numberOfStreets
-                        for (i in 0 until numberOfStreets)
-                            displacedChild((ImmutableVector2.X * 30f).withAngleDeg(i * degreesPerStreet)) {
-                                addLabel("Street")
-                                street((5..10).random(), direction = ImmutableVector2.X.withAngleDeg(i * degreesPerStreet)) {
-                                    home(direction = ImmutableVector2.Y.withAngleDeg(i * degreesPerStreet).withRotation90(1), distanceFromStreet = 10f)
-                                    home(direction = -ImmutableVector2.Y.withAngleDeg(i * degreesPerStreet).withRotation90(1), distanceFromStreet = 10f)
+             node {
+                    addLabel("Street")
+                    var degreesPerHub = 360f / 4
+                    for (centerHub in 0 until 2) {
+                        travelHub((ImmutableVector2.X * 100f).withAngleDeg(centerHub * degreesPerHub)) {
+                            street(5, 100f) {
+                                street(5, 50f, ImmutableVector2.Y) {
+                                    workPlace(20f, ImmutableVector2.X)
+                                }
+                                street(5, 50f, ImmutableVector2.X) {
+                                    restaurant(15f, ImmutableVector2.Y)
                                 }
                             }
+                        }
                     }
-                }
-                degreesPerHub = 360f / 4
-                for (centerHub in 0 until 2) {
-                    displacedChild((ImmutableVector2.X * 100f).withAngleDeg(centerHub * degreesPerHub)) {
-                        addLabel("TravelHub")
-                        street(5, 100f) {
-                            street( 5, 50f, ImmutableVector2.Y) {
-                                workPlace(20f, ImmutableVector2.X)
-                            }
+                    val numberOfHubs = (20..50).random()
+                    degreesPerHub = 360f / numberOfHubs
+                    for (hub in 0 until numberOfHubs) {
+                        travelHub((ImmutableVector2.X * 500f).withAngleDeg(hub * degreesPerHub)) {
+                            val numberOfStreets = (5..10).random()
+                            val degreesPerStreet = 360f / numberOfStreets
+                            for (i in 0 until numberOfStreets)
+                                displacedChild((ImmutableVector2.X * 30f).withAngleDeg(i * degreesPerStreet)) {
+                                    addLabel("Street")
+                                    street((5..10).random(), direction = ImmutableVector2.X.withAngleDeg(i * degreesPerStreet)) {
+                                        home(direction = ImmutableVector2.Y.withAngleDeg(i * degreesPerStreet).withRotation90(1), distanceFromStreet = 10f)
+                                        home(direction = -ImmutableVector2.Y.withAngleDeg(i * degreesPerStreet).withRotation90(1), distanceFromStreet = 10f)
+                                    }
+                                }
                         }
                     }
                 }
             }
-
-            for (homeNode in graph.nodes.filter { it.hasLabel("Home") }) {
-                allPlaces.add(Place(PlaceType.Home, homeNode))
-            }
-
-            for (workNode in graph.nodes.filter { it.hasLabel("WorkPlace") }) {
-                allPlaces.add(Place(PlaceType.Workplace, workNode))
-            }
-
-            for (travelNode in graph.nodes.filter { it.hasLabel("TravelHub") }) {
-                allPlaces.add(Place(PlaceType.TravelHub, travelNode))
-            }
-        }
-
-
         const val Neighbour = "Neighbour"
     }
 }
@@ -83,7 +73,7 @@ fun node(position: ImmutableVector2 = ImmutableVector2.ZERO, init: MapNode.() ->
 }
 
 fun MapNode.travelHub(displacement: ImmutableVector2,
-init: MapNode.()-> Unit) : MapNode {
+                      init: MapNode.() -> Unit): MapNode {
     val node = nodeWithLabel(displacement, "TravelHub", init)
     Mgo.allPlaces.add(Place(PlaceType.TravelHub, node))
     return node
@@ -111,7 +101,15 @@ fun MapNode.home(distanceFromStreet: Float = 20f,
                  direction: ImmutableVector2 = ImmutableVector2.Y,
                  init: MapNode.() -> Unit = {}): MapNode {
     val homeNode = nodeWithLabel(direction * distanceFromStreet, "Home", init)
-    Mgo.allPlaces.add(Place(PlaceType.Home, homeNode))
+    val home = Place(PlaceType.Home, homeNode)
+    Mgo.allPlaces.add(home)
+    val npc = Injector.inject<ActorFactory>().addNpcAt(home)
+    val dieRange = (1..100)
+    val infectionRisk = 5
+    if (dieRange.random() < infectionRisk) {
+        npc.coronaStatus = CoronaStatus.Infected
+        npc.symptomatic = false
+    }
     return homeNode
 }
 

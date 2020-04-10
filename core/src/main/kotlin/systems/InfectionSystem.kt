@@ -60,6 +60,9 @@ class InfectionSystem(interval: Float = 5f) : IntervalIteratingSystem(allOf(NpcC
         /*
         Recovery takes some time
          */
+        if(!infectedNpcs.contains(npc))
+            infectedNpcs.add(npc)
+
         val period = Period.between(npc.infectionDate, AiAndTimeSystem.currentDateTime.toLocalDate()).days
         val range = 0..100
 

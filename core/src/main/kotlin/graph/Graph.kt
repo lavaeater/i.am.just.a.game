@@ -66,6 +66,25 @@ class Graph<T>() {
         return nodes.filter { it.labels.containsAll(labelsToFind.asList()) }.asSequence()
     }
 
+    fun node(data: T): Node<T> {
+        val node = Node<T>(data)
+        addNode(node)
+        return node
+    }
+
+    fun node(data: T, label: String): Node<T> {
+        val node = Node<T>(data)
+        node.addLabel(label)
+        addNode(node)
+        return node
+    }
+
+    fun connect(from: Node<T>, to: Node<T>, relation: String = Node.Neighbour, twoWay: Boolean = true) {
+        from.addRelation(relation, to)
+        if(twoWay)
+            to.addRelation(relation, from)
+    }
+
 //    fun withLabels(nodes: Collection<Node<T>>, vararg labelsToFind: String): Sequence<Node<T>> {
 //        return labels.filterKeys { labelsToFind.contains(it) }.flatMap { it.value }.intersect(nodes).asSequence()
 //    }

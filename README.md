@@ -6,11 +6,14 @@ A [LibGDX](http://libgdx.badlogicgames.com/) project generated with [gdx-liftoff
 
 It appears that I can come up with features that I perform no valuable work on, whatsoever. This time it seems my thought process was that I was going to start working on Social Needs, but hey, I implemented Path Finding instead. So, social needs is on some kind of todo-list for now.
 
-### Time steps are boring and should die
+### A Free Map
 
-No, what I will do now is change the map generation, again. We "must" have a more organic way of describing the world. All nodes are coordinates and can, actually, be spread out however they please. How do we accomplish this? 
+So, let's start with the concept of areas, again. But areas won't be an actual data structure this time. We will more like just use them to create the map. So we will define some kind of walking distance for an npc, I say 1000 meters. Or more, but who cares. 
 
-Let's have some fun with that. But we will add generation strategies, not remove them, this time.
+To generate a free-flowing map we could start with a Travel Hub. Then radially, as before, from that hub, we could spread out nodes in the graph, so we construct all this by generating nodes and relations as we go instead of having matrices of nodes etc, which are supremely boring but well structured for the naive thing we were doing before. Nodes also do not need to be evenly spaced between each other. They could conceivably be any distance from the previous node. 
+
+So radially out. Then perhaps some structure? If we want to create a neighbourhood of homes, we can then try to create a
+cul-de-sac-based street pattern. This is cool. 
 
 ### Time step
 

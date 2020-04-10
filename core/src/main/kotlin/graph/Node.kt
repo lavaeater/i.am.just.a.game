@@ -1,8 +1,12 @@
 package graph
 
-data class Node<T>(val data: T) {
+open class Node<T>(val data: T) {
 	private val relations = mutableMapOf<String, MutableSet<Node<T>>>()
 	val allNeighbours: Iterable<Node<T>> get() = relations.map { it.value }.flatten()
+
+	fun addNeighbour(relatedNode: Node<T>) {
+		addRelation(Neighbour, relatedNode)
+	}
 
 	fun addRelation(name:String, relatedNode: Node<T>) {
 		if(!relations.containsKey(name))
@@ -49,5 +53,9 @@ data class Node<T>(val data: T) {
 
 	fun removeProperty(property: Property) {
 		properties.remove(property.name)
+	}
+
+	companion object {
+		const val Neighbour = "Neighbour"
 	}
 }

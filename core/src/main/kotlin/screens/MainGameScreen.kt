@@ -71,31 +71,31 @@ class MainGameScreen(
     private val friendRange = 1..10
     private var needsInit = true
     private fun initializeGame() {
-        Mgo.setupAreas2()
-
-        val r = 0f amid 64f
-
-        val infectionRisk = 5
-        val dieRange = (1..100)
-
-        for (home in homes) {
-            val npc = actorFactory.addNpcAt(home)
-            if (dieRange.random() < infectionRisk) {
-                npc.coronaStatus = CoronaStatus.Infected
-                npc.symptomatic = false
-            }
-        }
-
-        //Set up some friends!
-        for (npc in npcs) {
-            for (i in 1..friendRange.random()) {
-                //1. Find a friend
-                val friend = npcs.random()
-                //1. add both as friends to each other!
-                npc.friends.add(friend)
-                friend.friends.add(npc)
-            }
-        }
+        Mgo.buildWithBuilder()
+//
+//        val r = 0f amid 64f
+//
+//        val infectionRisk = 5
+//        val dieRange = (1..100)
+//
+//        for (home in homes) {
+//            val npc = actorFactory.addNpcAt(home)
+//            if (dieRange.random() < infectionRisk) {
+//                npc.coronaStatus = CoronaStatus.Infected
+//                npc.symptomatic = false
+//            }
+//        }
+//
+//        //Set up some friends!
+//        for (npc in npcs) {
+//            for (i in 1..friendRange.random()) {
+//                //1. Find a friend
+//                val friend = npcs.random()
+//                //1. add both as friends to each other!
+//                npc.friends.add(friend)
+//                friend.friends.add(npc)
+//            }
+//        }
 
         needsInit = false
     }

@@ -4,7 +4,6 @@ import ai.npc.TravelMode
 import ai.pathfinding.StarIsBorn
 import com.badlogic.gdx.ai.btree.BehaviorTree
 import com.badlogic.gdx.math.Circle
-import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Queue
 import graph.Node
@@ -156,7 +155,7 @@ class Npc(val name: String, val id: String, val home: Place,val walkingRange: Fl
 
             if(thePlaceIWantToBe.second == TravelMode.Walking && (!::currentPath.isInitialized || currentPath.first != thePlaceIWantToBe.first.node)) {
                 //Find the currently closest node
-                val start = Mgo.graphOfItAll.nodes.minBy { it.data.dst2(currentPosition) }!! //Potentially slow, might wanna do this some other way
+                val start = Mgo.graph.nodes.minBy { it.data.dst2(currentPosition) }!! //Potentially slow, might wanna do this some other way
                 val goal = thePlaceIWantToBe.first.node
                 currentPath = Pair(goal, StarIsBorn.calculatePath(start, goal, ::cost))
                 //So, we have a path from where we are to where we want to go.

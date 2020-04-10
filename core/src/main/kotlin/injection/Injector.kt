@@ -80,7 +80,7 @@ class Injector {
                 addSystem(
                         RenderSystem(
                                 inject(),
-                                inject(), false))
+                                inject(), true))
                 addSystem(FollowCameraSystem(inject()))
             }
         }

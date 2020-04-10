@@ -84,7 +84,7 @@ class RenderSystem(
             shapeRenderer.rect(it.box.x, it.box.y, it.box.width, it.box.height)
         }
         if (renderNodes) {
-            for (node in Mgo.graphOfItAll.withLabels("Road")) {
+            for (node in Mgo.graph.withLabels("Street")) {
                 if (node.hasLabel("Breadth"))
                     shapeRenderer.color = Color.GREEN
                 else if (node.hasLabel("A Star"))

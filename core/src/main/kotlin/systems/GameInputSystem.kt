@@ -83,8 +83,16 @@ class GameInputSystem(
             Input.Keys.J -> zoom(-0.5f)
             Input.Keys.K -> rotateCam(5f)
             Input.Keys.L -> rotateCam(-5f)
+            Input.Keys.N -> nextHub()
+            Input.Keys.M -> previousHub()
         }
         return true
+    }
+
+    var hubIndex = 0
+    private fun nextHub() {
+        clearFollow()
+        camera.position.x = Mgo.graph.withLabels("")
     }
 
     private fun resetSim() {

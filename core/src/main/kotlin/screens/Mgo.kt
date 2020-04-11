@@ -28,8 +28,10 @@ class Mgo {
         val travelHubs by lazy { allPlaces.filter { it.type == PlaceType.TravelHub } }
 
         fun buildWithBuilder() {
-             node {
-                    addLabel("Street")
+            var degreesPerHub = 90f
+            node {
+                displacedChild(ImmutableVector2(-500f, -1000f)) {
+                    addLabel("TravelHub")
                     var degreesPerHub = 360f / 4
                     for (centerHub in 0 until 2) {
                         travelHub((ImmutableVector2.X * 100f).withAngleDeg(centerHub * degreesPerHub)) {
@@ -43,7 +45,10 @@ class Mgo {
                             }
                         }
                     }
-                    val numberOfHubs = (20..50).random()
+                }
+                displacedChild(ImmutableVector2(1000f, 500f)) {
+                    addLabel("TravelHub")
+                    val numberOfHubs = 2//(5..10).random()
                     degreesPerHub = 360f / numberOfHubs
                     for (hub in 0 until numberOfHubs) {
                         travelHub((ImmutableVector2.X * 500f).withAngleDeg(hub * degreesPerHub)) {
@@ -61,7 +66,30 @@ class Mgo {
                     }
                 }
             }
+            var count = 0
+            for(node in graph.nodes) {
+                for(related in node.allNeighbours) {
+                    relationsToDraw.add(DrawableRelation(node.data, related.data))
+                    count++
+                }
+            }
+        }
+
+        val relationsToDraw = mutableSetOf<DrawableRelation>()
+
         const val Neighbour = "Neighbour"
+    }
+}
+
+
+class DrawableRelation(val from: ImmutableVector2, val to: ImmutableVector2) {
+    override fun equals(other: Any?): Boolean {
+        if(other == null) return false
+        return (other is DrawableRelation && ((other.from == this.from && other.to == this.to) || (other.to == this.from && other.from == this.to)) )
+    }
+
+    override fun hashCode(): Int {
+        return (from.hashCode() + to.hashCode()) * 23
     }
 }
 

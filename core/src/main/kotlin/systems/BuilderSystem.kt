@@ -2,15 +2,24 @@ package systems
 
 import com.badlogic.ashley.systems.IntervalSystem
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Vector3
 import ktx.math.ImmutableVector2
 import screens.*
 
+/**
+ * This system shall add more nodes to the map - one node at a time!
+ *
+ * It shall keep track of a list of nodes that can be the base of new nodes being
+ * added.
+ */
 class BuilderSystem(private val buildToggler: IToggleBuilds,
-                    private val camera: OrthographicCamera) : IntervalSystem(3f) {
+                    private val camera: OrthographicCamera) : IntervalSystem(1f) {
     private var currentNode: MapNode? = null
     private var startedBuilding = false
     private val directions = setOf(ImmutableVector2.X, -ImmutableVector2.X, ImmutableVector2.Y, -ImmutableVector2.Y)
     private var currentDirection = directions.random()
+    val randomRange = 1..100
+
 
     override fun updateInterval() {
         if (buildToggler.build)
@@ -31,68 +40,27 @@ class BuilderSystem(private val buildToggler: IToggleBuilds,
             currentNode = Mgo.graph.nodes.filter { it.hasLabel("TravelHub") }.random() as MapNode
         }
 
-        //What does this function return, really? The last node? The first node? Aaah?
-        val displaceRange = 100f..200f
-
-        //We just want to add ONE child per iteration, so let's make that happen later, when this bit actually works...
-
-
-        if (currentNode?.hasLabel("TravelHub") == true) {
-            //1. Pick a random direction
-            currentDirection = currentDirection.withRotation90(1)
-            currentNode?.street((10..25).random(), direction = currentDirection) {
-                home(direction = currentDirection.withRotation90(1)) {
-                    currentNode = this
-                }
-                home(direction = currentDirection.withRotation90(-1)) {
-                    currentNode = this
-                }
-            }
-        }
-
-
-        if (currentNode?.hasLabel("Home") == true) {
-            currentDirection = currentDirection.withRotation90(1)
-            currentNode?.street(5, direction =  currentDirection) {
-                currentNode = this
-            }
-        }
-
-
-        if (currentNode?.hasLabel("Restaurant") == true || currentNode?.hasLabel("WorkPlace") == true) {
-            currentNode?.street(1, direction = currentDirection) {
-                currentDirection = currentDirection.withRotation90(1)
-                travelHub(currentDirection * 20f) {
-                    currentNode = this
-                }
-            }
-        }
-
-
-        val restaurant = (1..2).random() == 1
-        if (currentNode?.hasLabel("Street") == true) {
-            currentDirection = currentDirection.withRotation90(1)
-            currentNode?.street((5..9).random(), direction = currentDirection) {
-                if (restaurant)
-                    restaurant(direction = currentDirection) {
-                        currentNode = this
-                    }
-                else
-                    workPlace(direction = currentDirection) {
-                        currentNode = this
-                    }
-            }
-        }
-
+        addStreetNode()
 
         val data = currentNode?.data
-        camera.position.x = data?.x ?: 0f
-        camera.position.y = data?.y ?: 0f
-        //What is current node after a few iterations? Will it ever be something other than street / travelhub?
-
+        if (data != null) {
+            camera.position.lerp(Vector3(data.x, data.y, 0f), 0.5f)
+        }
         Mgo.updateDrawableRelations()
-
     }
 
-
+    private fun addStreetNode() {
+        currentDirection = currentDirection.withRotation90(if (randomRange.random() > 5) -1 else 1)
+        currentNode?.street {
+            currentNode = when (randomRange.random()) {
+                in 1..10 -> restaurant(direction = currentDirection.withRotation90(if (randomRange.random() > 5) -1 else 1)) { }
+                in 11..20 -> workPlace(direction = currentDirection.withRotation90(if (randomRange.random() > 5) -1 else 1)) { }
+                in 21..40 -> home(direction = currentDirection.withRotation90(if (randomRange.random() > 5) -1 else 1)) { }
+                in 41..50 -> travelHub(currentDirection.withRotation90(if (randomRange.random() > 5) -1 else 1) * 20f) { }
+                else -> this
+            }
+        }
+    }
 }
+
+

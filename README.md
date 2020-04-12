@@ -14,14 +14,12 @@ It appears that I can come up with features that I perform no valuable work on, 
 
 Maybe it is, in fact. I will now abandon the development branch and simply work like a gitflow-thing instead.
 
-### A Free Map
+### Cooler map-generation
 
-So, let's start with the concept of areas, again. But areas won't be an actual data structure this time. We will more like just use them to create the map. So we will define some kind of walking distance for an npc, I say 1000 meters. Or more, but who cares. 
+#### What I Want:
+I want a city that builds itself - on rock and roll. I want to start with some kind of simple seed, that then sprawls outward from that seed and builds city blocks containing homes, restaurants and workplaces - and of course, the almightly travel hub. The shape of these city blocks need not be square, but they could be. Ideally they should look "organic" or "natural", as an actual city would look. But I want them to be blocks - so maybe the builder should work within that concept, sort of take a start node, any node on the map, and split off a new city block - they should not be overlapping. This is a good starting point, work from this.
 
-To generate a free-flowing map we could start with a Travel Hub. Then radially, as before, from that hub, we could spread out nodes in the graph, so we construct all this by generating nodes and relations as we go instead of having matrices of nodes etc, which are supremely boring but well structured for the naive thing we were doing before. Nodes also do not need to be evenly spaced between each other. They could conceivably be any distance from the previous node. 
-
-So radially out. Then perhaps some structure? If we want to create a neighbourhood of homes, we can then try to create a
-cul-de-sac-based street pattern. This is cool. 
+Goal: Does the map builder make city blocks? If so, this feature is DONE!
 
 ### Time step
 

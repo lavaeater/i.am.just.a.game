@@ -2,9 +2,17 @@
 
 A [LibGDX](http://libgdx.badlogicgames.com/) project generated with [gdx-liftoff](https://github.com/tommyettinger/gdx-liftoff).
 
+## How I work on this project
+
+I try to follow this paradigm for working on this project: **P**lan, **W**ork and **E**valuate (or **A**sess), where I plan for five what I will do for the coming say 25 minutes of time, and then after that time is up I smash together an planning / evaluation for the coming 20 minutes.
+
 ## WIP feature of the day
 
 It appears that I can come up with features that I perform no valuable work on, whatsoever. This time it seems my thought process was that I was going to start working on Social Needs, but hey, I implemented Path Finding instead. So, social needs is on some kind of todo-list for now.
+
+### Is this readme actually a blog of sorts?
+
+Maybe it is, in fact. I will now abandon the development branch and simply work like a gitflow-thing instead.
 
 ### A Free Map
 

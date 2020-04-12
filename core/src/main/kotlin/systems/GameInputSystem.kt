@@ -78,9 +78,7 @@ class GameInputSystem(
             Input.Keys.K to { rotateCam(5f) },
             Input.Keys.L to { rotateCam(-5f) },
             Input.Keys.N to { nextHub() },
-            Input.Keys.M to { previousHub() },
-            Input.Keys.B to { toggleBuild() }
-    )
+            Input.Keys.M to { previousHub() })
 
     var y = 0f;
     var x = 0f
@@ -90,30 +88,15 @@ class GameInputSystem(
     var ctrlId: UUID? = null
     var ctrlBody: Body? = null
 
-//    override fun keyDown(keycode: Int): Boolean {
-//
-//        //Use keys to select which character to follow
-//        if (!processInput) return false
-//        when (keycode) {
-//            Input.Keys.A -> camera.position.x -= 10f
-//            Input.Keys.D -> camera.position.x += 10f
-//            Input.Keys.W -> camera.position.y += 10f
-//            Input.Keys.S -> camera.position.y -= 10f
-//            Input.Keys.LEFT -> nextNpc()
-//            Input.Keys.RIGHT -> previousNpc()
-//            Input.Keys.C -> clearFollow()
-//            Input.Keys.Z -> centerCamera()
-//            Input.Keys.R -> resetSim()
-//            Input.Keys.U -> zoom(0.5f)
-//            Input.Keys.J -> zoom(-0.5f)
-//            Input.Keys.K -> rotateCam(5f)
-//            Input.Keys.L -> rotateCam(-5f)
-//            Input.Keys.N -> nextHub()
-//            Input.Keys.M -> previousHub()
-//            Input.Keys.B -> toggleBuild()
-//        }
-//        return true
-//    }
+    override fun keyDown(keycode: Int): Boolean {
+
+        //Use keys to select which character to follow
+        if (!processInput) return false
+        when (keycode) {
+            Input.Keys.B -> toggleBuild()
+        }
+        return true
+    }
 
     private fun toggleBuild() {
         buildToggler.toggle()

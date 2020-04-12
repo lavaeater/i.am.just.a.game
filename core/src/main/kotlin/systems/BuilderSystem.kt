@@ -6,7 +6,7 @@ import ktx.math.ImmutableVector2
 import screens.*
 
 class BuilderSystem(private val buildToggler: IToggleBuilds,
-                    private val camera: OrthographicCamera) : IntervalSystem(0.5f) {
+                    private val camera: OrthographicCamera) : IntervalSystem(3f) {
     private var currentNode: MapNode? = null
     private var startedBuilding = false
     private val directions = setOf(ImmutableVector2.X, -ImmutableVector2.X, ImmutableVector2.Y, -ImmutableVector2.Y)

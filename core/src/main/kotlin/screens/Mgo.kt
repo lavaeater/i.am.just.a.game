@@ -19,13 +19,11 @@ class Mgo {
         val allPlaces = mutableListOf<Place>()
         val graph = Graph<ImmutableVector2>()
 
-        val workPlaces by lazy { allPlaces.filter { it.type == PlaceType.Workplace } }
+        val workPlaces get() = allPlaces.filter { it.type == PlaceType.Workplace }
 
-        val restaurants by lazy { allPlaces.filter { it.type == PlaceType.Restaurant } }
+        val restaurants get()= allPlaces.filter { it.type == PlaceType.Restaurant }
 
-        val homes by lazy { allPlaces.filter { it.type == PlaceType.Home } }
-
-        val travelHubs by lazy { allPlaces.filter { it.type == PlaceType.TravelHub } }
+        val travelHubs get()= allPlaces.filter { it.type == PlaceType.TravelHub }.toMutableList()
 
         fun buildWithBuilder() {
             var degreesPerHub = 90f
@@ -33,14 +31,16 @@ class Mgo {
                 displacedChild(ImmutableVector2(-500f, -1000f)) {
                     addLabel("TravelHub")
                     var degreesPerHub = 360f / 4
-                    for (centerHub in 0 until 2) {
-                        travelHub((ImmutableVector2.X * 100f).withAngleDeg(centerHub * degreesPerHub)) {
+                    for (hubIndex in 0 until 2) {
+                        travelHub((ImmutableVector2.X * 100f).withAngleDeg(hubIndex * degreesPerHub)) {
                             street(5, 100f) {
                                 street(5, 50f, ImmutableVector2.Y) {
                                     workPlace(20f, ImmutableVector2.X)
                                 }
-                                street(5, 50f, ImmutableVector2.X) {
-                                    restaurant(15f, ImmutableVector2.Y)
+                            }
+                            street(4, 50f, -ImmutableVector2.X) {
+                                street(5, 50f, ImmutableVector2.Y) {
+                                    restaurant(15f, ImmutableVector2.X)
                                 }
                             }
                         }
@@ -66,11 +66,31 @@ class Mgo {
                     }
                 }
             }
-            var count = 0
+            updateDrawableRelations()
+        }
+
+        fun oneHubStarter() {
+            node {
+                addLabel("Street")
+                travelHub(ImmutableVector2(5f, 5f)) {
+                    street (4, direction = -ImmutableVector2.Y ){
+                        workPlace {  }
+                    }
+                    street(10,direction = ImmutableVector2.X) {
+                        home {  }
+                    }
+                    street(4, direction = -ImmutableVector2.X) {
+                        restaurant {  }
+                    }
+
+                }
+            }
+        }
+
+        fun updateDrawableRelations() {
             for(node in graph.nodes) {
                 for(related in node.allNeighbours) {
                     relationsToDraw.add(DrawableRelation(node.data, related.data))
-                    count++
                 }
             }
         }
@@ -101,7 +121,7 @@ fun node(position: ImmutableVector2 = ImmutableVector2.ZERO, init: MapNode.() ->
 }
 
 fun MapNode.travelHub(displacement: ImmutableVector2,
-                      init: MapNode.() -> Unit): MapNode {
+                      init: MapNode.() -> Unit = {}): MapNode {
     val node = nodeWithLabel(displacement, "TravelHub", init)
     Mgo.allPlaces.add(Place(PlaceType.TravelHub, node))
     return node

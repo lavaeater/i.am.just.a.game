@@ -5,16 +5,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.utils.viewport.Viewport
-import data.CoronaStatus
-import data.Place
-import data.PlaceType
 import factory.ActorFactory
 import ktx.app.KtxScreen
-import ktx.math.*
-import screens.Mgo.Companion.homes
-import screens.Mgo.Companion.npcs
 import systems.GameInputSystem
 import systems.RenderSystem
 import ui.IUserInterface
@@ -71,7 +64,7 @@ class MainGameScreen(
     private val friendRange = 1..10
     private var needsInit = true
     private fun initializeGame() {
-        Mgo.buildWithBuilder()
+        Mgo.oneHubStarter()
 //
 //        val r = 0f amid 64f
 //

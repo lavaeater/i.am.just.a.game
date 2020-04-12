@@ -32,6 +32,7 @@ class Injector {
                 bindSingleton(gameSettings)
                 bindSingleton<InputProcessor>(InputMultiplexer())
                 bindSingleton<Batch>(SpriteBatch())
+                bindSingleton<IToggleBuilds>(BuildToggler())
                 bindSingleton<Camera>(OrthographicCamera())
                 bind<Viewport> {
                     ExtendViewport(gameSettings.width,
@@ -75,7 +76,9 @@ class Injector {
                 addSystem(NpcControlSystem())
                 addSystem(GameInputSystem(
                         inject(),
-                        inject<Camera>() as OrthographicCamera))
+                        inject<Camera>() as OrthographicCamera,
+                        inject()))
+                addSystem(BuilderSystem(inject(), inject<Camera>() as OrthographicCamera))
                 addSystem(PhysicsSystem(inject()))
                 addSystem(
                         RenderSystem(

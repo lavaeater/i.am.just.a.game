@@ -26,6 +26,7 @@ import java.util.*
 class GameInputSystem(
         private val inputProcessor: InputProcessor,
         private val camera: OrthographicCamera,
+        private val buildToggler: IToggleBuilds,
         private val speed: Float = 20f) :
         KtxInputAdapter,
         IteratingSystem(allOf(NpcComponent::class).get(), 45) {
@@ -54,44 +55,73 @@ class GameInputSystem(
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
 
+        for (key in keyFuncMap.keys) {
+            if(Gdx.input.isKeyPressed(key))
+                keyFuncMap[key]?.invoke()
+        }
+
         ctrlBody?.linearVelocity = vec2(x, y).directionalVelocity(speed)
     }
+
+    private val keyFuncMap = mapOf(
+            Input.Keys.A to { camera.position.x -= 10f },
+            Input.Keys.D to { camera.position.x += 10f },
+            Input.Keys.W to { camera.position.y += 10f },
+            Input.Keys.S to { camera.position.y -= 10f },
+            Input.Keys.LEFT to { nextNpc() },
+            Input.Keys.RIGHT to { previousNpc() },
+            Input.Keys.C to { clearFollow() },
+            Input.Keys.Z to { centerCamera() },
+            Input.Keys.R to { resetSim() },
+            Input.Keys.U to { zoom(0.5f) },
+            Input.Keys.J to { zoom(-0.5f) },
+            Input.Keys.K to { rotateCam(5f) },
+            Input.Keys.L to { rotateCam(-5f) },
+            Input.Keys.N to { nextHub() },
+            Input.Keys.M to { previousHub() },
+            Input.Keys.B to { toggleBuild() }
+    )
 
     var y = 0f;
     var x = 0f
     private val kbCtrlMpr = mapperFor<KeyboardControlComponent>()
     private val npcComponentMapper = mapperFor<NpcComponent>()
 
-    var ctrlId:                      UUID? = null
+    var ctrlId: UUID? = null
     var ctrlBody: Body? = null
 
-    override fun keyDown(keycode: Int): Boolean {
+//    override fun keyDown(keycode: Int): Boolean {
+//
+//        //Use keys to select which character to follow
+//        if (!processInput) return false
+//        when (keycode) {
+//            Input.Keys.A -> camera.position.x -= 10f
+//            Input.Keys.D -> camera.position.x += 10f
+//            Input.Keys.W -> camera.position.y += 10f
+//            Input.Keys.S -> camera.position.y -= 10f
+//            Input.Keys.LEFT -> nextNpc()
+//            Input.Keys.RIGHT -> previousNpc()
+//            Input.Keys.C -> clearFollow()
+//            Input.Keys.Z -> centerCamera()
+//            Input.Keys.R -> resetSim()
+//            Input.Keys.U -> zoom(0.5f)
+//            Input.Keys.J -> zoom(-0.5f)
+//            Input.Keys.K -> rotateCam(5f)
+//            Input.Keys.L -> rotateCam(-5f)
+//            Input.Keys.N -> nextHub()
+//            Input.Keys.M -> previousHub()
+//            Input.Keys.B -> toggleBuild()
+//        }
+//        return true
+//    }
 
-        //Use keys to select which character to follow
-        if (!processInput) return false
-        when (keycode) {
-            Input.Keys.A -> camera.position.x -= 10f
-            Input.Keys.D -> camera.position.x += 10f
-            Input.Keys.W -> camera.position.y += 10f
-            Input.Keys.S -> camera.position.y -= 10f
-            Input.Keys.LEFT -> nextNpc()
-            Input.Keys.RIGHT -> previousNpc()
-            Input.Keys.C -> clearFollow()
-            Input.Keys.Z -> centerCamera()
-            Input.Keys.R -> resetSim()
-            Input.Keys.U -> zoom(0.5f)
-            Input.Keys.J -> zoom(-0.5f)
-            Input.Keys.K -> rotateCam(5f)
-            Input.Keys.L -> rotateCam(-5f)
-            Input.Keys.N -> nextHub()
-            Input.Keys.M -> previousHub()
-        }
-        return true
+    private fun toggleBuild() {
+        buildToggler.toggle()
     }
 
     private fun previousHub() {
         clearFollow()
-        hubIndex = (hubIndex-1).goAround(Mgo.travelHubs.indices)
+        hubIndex = (hubIndex - 1).goAround(Mgo.travelHubs.indices)
 
         camera.position.x = Mgo.travelHubs[hubIndex].center.x
         camera.position.y = Mgo.travelHubs[hubIndex].center.y
@@ -100,7 +130,7 @@ class GameInputSystem(
     var hubIndex = 0
     private fun nextHub() {
         clearFollow()
-        hubIndex = (hubIndex+1).goAround(Mgo.travelHubs.indices)
+        hubIndex = (hubIndex + 1).goAround(Mgo.travelHubs.indices)
 
         camera.position.x = Mgo.travelHubs[hubIndex].center.x
         camera.position.y = Mgo.travelHubs[hubIndex].center.y
@@ -124,18 +154,21 @@ class GameInputSystem(
         Set up some infected npcs!
          */
         val numberOfInfected = (5..15).random()
-        for(i in 0..numberOfInfected) {
+        for (i in 0..numberOfInfected) {
             npcComponentMapper[entities[i]].npc.coronaStatus = CoronaStatus.Infected
             npcComponentMapper[entities[i]].npc.infectionDate = AiAndTimeSystem.currentDateTime.toLocalDate()
         }
     }
 
     private fun centerCamera() {
+        val minX = Mgo.allPlaces.map { it.center.x }.min()!!
+        val minY = Mgo.allPlaces.map { it.center.y }.min()!!
+
         val maxX = Mgo.allPlaces.map { it.center.x }.max()!!
         val maxY = Mgo.allPlaces.map { it.center.y }.max()!!
 
-        camera.position.x = maxX / 2
-        camera.position.y = maxY / 2
+        camera.position.x = (maxX - minX) / 2
+        camera.position.y = (maxY - minY) / 2
     }
 
     fun clearFollow() {

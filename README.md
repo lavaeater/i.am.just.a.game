@@ -21,6 +21,15 @@ I want a city that builds itself - on rock and roll. I want to start with some k
 
 Goal: Does the map builder make city blocks? If so, this feature is DONE!
 
+#### Define a block!
+
+A block is a system of streets and places. Blocks may be residential (majority of places are homes) or commercial (majority is restaurants and work places). They always have a Travel Hub. The system of streets can be created using different patterns of construction. I would very much like some kind of organic-looking street system. But a good enough start would be Main Street / Side Streets. This means we have a Travel Hub. From that travel hub we have one street going in a random direction.
+
+Or all directions? Start with one.
+
+Travel Hub -> Street -> Every node on the street has a side street. Every side street has a house on each or not each side.
+
+
 ### Time step
 
 The time steps, fifteen minutes at a time. Fine and dandy. But a bit dull, innit? This means the AI only makes decisions every fifteen minutes, which perhaps is fine, but it also means that every single NPC makes their decisions at basically the same exact time. I will start by just changing the time step, that should make a difference to begin with. 

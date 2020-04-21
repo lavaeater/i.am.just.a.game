@@ -2,6 +2,8 @@ package data
 
 class CoronaStats {
     companion object {
+        var needsInit = true
+        val infectedNpcs = mutableSetOf<Npc>()
         var currentNpc: Npc? = null
         var infected = 0
         var susceptible = 0

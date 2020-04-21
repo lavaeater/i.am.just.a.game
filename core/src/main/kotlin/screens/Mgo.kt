@@ -25,7 +25,8 @@ class Mgo {
         val travelHubs get() = allPlaces.filter { it.type == PlaceType.TravelHub }.toMutableList()
         private val rotationDirection = -1..1
         private var currentDirection = ImmutableVector2.X
-
+        private var countX = 0
+        private var countY = 0
 
         private fun findSuitableBuildArea() : ImmutableVector2 {
             /*
@@ -34,8 +35,8 @@ class Mgo {
             if(graph.nodes.isEmpty()) return ImmutableVector2.ZERO
             val vectors = graph.nodes.map { it.data }
 
-            var minX = vectors.map { it.x }.min()!!
-            var minY =vectors.map { it.y }.min()!!
+            var minX = vectors.map { it.x }.min()!! - 50f
+            var minY =vectors.map { it.y }.min()!! - 50f
             var maxX = vectors.map { it.x }.max()!!
             var maxY = vectors.map { it.y }.max()!!
 
@@ -46,16 +47,33 @@ class Mgo {
 
             Just put the new travelHub at one of those four and work out from there.
              */
-            var xCoord = listOf(minX, maxX).random()
-            var yCoord = listOf(minY, maxY).random()
+            val xCoords = listOf(minX, maxX)
+            val yCoords = listOf(minY, maxY)
 
             /*
             Evaluate coordinates. if x is low, go left else go right.
 
             if Y is low, go down, else go up
              */
-            xCoord = if(xCoord < maxX) xCoord - 200f else xCoord + 200f
-            yCoord = if(yCoord < maxY) yCoord - 200f else yCoord + 200f
+            var xCoord = 0f
+            var yCoord = 0f
+            if(countY % 2 == 0 && countX % 2 == 0) {
+                xCoord = xCoords.first()
+                yCoord = yCoords.first()
+                countX++
+            } else if(countY % 2 != 0 && countX % 2 != 0) {
+                xCoord = xCoords.last()
+                yCoord = yCoords.last()
+                countX++
+            } else if(countY % 2 == 0) {
+                xCoord = xCoords.first()
+                yCoord = yCoords.last()
+                countY++
+            } else if(countX % 2 == 0) {
+                xCoord = xCoords.last()
+                yCoord = yCoords.first()
+                countY++
+            }
 
             return ImmutableVector2(xCoord, yCoord)
 
@@ -92,11 +110,13 @@ class Mgo {
             return !graph.nodes.map { it.data }.any { area.contains(it.x, it.y) }
         }
 
+        val randomRange = 5..25
+
         private fun buildOfficesAndRestaurants(pos: ImmutableVector2) {
             travelHub(pos) {
-                street(10, 40f, currentDirection) {
+                street(randomRange.random(), 40f, currentDirection) {
                     var sideStreetDirection = currentDirection.withRotation90(rotationDirection.random())
-                    street(10, 15f, sideStreetDirection) {
+                    street(randomRange.random(), 15f, sideStreetDirection) {
                         restaurant(direction = sideStreetDirection.withRotation90(-1), distanceFromStreet = 10f) { }
                         workPlace(direction = sideStreetDirection.withRotation90(1), distanceFromStreet = 10f) { }
                     }
@@ -106,9 +126,9 @@ class Mgo {
 
         private fun buildHomes(pos: ImmutableVector2) {
             travelHub(pos) {
-                street(10, 40f, currentDirection) {
+                street(randomRange.random(), 40f, currentDirection) {
                     var sideStreetDirection = currentDirection.withRotation90(rotationDirection.random())
-                    street(10, 15f, sideStreetDirection) {
+                    street(randomRange.random(), 15f, sideStreetDirection) {
                         home(direction = sideStreetDirection.withRotation90(rotationDirection.random()),distanceFromStreet = 10f) { }
                     }
                 }
@@ -119,7 +139,7 @@ class Mgo {
             val randomThingie = 1..3
             buildOfficesAndRestaurants(findSuitableBuildArea())
 
-            for(i in 1..5) {
+            for(i in 1..15) {
                 if (randomThingie.random() > 2) {
                     //Build some offices
                     buildOfficesAndRestaurants(findSuitableBuildArea())

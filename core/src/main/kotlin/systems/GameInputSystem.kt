@@ -132,6 +132,8 @@ class GameInputSystem(
         CoronaStats.asymptomatic = 0
         CoronaStats.recovered = 0
         CoronaStats.symptomaticThatStayAtHome = 0
+        CoronaStats.infectedNpcs.clear()
+        CoronaStats.needsInit = true
 
         /*
         Set up some infected npcs!

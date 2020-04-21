@@ -1,13 +1,12 @@
 package screens
 
+import com.badlogic.gdx.math.Rectangle
 import data.*
 import factory.ActorFactory
 import graph.Graph
 import graph.Node
 import injection.Injector
 import ktx.math.*
-import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
 
 class MapNode(data: ImmutableVector2) : Node<ImmutableVector2>(data)
 
@@ -21,9 +20,129 @@ class Mgo {
 
         val workPlaces get() = allPlaces.filter { it.type == PlaceType.Workplace }
 
-        val restaurants get()= allPlaces.filter { it.type == PlaceType.Restaurant }
+        val restaurants get() = allPlaces.filter { it.type == PlaceType.Restaurant }
 
-        val travelHubs get()= allPlaces.filter { it.type == PlaceType.TravelHub }.toMutableList()
+        val travelHubs get() = allPlaces.filter { it.type == PlaceType.TravelHub }.toMutableList()
+        private val rotationDirection = -1..1
+        private var currentDirection = ImmutableVector2.X
+
+
+        private fun findSuitableBuildArea() : ImmutableVector2 {
+            /*
+            Find a suitable area and start building. How?
+             */
+            if(graph.nodes.isEmpty()) return ImmutableVector2.ZERO
+            val vectors = graph.nodes.map { it.data }
+
+            var minX = vectors.map { it.x }.min()!!
+            var minY =vectors.map { it.y }.min()!!
+            var maxX = vectors.map { it.x }.max()!!
+            var maxY = vectors.map { it.y }.max()!!
+
+            /*
+            The min-max of node coordinates represent the four courners of the map:
+            minX,maxY   maxX,maxY
+            minX,minY   maxX,minY
+
+            Just put the new travelHub at one of those four and work out from there.
+             */
+            var xCoord = listOf(minX, maxX).random()
+            var yCoord = listOf(minY, maxY).random()
+
+            /*
+            Evaluate coordinates. if x is low, go left else go right.
+
+            if Y is low, go down, else go up
+             */
+            xCoord = if(xCoord < maxX) xCoord - 200f else xCoord + 200f
+            yCoord = if(yCoord < maxY) yCoord - 200f else yCoord + 200f
+
+            return ImmutableVector2(xCoord, yCoord)
+
+            /*
+            The coolest way to do this would be to build a mini-graph FIRST and
+            then test if we can fit it somewhere on the map. But the above will do for now.
+             */
+
+//            var foundAnArea = false
+//            val maxTries = 100
+//            var tries =0
+//            var centerX = 0f
+//            var centerY = 0f
+//            while(!foundAnArea && tries < maxTries) {
+//                tries++
+//                centerX = (minX..maxX).random()
+//                centerY = (minY..maxY).random()
+//                val potentialArea = Rectangle(centerX - 100f, centerY - 100f, 200f, 200f)
+//                foundAnArea = evaluateArea(potentialArea)
+//                minX-=50f
+//                minY-=50f
+//                maxX+=50f
+//                maxY+=50f
+//            }
+
+//            if(foundAnArea) {
+//                return ImmutableVector2(centerX, centerY)
+//            }
+//            return ImmutableVector2(0f,0f)
+        }
+
+
+        private fun evaluateArea(area: Rectangle) : Boolean {
+            return !graph.nodes.map { it.data }.any { area.contains(it.x, it.y) }
+        }
+
+        private fun buildOfficesAndRestaurants(pos: ImmutableVector2) {
+            travelHub(pos) {
+                street(10, 40f, currentDirection) {
+                    var sideStreetDirection = currentDirection.withRotation90(rotationDirection.random())
+                    street(10, 15f, sideStreetDirection) {
+                        restaurant(direction = sideStreetDirection.withRotation90(-1), distanceFromStreet = 10f) { }
+                        workPlace(direction = sideStreetDirection.withRotation90(1), distanceFromStreet = 10f) { }
+                    }
+                }
+            }
+        }
+
+        private fun buildHomes(pos: ImmutableVector2) {
+            travelHub(pos) {
+                street(10, 40f, currentDirection) {
+                    var sideStreetDirection = currentDirection.withRotation90(rotationDirection.random())
+                    street(10, 15f, sideStreetDirection) {
+                        home(direction = sideStreetDirection.withRotation90(rotationDirection.random()),distanceFromStreet = 10f) { }
+                    }
+                }
+            }
+        }
+
+        fun buildUsingCityBlocks() {
+            val randomThingie = 1..3
+            buildOfficesAndRestaurants(findSuitableBuildArea())
+
+            for(i in 1..5) {
+                if (randomThingie.random() > 2) {
+                    //Build some offices
+                    buildOfficesAndRestaurants(findSuitableBuildArea())
+                } else {
+                    buildHomes(findSuitableBuildArea())
+                }
+            }
+            /*
+            Just to see what the city looks like, I will connect every travelhub
+            to every other travelhub
+             */
+            val travelHubs =graph.withLabels("TravelHub").toList()
+            for((i, f) in travelHubs.withIndex()) {
+                if(i + 1 == travelHubs.count()) {
+                    graph.connect(f, travelHubs[0])
+                } else {
+                    graph.connect(f, travelHubs[i + 1])
+                }
+            }
+
+            updateDrawableRelations()
+        }
+
 
         fun buildWithBuilder() {
             var degreesPerHub = 90f
@@ -73,14 +192,14 @@ class Mgo {
             node {
                 addLabel("Street")
                 travelHub(ImmutableVector2(5f, 5f)) {
-                    street (4, direction = -ImmutableVector2.Y ){
-                        workPlace {  }
+                    street(4, direction = -ImmutableVector2.Y) {
+                        workPlace { }
                     }
-                    street(10,direction = ImmutableVector2.X) {
-                        home {  }
+                    street(10, direction = ImmutableVector2.X) {
+                        home { }
                     }
                     street(4, direction = -ImmutableVector2.X) {
-                        restaurant {  }
+                        restaurant { }
                     }
 
                 }
@@ -88,8 +207,8 @@ class Mgo {
         }
 
         fun updateDrawableRelations() {
-            for(node in graph.nodes) {
-                for(related in node.allNeighbours) {
+            for (node in graph.nodes) {
+                for (related in node.allNeighbours) {
                     relationsToDraw.add(DrawableRelation(node.data, related.data))
                 }
             }
@@ -98,7 +217,7 @@ class Mgo {
         fun addNodeToGraph(node: Node<ImmutableVector2>) {
             //1. Can we draw it's related nodes without disaster? Yes.
             graph.addNode(node)
-            for(related in node.allNeighbours) {
+            for (related in node.allNeighbours) {
                 relationsToDraw.add(DrawableRelation(node.data, related.data))
             }
         }
@@ -112,8 +231,8 @@ class Mgo {
 
 class DrawableRelation(val from: ImmutableVector2, val to: ImmutableVector2) {
     override fun equals(other: Any?): Boolean {
-        if(other == null) return false
-        return (other is DrawableRelation && ((other.from == this.from && other.to == this.to) || (other.to == this.from && other.from == this.to)) )
+        if (other == null) return false
+        return (other is DrawableRelation && ((other.from == this.from && other.to == this.to) || (other.to == this.from && other.from == this.to)))
     }
 
     override fun hashCode(): Int {
@@ -124,8 +243,18 @@ class DrawableRelation(val from: ImmutableVector2, val to: ImmutableVector2) {
 fun node(position: ImmutableVector2 = ImmutableVector2.ZERO, addToGraph: Boolean = true, init: MapNode.() -> Unit = {}): MapNode {
     val node = MapNode(position)
     node.init()
+    if (addToGraph)
+        Mgo.graph.addNode(node)
+    return node
+}
+
+fun travelHub(position: ImmutableVector2 = ImmutableVector2.ZERO, addToGraph: Boolean = true, init: MapNode.() -> Unit = {}): MapNode {
+    val node = MapNode(position)
+    node.init()
+    node.addLabel("TravelHub")
     if(addToGraph)
         Mgo.graph.addNode(node)
+    Mgo.allPlaces.add(Place(PlaceType.TravelHub, node))
     return node
 }
 
@@ -165,7 +294,7 @@ fun MapNode.home(distanceFromStreet: Float = 20f,
     val homeNode = nodeWithLabel(direction * distanceFromStreet, "Home", addNodeToGraph, init)
     val home = Place(PlaceType.Home, homeNode)
     Mgo.allPlaces.add(home)
-    if(addNpc) {
+    if (addNpc) {
         val npc = Injector.inject<ActorFactory>().addNpcAt(home)
         val dieRange = (1..100)
         val infectionRisk = 5

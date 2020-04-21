@@ -57,14 +57,6 @@ class RenderSystem(
         shapeRenderer.circle(x + manSprite.width / 2, y + manSprite.height / 2, 1.5f)
         shapeRenderer.end()
 
-        shapeRenderer.color = Color.GREEN
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
-        for (relation in Mgo.relationsToDraw) {
-            shapeRenderer.line(relation.from.x, relation.from.y, relation.to.x, relation.to.y)
-        }
-        shapeRenderer.end()
-
-
         manSprite.setPosition(x, y)
 
         batch.use {
@@ -101,6 +93,12 @@ class RenderSystem(
 
                 shapeRenderer.circle(node.data.x, node.data.y, 2f)
             }
+            shapeRenderer.color = Color.GREEN
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
+            for (relation in Mgo.relationsToDraw) {
+                shapeRenderer.line(relation.from.x, relation.from.y, relation.to.x, relation.to.y)
+            }
+            shapeRenderer.end()
         }
 
         shapeRenderer.end()

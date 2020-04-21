@@ -7,6 +7,7 @@ import ktx.math.minus
 import ktx.math.times
 import ktx.math.vec2
 import data.Place
+import screens.Mgo
 
 fun Vector2.pointIsInside(size: Vector2, point: Vector2):Boolean {
     return point.x < this.x + size.x / 2 && point.x > this.x -size.x && point.y < this.y + size.y / 2 && point.y > this.y - size.y
@@ -29,8 +30,19 @@ fun List<Place>.findNearest(x: Float, y:Float): Place {
 
 
 fun Npc.placeInWalkingRange(place: Place) :Boolean {
-    val distance =  this.currentPosition.dst(place.x, place.y)
-    return distance < this.walkingRange
+    /*
+    Walking distance should be both dumber and smarter and not
+    actually part of the NPC suite of methods, but really it should
+    be MGO.
+
+    So, a place is within walking distance if it is closer than the closes
+    TravelHub. Simple
+     */
+
+    val distanceToPlace =  this.currentPosition.dst2(place.x, place.y)
+    val distanceToClosestTravelHub = Mgo.travelHubs.map { it.center.dst2(this.currentPosition.x, this.currentPosition.y) }.min()
+
+    return distanceToPlace < distanceToClosestTravelHub!!
 }
 
 fun Npc.atPlace(place: Place) :Boolean {

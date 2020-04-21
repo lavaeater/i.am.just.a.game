@@ -64,7 +64,7 @@ class MainGameScreen(
     private val friendRange = 1..10
     private var needsInit = true
     private fun initializeGame() {
-        Mgo.oneHubStarter()
+        Mgo.buildUsingCityBlocks()
 //
 //        val r = 0f amid 64f
 //

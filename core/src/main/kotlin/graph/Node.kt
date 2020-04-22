@@ -1,6 +1,10 @@
 package graph
 
-open class Node<T>(val data: T) {
+open class Node<T>(data: T) {
+
+	var data: T = data
+	protected set
+
 	private val relations = mutableMapOf<String, MutableSet<Node<T>>>()
 	val allNeighbours: Iterable<Node<T>> get() = relations.map { it.value }.flatten()
 

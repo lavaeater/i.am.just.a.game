@@ -8,7 +8,11 @@ import graph.Node
 import injection.Injector
 import ktx.math.*
 
-class MapNode(data: ImmutableVector2) : Node<ImmutableVector2>(data)
+class MapNode(data: ImmutableVector2) : Node<ImmutableVector2>(data) {
+    fun move(diffX: Float, diffY: Float) {
+        data = ImmutableVector2(data.x + diffX, data.y + diffY)
+    }
+}
 
 class Mgo {
 
@@ -28,17 +32,29 @@ class Mgo {
         private var countX = 0
         private var countY = 0
 
-        private fun findSuitableBuildArea() : ImmutableVector2 {
+        private fun findRandomPosition() : ImmutableVector2 {
+            if (graph.nodes.isEmpty()) return ImmutableVector2.ZERO
+            val vectors = graph.nodes.map { it.data }
+
+            val minX = vectors.map { it.x }.min()!! - 50f
+            val minY = vectors.map { it.y }.min()!! - 50f
+            val maxX = vectors.map { it.x }.max()!! + 50f
+            val maxY = vectors.map { it.y }.max()!! + 50f
+
+            return ImmutableVector2((minX..maxX).random(), (minY..maxY).random())
+        }
+
+        private fun findSuitableBuildArea(): ImmutableVector2 {
             /*
             Find a suitable area and start building. How?
              */
-            if(graph.nodes.isEmpty()) return ImmutableVector2.ZERO
+            if (graph.nodes.isEmpty()) return ImmutableVector2.ZERO
             val vectors = graph.nodes.map { it.data }
 
             var minX = vectors.map { it.x }.min()!! - 50f
-            var minY =vectors.map { it.y }.min()!! - 50f
-            var maxX = vectors.map { it.x }.max()!!
-            var maxY = vectors.map { it.y }.max()!!
+            var minY = vectors.map { it.y }.min()!! - 50f
+            var maxX = vectors.map { it.x }.max()!! + 50f
+            var maxY = vectors.map { it.y }.max()!! + 50f
 
             /*
             The min-max of node coordinates represent the four courners of the map:
@@ -57,19 +73,19 @@ class Mgo {
              */
             var xCoord = 0f
             var yCoord = 0f
-            if(countY % 2 == 0 && countX % 2 == 0) {
+            if (countY % 2 == 0 && countX % 2 == 0) {
                 xCoord = xCoords.first()
                 yCoord = yCoords.first()
                 countX++
-            } else if(countY % 2 != 0 && countX % 2 != 0) {
+            } else if (countY % 2 != 0 && countX % 2 != 0) {
                 xCoord = xCoords.last()
                 yCoord = yCoords.last()
                 countX++
-            } else if(countY % 2 == 0) {
+            } else if (countY % 2 == 0) {
                 xCoord = xCoords.first()
                 yCoord = yCoords.last()
                 countY++
-            } else if(countX % 2 == 0) {
+            } else if (countX % 2 == 0) {
                 xCoord = xCoords.last()
                 yCoord = yCoords.first()
                 countY++
@@ -106,54 +122,106 @@ class Mgo {
         }
 
 
-        private fun evaluateArea(area: Rectangle) : Boolean {
+        private fun evaluateArea(area: Rectangle): Boolean {
             return !graph.nodes.map { it.data }.any { area.contains(it.x, it.y) }
         }
 
         val randomRange = 5..25
 
         private fun buildOfficesAndRestaurants(pos: ImmutableVector2) {
-            travelHub(pos) {
-                street(randomRange.random(), 40f, currentDirection) {
+            val newNodes = mutableListOf<MapNode>()
+            travelHub(pos, false) {
+                street(randomRange.random(), 40f, currentDirection, addNodeToGraph = false) {
                     var sideStreetDirection = currentDirection.withRotation90(rotationDirection.random())
-                    street(randomRange.random(), 15f, sideStreetDirection) {
-                        restaurant(direction = sideStreetDirection.withRotation90(-1), distanceFromStreet = 10f) { }
-                        workPlace(direction = sideStreetDirection.withRotation90(1), distanceFromStreet = 10f) { }
+                    street(randomRange.random(), 15f, sideStreetDirection, addNodeToGraph = false) {
+                        restaurant(direction = sideStreetDirection.withRotation90(-1), distanceFromStreet = 10f, addNodeToGraph = false) {
+                            newNodes.add(this)
+                        }
+                        workPlace(direction = sideStreetDirection.withRotation90(1), distanceFromStreet = 10f, addNodeToGraph = false) {
+                            newNodes.add(this)
+                        }
+                        newNodes.add(this)
                     }
+                    newNodes.add(this)
                 }
+                newNodes.add(this)
             }
+            validatePlaceAdd(newNodes)
         }
 
         private fun buildHomes(pos: ImmutableVector2) {
-            travelHub(pos) {
-                street(randomRange.random(), 40f, currentDirection) {
+            val newNodes = mutableListOf<MapNode>()
+            travelHub(pos, false) {
+                street(randomRange.random(), 40f, currentDirection, addNodeToGraph = false) {
                     var sideStreetDirection = currentDirection.withRotation90(rotationDirection.random())
-                    street(randomRange.random(), 15f, sideStreetDirection) {
-                        home(direction = sideStreetDirection.withRotation90(rotationDirection.random()),distanceFromStreet = 10f) { }
+                    street(randomRange.random(), 15f, sideStreetDirection, addNodeToGraph = false) {
+                        home(direction = sideStreetDirection.withRotation90(rotationDirection.random()), distanceFromStreet = 10f, addNodeToGraph = false) {
+                            newNodes.add(this)
+                        }
+                        newNodes.add(this)
                     }
+                    newNodes.add(this)
+                }
+                newNodes.add(this)
+            }
+            validatePlaceAdd(newNodes)
+        }
+
+        private fun validatePlaceAdd(newNodes: List<MapNode>) {
+            val vectors = newNodes.map { it.data }
+            val x = vectors.map { it.x }.min()!!
+            val y = vectors.map { it.y }.min()!!
+            val width = vectors.map { it.x }.max()!! - x
+            val height = vectors.map { it.y }.max()!! - y
+            var area = Rectangle(x, y, width, height)
+            var areaOk = false
+            val maxTries = 10
+            var tries = 0
+            while (!areaOk && tries < maxTries) {
+
+                areaOk = evaluateArea(area)
+
+                if(!areaOk) {
+                    val newPos = findRandomPosition()
+                    area = area.set(newPos.x, newPos.y, width, height)
+                }
+            }
+
+            /*
+            if area has changed (x or y are different, we must adjust position of EVERY node
+
+             */
+            if(area.x != x || area.y != y) {
+                val diffX = area.x - x
+                val diffY = area.y - y
+                for (node in newNodes) {
+                    node.move(diffX, diffY)
                 }
             }
         }
 
-        fun buildUsingCityBlocks() {
-            val randomThingie = 1..3
-            buildOfficesAndRestaurants(findSuitableBuildArea())
+        val directions = setOf(ImmutableVector2.X, -ImmutableVector2.X, ImmutableVector2.Y, -ImmutableVector2.Y)
 
-            for(i in 1..15) {
-                if (randomThingie.random() > 2) {
+        fun buildUsingCityBlocks() {
+            val randomThingie = 0..4
+            currentDirection = directions.random()
+            buildOfficesAndRestaurants(findRandomPosition())
+
+            for (i in 1..15) {
+                if (randomThingie.random() > 3) {
                     //Build some offices
-                    buildOfficesAndRestaurants(findSuitableBuildArea())
+                    buildOfficesAndRestaurants(findRandomPosition())
                 } else {
-                    buildHomes(findSuitableBuildArea())
+                    buildHomes(findRandomPosition())
                 }
             }
             /*
             Just to see what the city looks like, I will connect every travelhub
             to every other travelhub
              */
-            val travelHubs =graph.withLabels("TravelHub").toList()
-            for((i, f) in travelHubs.withIndex()) {
-                if(i + 1 == travelHubs.count()) {
+            val travelHubs = graph.withLabels("TravelHub").toList()
+            for ((i, f) in travelHubs.withIndex()) {
+                if (i + 1 == travelHubs.count()) {
                     graph.connect(f, travelHubs[0])
                 } else {
                     graph.connect(f, travelHubs[i + 1])
@@ -272,7 +340,7 @@ fun travelHub(position: ImmutableVector2 = ImmutableVector2.ZERO, addToGraph: Bo
     val node = MapNode(position)
     node.init()
     node.addLabel("TravelHub")
-    if(addToGraph)
+    if (addToGraph)
         Mgo.graph.addNode(node)
     Mgo.allPlaces.add(Place(PlaceType.TravelHub, node))
     return node
@@ -363,3 +431,4 @@ fun MapNode.displacedChild(displacement: ImmutableVector2,
     Mgo.graph.connect(parent, child)
     return child
 }
+

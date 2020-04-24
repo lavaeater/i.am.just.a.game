@@ -63,9 +63,9 @@ class NpcControlSystem : IteratingSystem(allOf(
     private fun walk(npc: Npc, body: Body) {
         //Walking now means traversing a list of items.
 
-        if( npc.currentPath.second.first()!!.data.dst2(npc.currentPosition.x, npc.currentPosition.y) < 2f) {
+        if(npc.currentPath.second.any() && npc.currentPath.second.first().data.dst2(npc.currentPosition.x, npc.currentPosition.y) < 2f) {
             npc.currentPath.second.removeAt(0) //Remove the first node
         }
-        npc.currentPath.second.first()!!.data.toMutable().moveFromTo(body, npc.speed * AiAndTimeSystem.secondsPerSecond)
+        npc.currentPath.second.firstOrNull()?.data?.toMutable()?.moveFromTo(body, npc.speed * AiAndTimeSystem.secondsPerSecond)
     }
 }

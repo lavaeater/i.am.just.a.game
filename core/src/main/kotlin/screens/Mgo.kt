@@ -32,14 +32,14 @@ class Mgo {
         private var countX = 0
         private var countY = 0
 
-        private fun findRandomPosition() : ImmutableVector2 {
+        private fun findRandomPosition(iteration: Int = 0) : ImmutableVector2 {
             if (graph.nodes.isEmpty()) return ImmutableVector2.ZERO
             val vectors = graph.nodes.map { it.data }
 
-            val minX = vectors.map { it.x }.min()!! - 50f
-            val minY = vectors.map { it.y }.min()!! - 50f
-            val maxX = vectors.map { it.x }.max()!! + 50f
-            val maxY = vectors.map { it.y }.max()!! + 50f
+            val minX = vectors.map { it.x }.min()!! - iteration * 10f
+            val minY = vectors.map { it.y }.min()!! - iteration * 10f
+            val maxX = vectors.map { it.x }.max()!! + iteration * 10f
+            val maxY = vectors.map { it.y }.max()!! + iteration * 10f
 
             return ImmutableVector2((minX..maxX).random(), (minY..maxY).random())
         }
@@ -126,7 +126,7 @@ class Mgo {
             return !graph.nodes.map { it.data }.any { area.contains(it.x, it.y) }
         }
 
-        val randomRange = 5..25
+        val randomRange = 3..12
 
         private fun buildOfficesAndRestaurants(pos: ImmutableVector2) {
             val newNodes = mutableListOf<MapNode>()
@@ -175,14 +175,16 @@ class Mgo {
             val height = vectors.map { it.y }.max()!! - y
             var area = Rectangle(x, y, width, height)
             var areaOk = false
-            val maxTries = 10
+            val maxTries = 100
             var tries = 0
-            while (!areaOk && tries < maxTries) {
 
+            while (!areaOk && tries < maxTries) {
+                tries++
                 areaOk = evaluateArea(area)
 
+
                 if(!areaOk) {
-                    val newPos = findRandomPosition()
+                    val newPos = findRandomPosition(tries)
                     area = area.set(newPos.x, newPos.y, width, height)
                 }
             }
@@ -198,6 +200,9 @@ class Mgo {
                     node.move(diffX, diffY)
                 }
             }
+
+            for(node in newNodes)
+                graph.addNode(node)
         }
 
         val directions = setOf(ImmutableVector2.X, -ImmutableVector2.X, ImmutableVector2.Y, -ImmutableVector2.Y)
@@ -207,7 +212,7 @@ class Mgo {
             currentDirection = directions.random()
             buildOfficesAndRestaurants(findRandomPosition())
 
-            for (i in 1..15) {
+            for (i in 1..25) {
                 if (randomThingie.random() > 3) {
                     //Build some offices
                     buildOfficesAndRestaurants(findRandomPosition())

@@ -1,5 +1,7 @@
 package graph
 
+import screens.MapNode
+
 open class Node<T>(data: T) {
 
 	var data: T = data
@@ -62,4 +64,9 @@ open class Node<T>(data: T) {
 	companion object {
 		const val Neighbour = "Neighbour"
 	}
+}
+fun <T> Node<T>.connect(to: Node<T>, relation: String = graph.Node.Neighbour, twoWay: Boolean = true) {
+		this.addRelation(relation, to)
+		if(twoWay)
+			to.addRelation(relation, this)
 }

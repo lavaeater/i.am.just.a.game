@@ -5,6 +5,7 @@ import data.*
 import factory.ActorFactory
 import graph.Graph
 import graph.Node
+import graph.connect
 import injection.Injector
 import ktx.math.*
 
@@ -31,8 +32,9 @@ class Mgo {
         private var currentDirection = ImmutableVector2.X
         private var countX = 0
         private var countY = 0
+        val randomRange = 3..12
 
-        private fun findRandomPosition(iteration: Int = 0) : ImmutableVector2 {
+        private fun findRandomPosition(iteration: Int = 0): ImmutableVector2 {
             if (graph.nodes.isEmpty()) return ImmutableVector2.ZERO
             val vectors = graph.nodes.map { it.data }
 
@@ -92,41 +94,12 @@ class Mgo {
             }
 
             return ImmutableVector2(xCoord, yCoord)
-
-            /*
-            The coolest way to do this would be to build a mini-graph FIRST and
-            then test if we can fit it somewhere on the map. But the above will do for now.
-             */
-
-//            var foundAnArea = false
-//            val maxTries = 100
-//            var tries =0
-//            var centerX = 0f
-//            var centerY = 0f
-//            while(!foundAnArea && tries < maxTries) {
-//                tries++
-//                centerX = (minX..maxX).random()
-//                centerY = (minY..maxY).random()
-//                val potentialArea = Rectangle(centerX - 100f, centerY - 100f, 200f, 200f)
-//                foundAnArea = evaluateArea(potentialArea)
-//                minX-=50f
-//                minY-=50f
-//                maxX+=50f
-//                maxY+=50f
-//            }
-
-//            if(foundAnArea) {
-//                return ImmutableVector2(centerX, centerY)
-//            }
-//            return ImmutableVector2(0f,0f)
         }
-
 
         private fun evaluateArea(area: Rectangle): Boolean {
             return !graph.nodes.map { it.data }.any { area.contains(it.x, it.y) }
         }
 
-        val randomRange = 3..12
 
         private fun buildOfficesAndRestaurants(pos: ImmutableVector2) {
             val newNodes = mutableListOf<MapNode>()
@@ -183,7 +156,7 @@ class Mgo {
                 areaOk = evaluateArea(area)
 
 
-                if(!areaOk) {
+                if (!areaOk) {
                     val newPos = findRandomPosition(tries)
                     area = area.set(newPos.x, newPos.y, width, height)
                 }
@@ -193,7 +166,7 @@ class Mgo {
             if area has changed (x or y are different, we must adjust position of EVERY node
 
              */
-            if(area.x != x || area.y != y) {
+            if (area.x != x || area.y != y) {
                 val diffX = area.x - x
                 val diffY = area.y - y
                 for (node in newNodes) {
@@ -201,7 +174,7 @@ class Mgo {
                 }
             }
 
-            for(node in newNodes)
+            for (node in newNodes)
                 graph.addNode(node)
         }
 
@@ -234,6 +207,108 @@ class Mgo {
             }
 
             updateDrawableRelations()
+        }
+
+        fun newCityBuilder() {
+            val randomThingie = 0..4
+            buildCityCenterBlock()
+
+            for (i in 1..100) {
+                if (randomThingie.random() > 3) {
+                    //Build some offices
+                    buildCityCenterBlock()
+                } else {
+                    buildResidentialBlock()
+                }
+            }
+
+            val travelHubs = graph.withLabels("TravelHub").toList()
+            for ((i, f) in travelHubs.withIndex()) {
+                if (i + 1 == travelHubs.count()) {
+                    graph.connect(f, travelHubs[0])
+                } else {
+                    graph.connect(f, travelHubs[i + 1])
+                }
+            }
+
+            updateDrawableRelations()
+        }
+
+        fun buildCityCenterBlock() {
+            val blockDescription ="""
+wswswswswswsw
+sssssssssssss
+swstswsrswsrs
+sssssssssssss
+wswswswswswsw
+sssssssssssss
+swsrstsrswsrs
+sssssssssssss
+wswswswswswsw
+sssssssssssss
+swsrswsrstsrs
+sssssssssssss
+swsrswsrswsrs
+""".trimIndent()
+            val newNodes = createFromString(blockDescription)
+            validatePlaceAdd(newNodes)
+        }
+
+        fun buildResidentialBlock() {
+            /*
+            I want the travel Hub in the middle of the block.
+            I want the top left corner to be a home and so on.
+
+            I want this to be built using some super simple code structure.
+
+            Perhaps a string we input?
+             */
+            val blockDescription ="""
+                hshshshshshshshshsh
+                sssssssssssssssssss
+                hshshshshshshshshsh
+                ssstssssstssssstsss
+                hshshshshshshshshsh
+                sssssssssssssssssss
+                hshshshshshshshshsh
+                hshshshshshshshshsh
+                sssssssssssssssssss
+                hshshshshshshshshsh
+                ssstssssstssssstsss
+                hshshshshshshshshsh
+                sssssssssssssssssss
+                hshshshshshshshshsh
+            """.trimIndent()
+            val newNodes = createFromString(blockDescription)
+            /*
+            This is kinda nice, because we can generate the string above and easily
+            construct our city from it instead of working with code. Also, the relations are
+            easily figured out, all columns are same size, all are related the same way.
+             */
+            validatePlaceAdd(newNodes)
+        }
+
+        private fun createFromString(blockDescription: String) : List<MapNode> {
+            val rows = blockDescription.split('\n')
+            var previousRow = arrayOf<MapNode>()
+            val allNodes = mutableListOf<MapNode>()
+            for ((r, row) in rows.withIndex()) {
+                val cols = row.toCharArray()
+                val newNodes = Array<MapNode>(cols.size) { c ->
+                    nodeFromString(cols[c], ImmutableVector2(c * 20f, r * 20f))
+                }
+                for ((i, node) in newNodes.withIndex()) {
+                    if (i + 1 in newNodes.indices) {
+                        node.connect(newNodes[i + 1])
+                    }
+                    if (r > 0) {
+                        node.connect(previousRow[i])
+                    }
+                }
+                allNodes.addAll(newNodes)
+                previousRow = newNodes
+            }
+            return allNodes
         }
 
 
@@ -331,6 +406,43 @@ class DrawableRelation(val from: ImmutableVector2, val to: ImmutableVector2) {
     override fun hashCode(): Int {
         return (from.hashCode() + to.hashCode()) * 23
     }
+}
+
+fun nodeFromString(type: Char, position: ImmutableVector2, init: MapNode.() -> Unit = {}) : MapNode {
+    val node = node(position, init)
+    when (type) {
+        's' -> node.addLabel("Street")
+        't' -> {
+            Mgo.allPlaces.add(Place(PlaceType.TravelHub, node))
+            node.addLabel("TravelHub")
+        }
+        'h' -> {
+            val home = Place(PlaceType.Home, node)
+            Mgo.allPlaces.add(home)
+            node.addLabel("Home")
+            val npc = Injector.inject<ActorFactory>().addNpcAt(home)
+            val dieRange = (1..100)
+            val infectionRisk = 5
+            if (dieRange.random() < infectionRisk) {
+                npc.coronaStatus = CoronaStatus.Infected
+                npc.symptomatic = false
+            }
+        }
+        'w' -> {
+            Mgo.allPlaces.add(Place(PlaceType.Workplace, node))
+            node.addLabel("WorkPlace")
+        }
+        'r' -> {
+            Mgo.allPlaces.add(Place(PlaceType.Restaurant, node))
+            node.addLabel("Restaurant")
+        }
+    }
+    return node
+}
+
+
+fun node(position: ImmutableVector2, init: MapNode.() -> Unit = {}) : MapNode {
+    return node(position, false, init)
 }
 
 fun node(position: ImmutableVector2 = ImmutableVector2.ZERO, addToGraph: Boolean = true, init: MapNode.() -> Unit = {}): MapNode {

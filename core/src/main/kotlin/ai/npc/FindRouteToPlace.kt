@@ -2,7 +2,7 @@ package ai.npc
 
 import com.badlogic.gdx.ai.btree.Task
 import data.Npc
-import findNearest
+import findClosestTo
 import findPlaceNearby
 import placeInWalkingRange
 import screens.Mgo
@@ -50,7 +50,7 @@ class FindRouteToPlace: NpcTask() {
 
                 //By going to the nearest hub!
 
-                val hubToWalkTo = Mgo.travelHubs.findNearest(npc.currentPosition.x, npc.currentPosition.y)
+                val hubToWalkTo = Mgo.travelHubs.findClosestTo(npc.currentPosition.x, npc.currentPosition.y)
 
                 npc.addPlaceToGoTo(hubToWalkTo, TravelMode.Walking)
                 /*

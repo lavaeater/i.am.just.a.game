@@ -82,7 +82,16 @@ class RenderSystem(
             }
             shapeRenderer.rect(it.box.x, it.box.y, it.box.width, it.box.height)
         }
+        shapeRenderer.end()
+
         if (renderNodes) {
+            shapeRenderer.color = Color.OLIVE
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
+            for (relation in Mgo.relationsToDraw) {
+                shapeRenderer.line(relation.from.x, relation.from.y, relation.to.x, relation.to.y)
+            }
+            shapeRenderer.end()
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
             for (node in Mgo.graph.withLabels("Street")) {
                 if (node.hasLabel("Breadth"))
                     shapeRenderer.color = Color.GREEN
@@ -93,15 +102,9 @@ class RenderSystem(
 
                 shapeRenderer.circle(node.data.x, node.data.y, 2f)
             }
-            shapeRenderer.color = Color.GREEN
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
-            for (relation in Mgo.relationsToDraw) {
-                shapeRenderer.line(relation.from.x, relation.from.y, relation.to.x, relation.to.y)
-            }
             shapeRenderer.end()
         }
 
-        shapeRenderer.end()
 
         super.update(deltaTime)
     }

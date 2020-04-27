@@ -19,12 +19,12 @@ fun Vector2.pointIsInside(size: Vector2, point: Vector2):Boolean {
  * closeset to it. This will be the target hub for the npc
  */
 fun List<Place>.findPlaceNearby(place: Place) : Place {
-    val hub = this.findNearest(place.center.x, place.center.y)
+    val hub = this.findClosestTo(place.center.x, place.center.y)
     return hub
 }
 
-fun List<Place>.findNearest(x: Float, y:Float): Place {
-    val place = this.minBy { it.center.dst(x, y) }
+fun List<Place>.findClosestTo(x: Float, y:Float): Place {
+    val place = this.minBy { it.center.dst2(x, y) }
     return place!!
 }
 

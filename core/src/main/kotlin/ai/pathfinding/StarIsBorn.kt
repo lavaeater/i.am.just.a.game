@@ -43,7 +43,8 @@ class StarIsBorn {
                     break
 
                 for(next in current.neighbours(Mgo.Neighbour)) {
-                    newCost = costSoFar[current]!! + 1
+                    //We make the cost be actual distance between nodes instead, for more accurate estimates
+                    newCost = costSoFar[current]!! + heuristic(current, goal)
                     if((!costSoFar.containsKey(next) || newCost < costSoFar[next]!! )) {
                         costSoFar[next] = newCost
                         priority = newCost + heuristic(goal, next)

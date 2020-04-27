@@ -6,6 +6,7 @@ import com.badlogic.gdx.ai.btree.BehaviorTree
 import com.badlogic.gdx.math.Circle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Queue
+import dst2
 import graph.Node
 import ktx.math.ImmutableVector2
 import ktx.math.random
@@ -61,10 +62,11 @@ class Npc(val name: String, val id: String, val home: Place,val walkingRange: Fl
 
     val npcStats = NpcStats()
             .apply {
-        statsMap[Needs.Fuel] = 96
+        statsMap[Needs.Fuel] = 0
         statsMap[Needs.Rest] = 96
-        statsMap[Needs.Money] = 0
+        statsMap[Needs.Money] = 96
         statsMap[Needs.Social] = 94
+        statsMap[Needs.Fun] = 94
     }
 
     private val npcStateMachine = StateMachine.buildStateMachine(Activity.Neutral, ::myStateHasChanged) {
@@ -189,7 +191,5 @@ class Npc(val name: String, val id: String, val home: Place,val walkingRange: Fl
     }
 }
 
-private fun ImmutableVector2.dst2(position: Vector2): Float {
-    return this.dst2(ImmutableVector2(position.x, position.y))
-}
+
 

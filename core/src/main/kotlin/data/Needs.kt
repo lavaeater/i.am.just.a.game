@@ -7,5 +7,6 @@ class Needs {
         const val Money = "Money"
         const val Social = "Social"
         const val Nothing = "Nothing"
+        const val Fun = "Fun"
     }
 }

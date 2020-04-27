@@ -7,6 +7,7 @@ import ktx.math.minus
 import ktx.math.times
 import ktx.math.vec2
 import data.Place
+import ktx.math.ImmutableVector2
 import screens.Mgo
 
 fun Vector2.pointIsInside(size: Vector2, point: Vector2):Boolean {
@@ -75,7 +76,9 @@ fun Vector2.moveTowards(target: Vector2, velocity: Float): Vector2 {
     return (target - this).nor() * velocity
 }
 
-
+fun ImmutableVector2.dst2(position: Vector2): Float {
+    return this.dst2(ImmutableVector2(position.x, position.y))
+}
 
 fun Npc.getBehaviorTree() : BehaviorTree<Npc> {
 

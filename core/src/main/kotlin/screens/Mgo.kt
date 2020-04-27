@@ -236,10 +236,16 @@ class Mgo {
 
         fun buildCityCenterBlock() {
             val blockDescription ="""
-wsrsts
-ssssss
-hrhhrs
-tssssw
+sssssssss
+swsssssts
+sssssssss
+srsssssrs
+sssssssss
+sssssssss
+sssssssss
+sssshssss
+sssssssss
+
 """.trimIndent()
             val newNodes = createFromString(blockDescription)
             validatePlaceAdd(newNodes)

@@ -212,15 +212,15 @@ class Mgo {
         fun newCityBuilder() {
             val randomThingie = 0..4
             buildCityCenterBlock()
-
-            for (i in 1..100) {
-                if (randomThingie.random() > 3) {
-                    //Build some offices
-                    buildCityCenterBlock()
-                } else {
-                    buildResidentialBlock()
-                }
-            }
+//
+//            for (i in 1..100) {
+//                if (randomThingie.random() > 3) {
+//                    //Build some offices
+//                    buildCityCenterBlock()
+//                } else {
+//                    buildResidentialBlock()
+//                }
+//            }
 
             val travelHubs = graph.withLabels("TravelHub").toList()
             for ((i, f) in travelHubs.withIndex()) {
@@ -236,19 +236,10 @@ class Mgo {
 
         fun buildCityCenterBlock() {
             val blockDescription ="""
-wswswswswswsw
-sssssssssssss
-swstswsrswsrs
-sssssssssssss
-wswswswswswsw
-sssssssssssss
-swsrstsrswsrs
-sssssssssssss
-wswswswswswsw
-sssssssssssss
-swsrswsrstsrs
-sssssssssssss
-swsrswsrswsrs
+wsrsts
+ssssss
+hrhhrs
+tssssw
 """.trimIndent()
             val newNodes = createFromString(blockDescription)
             validatePlaceAdd(newNodes)

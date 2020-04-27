@@ -70,19 +70,6 @@ class RenderSystem(
         batch.projectionMatrix = camera.combined
 
         shapeRenderer.projectionMatrix = camera.combined
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
-
-        Mgo.allPlaces.forEach {
-            when (it.type) {
-                is PlaceType.Home -> shapeRenderer.setColor(0.3f, 0.3f, 0f, 0.9f)
-                is PlaceType.Workplace -> shapeRenderer.setColor(.3f, .3f, 0.7f, 0.6f)
-                is PlaceType.Restaurant -> shapeRenderer.setColor(0f, .6f, 0f, .7f)
-                is PlaceType.Tivoli -> shapeRenderer.setColor(1f, 0f, 0f, 0f)
-                is PlaceType.TravelHub -> shapeRenderer.color = Color.CORAL
-            }
-            shapeRenderer.rect(it.box.x, it.box.y, it.box.width, it.box.height)
-        }
-        shapeRenderer.end()
 
         if (renderNodes) {
             shapeRenderer.color = Color.OLIVE
@@ -96,7 +83,7 @@ class RenderSystem(
                 if (node.hasLabel("Breadth"))
                     shapeRenderer.color = Color.GREEN
                 else if (node.hasLabel("A Star"))
-                  shapeRenderer.color = Color.RED
+                    shapeRenderer.color = Color.RED
                 else
                     shapeRenderer.color = Color.WHITE
 
@@ -104,6 +91,21 @@ class RenderSystem(
             }
             shapeRenderer.end()
         }
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
+        Mgo.allPlaces.forEach {
+            when (it.type) {
+                is PlaceType.Home -> shapeRenderer.setColor(0.3f, 0.3f, 0f, 0.9f)
+                is PlaceType.Workplace -> shapeRenderer.setColor(.3f, .3f, 0.7f, 0.6f)
+                is PlaceType.Restaurant -> shapeRenderer.setColor(0f, .6f, 0f, .7f)
+                is PlaceType.Tivoli -> shapeRenderer.setColor(1f, 0f, 0f, 0f)
+                is PlaceType.TravelHub -> shapeRenderer.color = Color.CORAL
+            }
+            shapeRenderer.rect(it.box.x, it.box.y, it.box.width, it.box.height)
+        }
+        shapeRenderer.end()
+
+
 
 
         super.update(deltaTime)

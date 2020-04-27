@@ -16,7 +16,8 @@ import systems.AiAndTimeSystem
 
 class UserInterface(
     private val batch: Batch,
-    debug: Boolean = true): IUserInterface {
+    debug: Boolean = false,
+ private val coronaStuff: Boolean = false): IUserInterface {
 
   override val hudViewPort = ExtendViewport(uiWidth, uiHeight, OrthographicCamera())
   override val stage = Stage(hudViewPort, batch)
@@ -40,7 +41,9 @@ class UserInterface(
 
   override fun update(delta: Float) {
     batch.projectionMatrix = stage.camera.combined
-    updateCoronaInfo()
+    if(coronaStuff)
+      updateCoronaInfo()
+
     showCurrentNpcInfo()
     stage.act(delta)
     stage.draw()
@@ -97,7 +100,6 @@ u, j                    -> zoom in and out
 k, l                    -> rotate camera
 r                       -> Reset Sim
       """)
-
       infoLabel = label("InfoLabel")
       npcLabel = label("NpcInfo")
     }

@@ -72,7 +72,8 @@ class Injector {
         private fun getEngine() : Engine {
             return Engine().apply {
                 addSystem(AiAndTimeSystem(interval = timeInterval, minutes = minutesPerTick))
-                addSystem(InfectionSystem(interval = timeInterval))
+                //1. Temporarily disable Corona stuff
+                //addSystem(InfectionSystem(interval = timeInterval))
                 addSystem(NpcControlSystem())
                 addSystem(GameInputSystem(
                         inject(),
@@ -83,7 +84,7 @@ class Injector {
                 addSystem(
                         RenderSystem(
                                 inject(),
-                                inject(), false))
+                                inject(), true))
                 addSystem(FollowCameraSystem(inject()))
             }
         }

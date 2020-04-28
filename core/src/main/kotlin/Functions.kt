@@ -12,7 +12,7 @@ import data.PlaceType
 import factory.ActorFactory
 import injection.Injector
 import ktx.math.ImmutableVector2
-import screens.MapNode
+import data.MapNode
 import screens.Mgo
 
 fun Vector2.pointIsInside(size: Vector2, point: Vector2):Boolean {
@@ -151,8 +151,8 @@ fun travelHub(position: ImmutableVector2 = ImmutableVector2.ZERO, addToGraph: Bo
 }
 
 fun MapNode.travelHub(displacement: ImmutableVector2,
-                      addNodeToGraph: Boolean = true,
-                      init: MapNode.() -> Unit = {}): MapNode {
+                                              addNodeToGraph: Boolean = true,
+                                              init: MapNode.() -> Unit = {}): MapNode {
     val node = nodeWithLabel(displacement, "TravelHub", addNodeToGraph, init)
     Mgo.allPlaces.add(Place(PlaceType.TravelHub, node))
     return node
@@ -160,9 +160,9 @@ fun MapNode.travelHub(displacement: ImmutableVector2,
 }
 
 fun MapNode.workPlace(distanceFromStreet: Float = 20f,
-                      direction: ImmutableVector2 = ImmutableVector2.Y,
-                      addNodeToGraph: Boolean = true,
-                      init: MapNode.() -> Unit = {}): MapNode {
+                                              direction: ImmutableVector2 = ImmutableVector2.Y,
+                                              addNodeToGraph: Boolean = true,
+                                              init: MapNode.() -> Unit = {}): MapNode {
     val workPlaceNode = nodeWithLabel(direction * distanceFromStreet, "WorkPlace", addNodeToGraph, init)
     Mgo.allPlaces.add(Place(PlaceType.Workplace, workPlaceNode))
     return workPlaceNode
@@ -170,19 +170,19 @@ fun MapNode.workPlace(distanceFromStreet: Float = 20f,
 
 
 fun MapNode.restaurant(distanceFromStreet: Float = 20f,
-                       direction: ImmutableVector2 = ImmutableVector2.Y,
-                       addNodeToGraph: Boolean = true,
-                       init: MapNode.() -> Unit = {}): MapNode {
+                                               direction: ImmutableVector2 = ImmutableVector2.Y,
+                                               addNodeToGraph: Boolean = true,
+                                               init: MapNode.() -> Unit = {}): MapNode {
     val node = nodeWithLabel(direction * distanceFromStreet, "Restaurant", addNodeToGraph, init)
     Mgo.allPlaces.add(Place(PlaceType.Restaurant, node))
     return node
 }
 
 fun MapNode.home(distanceFromStreet: Float = 20f,
-                 direction: ImmutableVector2 = ImmutableVector2.Y,
-                 addNodeToGraph: Boolean = true,
-                 addNpc: Boolean = true,
-                 init: MapNode.() -> Unit = {}): MapNode {
+                                         direction: ImmutableVector2 = ImmutableVector2.Y,
+                                         addNodeToGraph: Boolean = true,
+                                         addNpc: Boolean = true,
+                                         init: MapNode.() -> Unit = {}): MapNode {
     val homeNode = nodeWithLabel(direction * distanceFromStreet, "Home", addNodeToGraph, init)
     val home = Place(PlaceType.Home, homeNode)
     Mgo.allPlaces.add(home)
@@ -199,9 +199,9 @@ fun MapNode.home(distanceFromStreet: Float = 20f,
 }
 
 fun MapNode.nodeWithLabel(displacement: ImmutableVector2,
-                          label: String,
-                          addNodeToGraph: Boolean = true,
-                          init: MapNode.() -> Unit = {}): MapNode {
+                                                  label: String,
+                                                  addNodeToGraph: Boolean = true,
+                                                  init: MapNode.() -> Unit = {}): MapNode {
     return displacedChild(displacement, addNodeToGraph) {
         addLabel(label)
         init()
@@ -209,11 +209,11 @@ fun MapNode.nodeWithLabel(displacement: ImmutableVector2,
 }
 
 fun MapNode.street(count: Int = 1,
-                   distanceBetween: Float = 30f,
-                   direction: ImmutableVector2 = ImmutableVector2.X,
-                   label: String = "Street",
-                   addNodeToGraph: Boolean = true,
-                   init: MapNode.() -> Unit = {}): MapNode {
+                                           distanceBetween: Float = 30f,
+                                           direction: ImmutableVector2 = ImmutableVector2.X,
+                                           label: String = "Street",
+                                           addNodeToGraph: Boolean = true,
+                                           init: MapNode.() -> Unit = {}): MapNode {
     val previous = this
     val next = previous.displacedChild(direction * distanceBetween, addNodeToGraph) {
         addLabel(label)
@@ -226,8 +226,8 @@ fun MapNode.street(count: Int = 1,
 }
 
 fun MapNode.displacedChild(displacement: ImmutableVector2,
-                           addNodeToGraph: Boolean = true,
-                           init: MapNode.() -> Unit = {}): MapNode {
+                                                   addNodeToGraph: Boolean = true,
+                                                   init: MapNode.() -> Unit = {}): MapNode {
     val parent = this
     val child = node(parent.data + displacement, addNodeToGraph) {
         init()

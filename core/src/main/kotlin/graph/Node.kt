@@ -1,7 +1,5 @@
 package graph
 
-import screens.MapNode
-
 open class Node<T>(data: T) {
 
 	var data: T = data

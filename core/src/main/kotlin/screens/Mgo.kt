@@ -1,20 +1,14 @@
 package screens
 
 import com.badlogic.gdx.math.Rectangle
+import data.MapNode
 import data.Place
 import data.PlaceType
 import graph.Graph
-import graph.Node
 import graph.connect
 import ktx.math.ImmutableVector2
 import ktx.math.random
 import nodeFromString
-
-class MapNode(data: ImmutableVector2) : Node<ImmutableVector2>(data) {
-    fun move(diffX: Float, diffY: Float) {
-        data = ImmutableVector2(data.x + diffX, data.y + diffY)
-    }
-}
 
 class Mgo {
     companion object {
@@ -179,7 +173,7 @@ sssssssss
             return allNodes
         }
 
-        fun updateDrawableRelations() {
+        private fun updateDrawableRelations() {
             for (node in graph.nodes) {
                 for (related in node.allNeighbours) {
                     relationsToDraw.add(DrawableRelation(node.data, related.data))

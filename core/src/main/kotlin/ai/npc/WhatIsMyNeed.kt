@@ -1,9 +1,7 @@
 package ai.npc
 
 import com.badlogic.gdx.ai.btree.Task
-import data.CoronaStatus
 import data.Needs
-import data.NeedsAndStuff
 import data.Npc
 
 class WhatIsMyNeed : NpcTask() {
@@ -15,7 +13,7 @@ class WhatIsMyNeed : NpcTask() {
     override fun execute(): Status {
         timeHasPassed()
 
-        for(need in NeedsAndStuff.prioritizedNeeds) {
+        for(need in Needs.prioritizedNeeds) {
             if(hasNeed(need)) {
                 npc.currentNeed = need
                 return Status.SUCCEEDED

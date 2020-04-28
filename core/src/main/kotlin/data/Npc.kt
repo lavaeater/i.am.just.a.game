@@ -19,7 +19,7 @@ import java.time.LocalDate
 /**
  * We're gonna be needin' some friendship up in here.
  */
-class Npc(val name: String, val id: String, val home: Place,val walkingRange: Float = 100f) {
+class Npc(val name: String, val id: String, val home: Place, val workPlace: Place, val walkingRange: Float = 100f) {
     val speed = (1f..3f).random()
     lateinit var currentPath: Pair<Node<ImmutableVector2>, MutableList<Node<ImmutableVector2>>>
     lateinit var behaviorTree: BehaviorTree<Npc>
@@ -28,7 +28,6 @@ class Npc(val name: String, val id: String, val home: Place,val walkingRange: Fl
     var symptomatic = true
     lateinit var thePlaceIWantToBe: Pair<Place, TravelMode>
         private set
-    val workPlace = Mgo.workPlaces.random() //Aaah, perfect, random references to stuff
     val friends = mutableSetOf<Npc>()
     private val circleOfConcernRadius = 4f
 
@@ -50,7 +49,7 @@ class Npc(val name: String, val id: String, val home: Place,val walkingRange: Fl
         return _circleOfConcern
     }
 
-    val onTheMove get() = npcState in NeedsAndStuff.movingStates
+    val onTheMove get() = npcState in Needs.movingStates
     val meetingAFriend get() = npcState == Activity.GoingToMeetAFriend && friendToGoTo != null
     var friendToGoTo : Npc? = null
 

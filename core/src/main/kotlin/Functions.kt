@@ -2,12 +2,17 @@ import com.badlogic.gdx.ai.btree.BehaviorTree
 import com.badlogic.gdx.ai.btree.utils.BehaviorTreeParser
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
+import data.CoronaStatus
 import data.Npc
 import ktx.math.minus
 import ktx.math.times
 import ktx.math.vec2
 import data.Place
+import data.PlaceType
+import factory.ActorFactory
+import injection.Injector
 import ktx.math.ImmutableVector2
+import screens.MapNode
 import screens.Mgo
 
 fun Vector2.pointIsInside(size: Vector2, point: Vector2):Boolean {
@@ -86,4 +91,147 @@ fun Npc.getBehaviorTree() : BehaviorTree<Npc> {
     val parser = BehaviorTreeParser<Npc>(BehaviorTreeParser.DEBUG_NONE)
     this.behaviorTree = parser.parse(reader, this)
     return this.behaviorTree
+}
+
+
+
+fun nodeFromString(type: Char, position: ImmutableVector2, init: MapNode.() -> Unit = {}) : MapNode {
+    val node = node(position, init)
+    when (type) {
+        's' -> node.addLabel("Street")
+        't' -> {
+            Mgo.allPlaces.add(Place(PlaceType.TravelHub, node))
+            node.addLabel("TravelHub")
+        }
+        'h' -> {
+            val home = Place(PlaceType.Home, node)
+            Mgo.allPlaces.add(home)
+            node.addLabel("Home")
+            val npc = Injector.inject<ActorFactory>().addNpcAt(home, Mgo.workPlaces.random())
+            val dieRange = (1..100)
+            val infectionRisk = 5
+            if (dieRange.random() < infectionRisk) {
+                npc.coronaStatus = CoronaStatus.Infected
+                npc.symptomatic = false
+            }
+        }
+        'w' -> {
+            Mgo.allPlaces.add(Place(PlaceType.Workplace, node))
+            node.addLabel("WorkPlace")
+        }
+        'r' -> {
+            Mgo.allPlaces.add(Place(PlaceType.Restaurant, node))
+            node.addLabel("Restaurant")
+        }
+    }
+    return node
+}
+
+
+fun node(position: ImmutableVector2, init: MapNode.() -> Unit = {}) : MapNode {
+    return node(position, false, init)
+}
+
+fun node(position: ImmutableVector2 = ImmutableVector2.ZERO, addToGraph: Boolean = true, init: MapNode.() -> Unit = {}): MapNode {
+    val node = MapNode(position)
+    node.init()
+    if (addToGraph)
+        Mgo.graph.addNode(node)
+    return node
+}
+
+fun travelHub(position: ImmutableVector2 = ImmutableVector2.ZERO, addToGraph: Boolean = true, init: MapNode.() -> Unit = {}): MapNode {
+    val node = MapNode(position)
+    node.init()
+    node.addLabel("TravelHub")
+    if (addToGraph)
+        Mgo.graph.addNode(node)
+    Mgo.allPlaces.add(Place(PlaceType.TravelHub, node))
+    return node
+}
+
+fun MapNode.travelHub(displacement: ImmutableVector2,
+                      addNodeToGraph: Boolean = true,
+                      init: MapNode.() -> Unit = {}): MapNode {
+    val node = nodeWithLabel(displacement, "TravelHub", addNodeToGraph, init)
+    Mgo.allPlaces.add(Place(PlaceType.TravelHub, node))
+    return node
+
+}
+
+fun MapNode.workPlace(distanceFromStreet: Float = 20f,
+                      direction: ImmutableVector2 = ImmutableVector2.Y,
+                      addNodeToGraph: Boolean = true,
+                      init: MapNode.() -> Unit = {}): MapNode {
+    val workPlaceNode = nodeWithLabel(direction * distanceFromStreet, "WorkPlace", addNodeToGraph, init)
+    Mgo.allPlaces.add(Place(PlaceType.Workplace, workPlaceNode))
+    return workPlaceNode
+}
+
+
+fun MapNode.restaurant(distanceFromStreet: Float = 20f,
+                       direction: ImmutableVector2 = ImmutableVector2.Y,
+                       addNodeToGraph: Boolean = true,
+                       init: MapNode.() -> Unit = {}): MapNode {
+    val node = nodeWithLabel(direction * distanceFromStreet, "Restaurant", addNodeToGraph, init)
+    Mgo.allPlaces.add(Place(PlaceType.Restaurant, node))
+    return node
+}
+
+fun MapNode.home(distanceFromStreet: Float = 20f,
+                 direction: ImmutableVector2 = ImmutableVector2.Y,
+                 addNodeToGraph: Boolean = true,
+                 addNpc: Boolean = true,
+                 init: MapNode.() -> Unit = {}): MapNode {
+    val homeNode = nodeWithLabel(direction * distanceFromStreet, "Home", addNodeToGraph, init)
+    val home = Place(PlaceType.Home, homeNode)
+    Mgo.allPlaces.add(home)
+    if (addNpc) {
+        val npc = Injector.inject<ActorFactory>().addNpcAt(home, Mgo.workPlaces.random())
+        val dieRange = (1..100)
+        val infectionRisk = 5
+        if (dieRange.random() < infectionRisk) {
+            npc.coronaStatus = CoronaStatus.Infected
+            npc.symptomatic = false
+        }
+    }
+    return homeNode
+}
+
+fun MapNode.nodeWithLabel(displacement: ImmutableVector2,
+                          label: String,
+                          addNodeToGraph: Boolean = true,
+                          init: MapNode.() -> Unit = {}): MapNode {
+    return displacedChild(displacement, addNodeToGraph) {
+        addLabel(label)
+        init()
+    }
+}
+
+fun MapNode.street(count: Int = 1,
+                   distanceBetween: Float = 30f,
+                   direction: ImmutableVector2 = ImmutableVector2.X,
+                   label: String = "Street",
+                   addNodeToGraph: Boolean = true,
+                   init: MapNode.() -> Unit = {}): MapNode {
+    val previous = this
+    val next = previous.displacedChild(direction * distanceBetween, addNodeToGraph) {
+        addLabel(label)
+        init()
+    }
+    if (count - 1 > 0)
+        next.street(count - 1, distanceBetween, direction, init = init) //Ooh, same init function for all children, madness
+
+    return next
+}
+
+fun MapNode.displacedChild(displacement: ImmutableVector2,
+                           addNodeToGraph: Boolean = true,
+                           init: MapNode.() -> Unit = {}): MapNode {
+    val parent = this
+    val child = node(parent.data + displacement, addNodeToGraph) {
+        init()
+    }
+    Mgo.graph.connect(parent, child)
+    return child
 }

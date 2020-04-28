@@ -24,8 +24,8 @@ class ActorFactory(
     }
 
 
-    fun addNpcAt(home: Place, name: String = randomNpcName()): Npc {
-        val npc = Npc(name, getNpcId(name), home)
+    fun addNpcAt(home: Place, workPlace: Place, name: String = randomNpcName()): Npc {
+        val npc = Npc(name, getNpcId(name), home, workPlace)
 
         npcByKeys[npc.id] = npc
 

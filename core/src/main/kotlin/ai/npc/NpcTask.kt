@@ -15,13 +15,13 @@ abstract class NpcTask : LeafTask<Npc>() {
     }
 
     fun checkIfNpcDied() {
-        if(npc.npcStats.statsMap[Needs.Fuel]!! <= NeedsAndStuff.lowRange.first + 1) {
+        if(npc.npcStats.statsMap[Needs.Fuel]!! <= Needs.lowRange.first + 1) {
             npc.die()
         }
     }
 
     fun hasAnyNeed() : Boolean {
-        return npc.npcStats.statsMap.values.any { it in NeedsAndStuff.lowRange }
+        return npc.npcStats.statsMap.values.any { it in Needs.lowRange }
     }
 
     /**
@@ -29,7 +29,7 @@ abstract class NpcTask : LeafTask<Npc>() {
      */
     fun hasNeed(need:String) : Boolean {
         val stat = npc.npcStats.statsMap[need]
-        return if(need == Needs.Rest && npc.iWillStayAtHome) true else stat in NeedsAndStuff.lowRange
+        return if(need == Needs.Rest && npc.iWillStayAtHome) true else stat in Needs.lowRange
     }
 
     /**
@@ -38,11 +38,11 @@ abstract class NpcTask : LeafTask<Npc>() {
      */
     fun stillHasNeed(need:String) : Boolean {
         val stat = npc.npcStats.statsMap[need]
-        return if(need == Needs.Rest && npc.iWillStayAtHome) true else stat in NeedsAndStuff.lowNormal
+        return if(need == Needs.Rest && npc.iWillStayAtHome) true else stat in Needs.lowNormal
     }
 
     private fun applyCosts() {
-        val cost = NeedsAndStuff.getCostForActivity(npc.npcState)
+        val cost = Needs.getCostForActivity(npc.npcState)
         applyCosts(cost)
     }
 
@@ -50,7 +50,7 @@ abstract class NpcTask : LeafTask<Npc>() {
         val timeFactor = 60 / AiAndTimeSystem.minutesPerTick.toInt()
         for((k, c) in cost.costMap) {
             val actualCost = c / timeFactor
-            npc.npcStats.statsMap[k] = (npc.npcStats.statsMap[k]!! - actualCost).coerceIn(NeedsAndStuff.fullRange)
+            npc.npcStats.statsMap[k] = (npc.npcStats.statsMap[k]!! - actualCost).coerceIn(Needs.fullRange)
         }
     }
 }

@@ -22,4 +22,3 @@ class HasAnyNeed : NpcTask() {
             Status.FAILED
     }
 }
-

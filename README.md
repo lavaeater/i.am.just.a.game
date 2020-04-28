@@ -15,6 +15,15 @@ So, is this readme a blog? Or what is it? Is it perhaps shit?
 * Change City to small one-block city - done
 * Take a look at Eat-Neutral-Eat cycle and NPC state
 * Social Needs and Boredom
+* Money should have no upper limit
+
+Needs need to be categorized into musts and wants... or something. If you do not eat or sleep, you die, but you can manage to exist without money or social context - maybe. 
+
+The entire purpose of working with the needs in the game is to make it more complex, to create more advanced behavior that sort of can steer the inhabitants of the city into more random behavior.
+
+So needs might be categorized into two groups, as of now. And that would be a boolean, simply put. It is "Essential" or not.
+
+Let's do something fun with Sealed Classes or something.
 
 ### Pathfinding improvements
 What would I want to do with my "game" and the concepts I've explored in it? One issue I see right now is that we have tons of nodes which degrades performance - when we also deal with tons of NPCs. How do we optimize that? Another thing is that the NPCs choose strange paths, for some reason. I am not entirely sure why. I think the cost estimate for every path is whack and also, the prioritization of paths. A* requires some kind of cost - well the cost might be related to distance between nodes, which is a change I reintroduced. But I also do not see why the player would take some of the routes. To work on that we need to reduce the map to only one living area and one commercial area. We don't need a ton of stuff in each - which is easy enought to accomplish. So, performance, there is another aspect as well - we could precalculate paths for every node to every Place. So, wherever the NPC is currently, we can just lookup the path to a place - which would be infinitely faster than calculating it ad hoc for everyone. On the other hand, that lookup would be very large indeed after a while. Perhaps implemented as a cache that can hold a certain number of paths? An assumption would be that paths to TravelHubs might vary quite a bit but paths FROM travelhubs to the places would not - prime for pre-calculations!

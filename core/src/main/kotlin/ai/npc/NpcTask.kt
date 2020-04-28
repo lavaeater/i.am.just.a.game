@@ -21,6 +21,18 @@ abstract class NpcTask : LeafTask<Npc>() {
     }
 
     fun hasAnyNeed() : Boolean {
+        /*
+        In the new model, the NPC will always have a need.
+
+        This need will be the top most prioritized need
+        in his list of needs and stats. The needs will be prioritized somehow.
+
+        Break all that out into some kind of utility class that can manage an
+        NPCs stats and needs at the same time - making the class testable
+         */
+
+
+
         return npc.npcStats.statsMap.values.any { it in Needs.lowRange }
     }
 

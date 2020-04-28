@@ -10,11 +10,11 @@ class Needs {
         const val Fun = "Fun"
 
         fun getCostForNeed(need:String) : Cost {
-            return costs[needsToActivities[need]]?: (costs[Activity.Neutral] ?: error("Actitivy Neutral has no cost, this is wrong"))
+            return costs[needsToActivities[need]]?: (costs[Activities.Neutral] ?: error("Actitivy Neutral has no cost, this is wrong"))
         }
 
         fun getCostForActivity(activity: String) : Cost {
-            return costs[activity] ?: costs[Activity.Neutral] ?: error("Activity Neutral has no cost, which is wrong")
+            return costs[activity] ?: costs[Activities.Neutral] ?: error("Activity Neutral has no cost, which is wrong")
         }
 
         /**
@@ -39,75 +39,70 @@ class Needs {
          * This is very good.
          */
         private val costs = mapOf(
-                Activity.Working to Cost(
-                        Activity.Working, mapOf(
+                Activities.Working to Cost(
+                        Activities.Working, mapOf(
                         Money to -30,
                         Fuel to 16,
                         Rest to 8,
                         Social to 2
                 )),
-                Activity.Sleeping to Cost(
-                        Activity.Sleeping, mapOf(
-                        Money to 0,
-                        Fuel to 0,
-                        Rest to -12,
-                        Social to 0
+                Activities.Sleeping to Cost(
+                        Activities.Sleeping, mapOf(
+                        Rest to -12
                 )),
-                Activity.Socializing to Cost(
-                        Activity.Socializing, mapOf(
+                Activities.Socializing to Cost(
+                        Activities.Socializing, mapOf(
                         Money to 40,
                         Fuel to 20,
                         Rest to 2,
                         Social to -48
                 )),
-                Activity.Eating to Cost(Activity.Eating, mapOf(
+                Activities.Eating to Cost(Activities.Eating, mapOf(
                         Money to 24,
                         Fuel to -64,
-                        Rest to 0,
                         Social to 4
                 )),
-                Activity.Neutral to Cost(Activity.Neutral),
-                Activity.OnTheMove to Cost(Activity.OnTheMove, mapOf(
-                        Money to 0,
+                Activities.Neutral to Cost(Activities.Neutral),
+                Activities.OnTheMove to Cost(Activities.OnTheMove, mapOf(
                         Fuel to 2,
-                        Rest to 0,
                         Social to 2)))
 
         val needsToActivities = mapOf(
-                Fuel to Activity.Eating,
-                Rest to Activity.Sleeping,
-                Money to Activity.Working,
-                Social to Activity.Socializing
+                Fuel to Activities.Eating,
+                Rest to Activities.Sleeping,
+                Money to Activities.Working,
+                Social to Activities.Socializing
         )
 
         val prioritizedNeeds = listOf(
                 Fuel,
                 Rest,
                 Money,
+                Fun,
                 Social,
                 Nothing
         )
 
         val statesToNeeds = mapOf(
-                Activity.Working to Money,
-                Activity.Sleeping to Rest,
-                Activity.Eating to Fuel,
-                Activity.Socializing to Social
+                Activities.Working to Money,
+                Activities.Sleeping to Rest,
+                Activities.Eating to Fuel,
+                Activities.Socializing to Social
         )
 
         val activitiesToEvents = mapOf(
-                Activity.Working to Events.StartedWorking,
-                Activity.Eating to Events.StartedEating,
-                Activity.Sleeping to Events.FellAsleep,
-                Activity.Socializing to Events.StartedSocializing
+                Activities.Working to Events.StartedWorking,
+                Activities.Eating to Events.StartedEating,
+                Activities.Sleeping to Events.FellAsleep,
+                Activities.Socializing to Events.StartedSocializing
         )
 
         val movingStates = setOf(
-                Activity.OnTheMove,
-                Activity.GoingToEat,
-                Activity.GoingToWork,
-                Activity.GoingHomeToSleep,
-                Activity.GoingToMeetAFriend
+                Activities.OnTheMove,
+                Activities.GoingToEat,
+                Activities.GoingToWork,
+                Activities.GoingHomeToSleep,
+                Activities.GoingToMeetAFriend
         )
 
         val lowRange = -24..24

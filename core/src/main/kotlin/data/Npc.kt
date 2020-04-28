@@ -50,13 +50,13 @@ class Npc(val name: String, val id: String, val home: Place, val workPlace: Plac
     }
 
     val onTheMove get() = npcState in Needs.movingStates
-    val meetingAFriend get() = npcState == Activity.GoingToMeetAFriend && friendToGoTo != null
+    val meetingAFriend get() = npcState == Activities.GoingToMeetAFriend && friendToGoTo != null
     var friendToGoTo : Npc? = null
 
     var isDead = false
         private set
 
-    var npcState: String = Activity.Neutral
+    var npcState: String = Activities.Neutral
         private set
 
     val npcStats = NpcStats()
@@ -68,49 +68,49 @@ class Npc(val name: String, val id: String, val home: Place, val workPlace: Plac
         statsMap[Needs.Fun] = 94
     }
 
-    private val npcStateMachine = StateMachine.buildStateMachine(Activity.Neutral, ::myStateHasChanged) {
-        state(Activity.Neutral) {
-            edge(Events.LeftSomewhere, Activity.OnTheMove) {}
-            edge(Events.GoingToMeetAFriend, Activity.GoingToMeetAFriend) {}
-            edge(Events.FellAsleep, Activity.Sleeping) {}
-            edge(Events.StartedEating, Activity.Eating) {}
-            edge(Events.WentToEat, Activity.GoingToEat) {}
-            edge(Events.WentToWork, Activity.GoingToWork) {}
-            edge(Events.WentHomeToSleep, Activity.GoingHomeToSleep) {}
-            edge(Events.StartedHavingFun, Activity.HavingFun) {}
-            edge(Events.StartedSocializing, Activity.Socializing) {}
-            edge(Events.StartedWorking, Activity.Working) {}
+    private val npcStateMachine = StateMachine.buildStateMachine(Activities.Neutral, ::myStateHasChanged) {
+        state(Activities.Neutral) {
+            edge(Events.LeftSomewhere, Activities.OnTheMove) {}
+            edge(Events.GoingToMeetAFriend, Activities.GoingToMeetAFriend) {}
+            edge(Events.FellAsleep, Activities.Sleeping) {}
+            edge(Events.StartedEating, Activities.Eating) {}
+            edge(Events.WentToEat, Activities.GoingToEat) {}
+            edge(Events.WentToWork, Activities.GoingToWork) {}
+            edge(Events.WentHomeToSleep, Activities.GoingHomeToSleep) {}
+            edge(Events.StartedHavingFun, Activities.HavingFun) {}
+            edge(Events.StartedSocializing, Activities.Socializing) {}
+            edge(Events.StartedWorking, Activities.Working) {}
         }
-        state(Activity.OnTheMove) {
-            edge(Events.StoppedDoingIt, Activity.Neutral) {}
+        state(Activities.OnTheMove) {
+            edge(Events.StoppedDoingIt, Activities.Neutral) {}
         }
-        state(Activity.GoingToMeetAFriend) {
-            edge(Events.StoppedDoingIt, Activity.Neutral) {}
+        state(Activities.GoingToMeetAFriend) {
+            edge(Events.StoppedDoingIt, Activities.Neutral) {}
         }
-        state(Activity.HavingFun) {
-            edge(Events.StoppedDoingIt, Activity.Neutral) {}
+        state(Activities.HavingFun) {
+            edge(Events.StoppedDoingIt, Activities.Neutral) {}
         }
-        state(Activity.Working) {
-            edge(Events.StoppedDoingIt, Activity.Neutral) {}
+        state(Activities.Working) {
+            edge(Events.StoppedDoingIt, Activities.Neutral) {}
         }
-        state(Activity.Socializing) {
-            edge(Events.StoppedDoingIt, Activity.Neutral) {}
+        state(Activities.Socializing) {
+            edge(Events.StoppedDoingIt, Activities.Neutral) {}
         }
-        state(Activity.Eating) {
-            edge(Events.StoppedDoingIt, Activity.Neutral) {}
-            edge(Events.LeftSomewhere, Activity.OnTheMove) {}
+        state(Activities.Eating) {
+            edge(Events.StoppedDoingIt, Activities.Neutral) {}
+            edge(Events.LeftSomewhere, Activities.OnTheMove) {}
         }
-        state(Activity.GoingToEat) {
-            edge(Events.StoppedDoingIt, Activity.Neutral) {}
+        state(Activities.GoingToEat) {
+            edge(Events.StoppedDoingIt, Activities.Neutral) {}
         }
-        state(Activity.GoingToWork) {
-            edge(Events.StoppedDoingIt, Activity.Neutral) {}
+        state(Activities.GoingToWork) {
+            edge(Events.StoppedDoingIt, Activities.Neutral) {}
         }
-        state(Activity.GoingHomeToSleep) {
-            edge(Events.StoppedDoingIt, Activity.Neutral) {}
+        state(Activities.GoingHomeToSleep) {
+            edge(Events.StoppedDoingIt, Activities.Neutral) {}
         }
-        state(Activity.Sleeping) {
-            edge(Events.StoppedDoingIt, Activity.Neutral) {}
+        state(Activities.Sleeping) {
+            edge(Events.StoppedDoingIt, Activities.Neutral) {}
         }
     }
 
@@ -142,7 +142,7 @@ class Npc(val name: String, val id: String, val home: Place, val workPlace: Plac
     }
 
     fun stopDoingIt() {
-        if (npcState != Activity.Neutral)
+        if (npcState != Activities.Neutral)
             npcStateMachine.acceptEvent(Events.StoppedDoingIt)
     }
 

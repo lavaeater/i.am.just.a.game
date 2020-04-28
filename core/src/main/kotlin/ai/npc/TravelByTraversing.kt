@@ -2,7 +2,7 @@ package ai.npc
 
 import atPlace
 import com.badlogic.gdx.ai.btree.Task
-import data.Activity
+import data.Activities
 import data.Needs
 import data.Npc
 
@@ -13,7 +13,7 @@ class TravelByTraversing: NpcTask() {
 
     override fun execute(): Status {
 
-        applyCosts(Needs.getCostForActivity(Activity.OnTheMove))
+        applyCosts(Needs.getCostForActivity(Activities.OnTheMove))
 
         /*
         we get here every tick

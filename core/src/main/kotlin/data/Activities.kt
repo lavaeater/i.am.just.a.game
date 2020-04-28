@@ -4,7 +4,7 @@ package data
  * Sort of like what we're doing or something, used to be
  * called states
  */
-class Activity {
+class Activities {
     companion object {
         const val Neutral = "Neutral"
         const val OnTheMove = "OnTheMove"

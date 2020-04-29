@@ -58,15 +58,15 @@ class Npc(val name: String, val id: String, val home: Place, val workPlace: Plac
 
     var npcState: String = Activities.Neutral
         private set
-
-    val npcStats = NpcStats()
-            .apply {
-        statsMap[Needs.Fuel] = 0
-        statsMap[Needs.Rest] = 96
-        statsMap[Needs.Money] = 96
-        statsMap[Needs.Social] = 94
-        statsMap[Needs.Fun] = 94
-    }
+//
+//    val npcStats = NpcStats()
+//            .apply {
+//        statsMap[Needs.Fuel] = 0
+//        statsMap[Needs.Rest] = 96
+//        statsMap[Needs.Money] = 96
+//        statsMap[Needs.Social] = 94
+//        statsMap[Needs.Fun] = 94
+//    }
 
     private val npcStateMachine = StateMachine.buildStateMachine(Activities.Neutral, ::myStateHasChanged) {
         state(Activities.Neutral) {
@@ -125,10 +125,7 @@ class Npc(val name: String, val id: String, val home: Place, val workPlace: Plac
             Symptomatic: $symptomatic
             Stays at home: $iWillStayAtHome
             State: $npcState
-            Current Top Need: $currentNeed 
-            Fuel: ${npcStats.statsMap[Needs.Fuel]}
-            Rest: ${npcStats.statsMap[Needs.Rest]}
-            Money: ${npcStats.statsMap[Needs.Money]}
+            Current Top Need: $currentNeed
         """.trimIndent()
     }
 

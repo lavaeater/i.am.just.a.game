@@ -12,7 +12,7 @@ class SatisfyNeed : NpcTask() {
     override fun execute(): Status {
         return if (stillHasNeed(npc.currentNeed)) {
             val cost = Needs.getCostForNeed(npc.currentNeed)
-            if(npc.npcState != cost.activity)
+            if(npc.currentActivity != cost.activity)
                 npc.acceptEvent(Needs.activitiesToEvents[cost.activity]?: error("Event not found for $cost"))
 
             applyCosts(cost)

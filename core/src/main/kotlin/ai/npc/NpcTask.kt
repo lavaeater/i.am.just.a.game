@@ -3,7 +3,6 @@ package ai.npc
 import com.badlogic.gdx.ai.btree.LeafTask
 import data.*
 import systems.AiAndTimeSystem
-import java.lang.Math.abs
 
 abstract class NpcTask : LeafTask<Npc>() {
 
@@ -56,7 +55,7 @@ abstract class NpcTask : LeafTask<Npc>() {
     }
 
     private fun applyCosts() {
-        val cost = Needs.getCostForActivity(npc.npcState)
+        val cost = Needs.getCostForActivity(npc.currentActivity)
         applyCosts(cost)
     }
 
@@ -64,7 +63,7 @@ abstract class NpcTask : LeafTask<Npc>() {
         val timeFactor = 60 / AiAndTimeSystem.minutesPerTick.toInt()
         for((k, c) in cost.costMap) {
             val actualCost = c / timeFactor
-//            npc.npcStats.statsMap[k] = (npc.npcStats.statsMap[k]!! - actualCost).coerceIn(Needs.fullRange)
+            npc.npcStats.applyCost(k, actualCost)
         }
     }
 }

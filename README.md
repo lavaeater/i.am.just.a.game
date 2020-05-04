@@ -13,7 +13,7 @@ So, is this readme a blog? Or what is it? Is it perhaps shit?
 ## Current Immediate TODO
 * Turn off Corona - done
 * Change City to small one-block city - done
-* Take a look at Eat-Neutral-Eat cycle and NPC state
+* Fix stats handling and take a look at Eat-Neutral-Eat cycle and NPC state - WIP
 * Social Needs and Boredom
 * Money should have no upper limit
 

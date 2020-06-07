@@ -212,15 +212,15 @@ class Mgo {
         fun newCityBuilder() {
             val randomThingie = 0..4
             buildCityCenterBlock()
-//
-//            for (i in 1..100) {
-//                if (randomThingie.random() > 3) {
-//                    //Build some offices
-//                    buildCityCenterBlock()
-//                } else {
-//                    buildResidentialBlock()
-//                }
-//            }
+
+            for (i in 1..40) {
+                if (randomThingie.random() > 3) {
+                    //Build some offices
+                    buildCityCenterBlock()
+                } else {
+                    buildResidentialBlock()
+                }
+            }
 
             val travelHubs = graph.withLabels("TravelHub").toList()
             for ((i, f) in travelHubs.withIndex()) {

@@ -80,7 +80,7 @@ class Mgo {
             val randomThingie = 0..4
             buildCityCenterBlock()
 
-            for (i in 1..100) {
+            for (i in 1..25) {
                 if (randomThingie.random() > 3) {
                     //Build some offices
                     buildCityCenterBlock()

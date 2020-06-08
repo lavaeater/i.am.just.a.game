@@ -17,7 +17,7 @@ import systems.AiAndTimeSystem
 class UserInterface(
     private val batch: Batch,
     debug: Boolean = false,
- private val coronaStuff: Boolean = false): IUserInterface {
+ private val coronaStuff: Boolean = true): IUserInterface {
 
   override val hudViewPort = ExtendViewport(uiWidth, uiHeight, OrthographicCamera())
   override val stage = Stage(hudViewPort, batch)

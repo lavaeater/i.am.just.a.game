@@ -6,6 +6,10 @@ A [LibGDX](http://libgdx.badlogicgames.com/) project generated with [gdx-liftoff
 
 I try to follow this paradigm for working on this project: **P**lan, **W**ork and **E**valuate (or **A**sess), where I plan for five what I will do for the coming say 25 minutes of time, and then after that time is up I smash together an planning / evaluation for the coming 20 minutes.
 
+### 8th of June 2020
+
+So, this readme will serve as a project diary of this project, as well. Why? Well, I need to keep track of *what* I was doing before taking a break from the project. By its very nature, I will work sporadically on this project which means I can easily forget what I was actually doing. All this might end up in different branches and stuff, which is bad. I will  try to edit the README on the master branch. So what am I currently doing - or what was I previously doing before hiatus?
+
 ## Current thoughts
 
 So, is this readme a blog? Or what is it? Is it perhaps shit?

@@ -73,7 +73,7 @@ class Injector {
             return Engine().apply {
                 addSystem(AiAndTimeSystem(interval = timeInterval, minutes = minutesPerTick))
                 //1. Temporarily disable Corona stuff
-                addSystem(InfectionSystem(interval = timeInterval))
+                //addSystem(InfectionSystem(interval = timeInterval))
                 addSystem(NpcControlSystem())
                 addSystem(GameInputSystem(
                         inject(),

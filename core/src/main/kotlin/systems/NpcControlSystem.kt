@@ -30,10 +30,7 @@ class NpcControlSystem : IteratingSystem(allOf(
     private val npcMpr = mapperFor<NpcComponent>()
     private val bodyMpr = mapperFor<Box2dBodyComponent>()
     private var someVector = vec2(0f, 0f)
-
     private lateinit var whereAreWeGoing: Pair<Place, TravelMode>
-
-    private var somekindOfSpeedFactor = 2f * AiAndTimeSystem.secondsPerSecond
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val npc = npcMpr[entity].npc

@@ -68,8 +68,6 @@ class GameInputSystem(
             Input.Keys.D to { camera.position.x += 10f },
             Input.Keys.W to { camera.position.y += 10f },
             Input.Keys.S to { camera.position.y -= 10f },
-            Input.Keys.LEFT to { nextNpc() },
-            Input.Keys.RIGHT to { previousNpc() },
             Input.Keys.C to { clearFollow() },
             Input.Keys.Z to { centerCamera() },
             Input.Keys.R to { resetSim() },
@@ -231,10 +229,8 @@ class GameInputSystem(
     override fun keyUp(keycode: Int): Boolean {
         if (!processInput) return false
         when (keycode) {
-            Input.Keys.A, Input.Keys.LEFT -> x = 0f
-            Input.Keys.D, Input.Keys.RIGHT -> x = 0f
-            Input.Keys.W, Input.Keys.UP -> y = 0f
-            Input.Keys.S, Input.Keys.DOWN -> y = 0f
+            Input.Keys.LEFT -> nextNpc()
+            Input.Keys.RIGHT -> previousNpc()
         }
         return true
     }

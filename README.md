@@ -10,6 +10,12 @@ I try to follow this paradigm for working on this project: **P**lan, **W**ork an
 
 So, this readme will serve as a project diary of this project, as well. Why? Well, I need to keep track of *what* I was doing before taking a break from the project. By its very nature, I will work sporadically on this project which means I can easily forget what I was actually doing. All this might end up in different branches and stuff, which is bad. I will  try to edit the README on the master branch. So what am I currently doing - or what was I previously doing before hiatus?
 
+I was working on stats and needs and such things. Now I want to add variability to the speeds that the characters move at. Variability should be at the core, every character in the world should be unique and behave in it's own little quirky way. Adding variability to the speed should be real easy. Every character should have a speed stat and that stat should influence how fast they move. After checking, it appears that all npc's actually DO have a speed stat, it's just that it doesn't have any effect whatsoever.
+
+Also, I realized I have disabled hunger and everything in the sim. I should redesign it into something completely new and fun, that also, ahem, works. And also, another thing that I want to do, is make an actual game. So perhaps we should start thinking abou that, whaddyasay?
+
+So, stats are updated but NPC actions are eliminated. Now we need a GAME to work on. Lets merge this shit into master and get on with it.
+
 ## Current thoughts
 
 So, is this readme a blog? Or what is it? Is it perhaps shit?

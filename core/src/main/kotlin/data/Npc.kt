@@ -20,7 +20,7 @@ import java.time.LocalDate
  * We're gonna be needin' some friendship up in here.
  */
 class Npc(val name: String, val id: String, val home: Place, val workPlace: Place, val walkingRange: Float = 100f) {
-    val speed = (1f..3f).random()
+    val speed = (1f..10f).random()
     lateinit var currentPath: Pair<Node<ImmutableVector2>, MutableList<Node<ImmutableVector2>>>
     lateinit var behaviorTree: BehaviorTree<Npc>
     var currentNeed: String = Needs.Money
@@ -119,6 +119,8 @@ class Npc(val name: String, val id: String, val home: Place, val workPlace: Plac
             Stays at home: $iWillStayAtHome
             State: $currentActivity
             Current Top Need: $currentNeed
+            Stats: ${npcStats.stats}
+            
         """.trimIndent()
     }
 
